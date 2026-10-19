@@ -5,74 +5,154 @@ Imports eSession = Cocolife.Utility.OCS.Enums.eSession
 Imports Cocolife.Utility.OCS.Common
 Imports System.IO
 
-
-
 Partial Public Class RptReceiptDMCM
     Inherits System.Web.UI.Page
 
+    Private mPdfBytes As Byte()
+    Private mPdfFileName As String
 
+    Protected Sub Page_Load(
+        ByVal sender As Object,
+        ByVal e As System.EventArgs
+    ) Handles Me.Load
 
-    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-        Dim mPara = Split(Session(eSession.ReportParam), "|")
-        Dim mDocNumber As Long = CLng(mPara(0))
-        Dim mHasPrintButton As Boolean = CBool(mPara(1))
-        Dim mSiteCode As Long = mPara(2)
-        Dim mUserId As Long = mPara(3)
-        Dim mFile As String = mPara(5)
-        Dim oReport As New ReportDocument
-
-        Dim strFileName As String = String.Concat(mSiteCode, "_", mDocNumber, "_ReceiptDMCM.pdf")
-        Dim strReportFileName As String = String.Concat("~\reports\ReceiptDMCM", mFile, ".rpt")
-
-        If Not File.Exists(Server.MapPath(strReportFileName)) Then
-            strReportFileName = "~\reports\ReceiptDMCM.rpt"
+        If Session(eSession.ReportParam) Is Nothing Then
+            Throw New InvalidOperationException(
+                "Report parameters are missing. Please reopen the DMCM report."
+            )
         End If
 
+        Dim mPara As String() =
+            Session(eSession.ReportParam).ToString().Split("|"c)
+
+        If mPara.Length < 6 Then
+            Throw New InvalidOperationException(
+                "DMCM report parameters are incomplete."
+            )
+        End If
+
+        Dim mDocNumber As Long = CLng(mPara(0))
+        Dim mSiteCode As Long = CLng(mPara(2))
+        Dim mUserId As Long = CLng(mPara(3))
+        Dim mFile As String = mPara(5)
+
+        mPdfFileName =
+            String.Concat(mSiteCode, "_", mDocNumber, "_ReceiptDMCM.pdf")
+
+        Dim strReportFileName As String =
+            String.Concat("~/reports/ReceiptDMCM", mFile, ".rpt")
+
+        If Not File.Exists(Server.MapPath(strReportFileName)) Then
+            strReportFileName = "~/reports/ReceiptDMCM.rpt"
+        End If
+
+        If Not File.Exists(Server.MapPath(strReportFileName)) Then
+            Throw New FileNotFoundException(
+                "The DMCM Crystal Report template was not found."
+            )
+        End If
+
+        'This page owns and disposes this report instance.
+        Dim oReport As New ReportDocument()
+
         Try
-            oReport = uReportFactory.GetReport(oReport.GetType)
-            CRSource.Report.FileName = strReportFileName
-            oReport.Load(Server.MapPath(strReportFileName), OpenReportMethod.OpenReportByTempCopy)
+            oReport.Load(
+                Server.MapPath(strReportFileName),
+                OpenReportMethod.OpenReportByTempCopy
+            )
 
             oReport.SetParameterValue("pSiteCode", mSiteCode)
             oReport.SetParameterValue("pDocNumber", mDocNumber)
             oReport.SetParameterValue("pUserId", mUserId)
-            CRViewer.HasPrintButton = mHasPrintButton
-            'btnPrint.Visible = False 'mHasPrintButton
 
-            Call uReportFactory.CRLogOnInfo(oReport, cCrystalConn.CRServerName, String.Empty, cCrystalConn.CRUserID, cCrystalConn.CRPassword)
-            CRViewer.ReportSource = oReport
+            'Use your existing working database login method.
+            uReportFactory.CRLogOnInfo(
+                oReport,
+                cCrystalConn.CRServerName,
+                String.Empty,
+                cCrystalConn.CRUserID,
+                cCrystalConn.CRPassword
+            )
 
-            'If mHasPrintButton Then
-            'CRViewer.DataBind()
+            'STEP 1: Export the report as PDF.
+            Using pdfStream As Stream =
+                oReport.ExportToStream(ExportFormatType.PortableDocFormat)
 
-            Call uReportFactory.ExportCRTo(oReport, ExportFormatType.PortableDocFormat, strFileName, "inline")
-            'End If
-        Catch ex As Exception
-          
-            oReport.Database.Dispose()
-            oReport.Close()
-            oReport.Dispose()
-            oReport = Nothing
-        Finally
-            'If mHasPrintButton Then
-            If oReport IsNot Nothing Then
-                If oReport.IsLoaded Then
-                    oReport.Database.Dispose()
-                    oReport.Close()
-                    oReport.Dispose()
-                    oReport = Nothing
+                If pdfStream Is Nothing Then
+                    Throw New InvalidOperationException(
+                        "Crystal Reports did not return a PDF stream."
+                    )
                 End If
+
+                If pdfStream.CanSeek Then
+                    pdfStream.Position = 0
+                End If
+
+                'STEP 2: Convert the PDF stream to Byte().
+                Using memoryStream As New MemoryStream()
+                    pdfStream.CopyTo(memoryStream)
+                    mPdfBytes = memoryStream.ToArray()
+                End Using
+            End Using
+
+            If mPdfBytes.Length = 0 Then
+                Throw New InvalidOperationException(
+                    "The generated PDF is empty."
+                )
             End If
-            'End If
+
+            'View this in Visual Studio: View > Output > Debug.
+            System.Diagnostics.Debug.WriteLine(
+                "DMCM PDF filename: " & mPdfFileName
+            )
+
+            System.Diagnostics.Debug.WriteLine(
+                "DMCM PDF byte count: " & mPdfBytes.Length.ToString()
+            )
+
+            'DATABASE SAVE WILL GO HERE LATER.
+            'Pass mPdfBytes to a BLOB / VARBINARY database parameter.
+            'Example:
+            'SaveDMCMReceipt(mDocNumber, mPdfFileName, mPdfBytes)
+
+        Finally
+            Try
+                oReport.Close()
+            Finally
+                oReport.Dispose()
+            End Try
         End Try
+
     End Sub
 
-    Private Sub CRViewer_Unload(sender As Object, e As EventArgs) Handles CRViewer.Unload
-        CRViewer.ReportSource = Nothing
-        CRViewer.Dispose()
-        CRViewer = Nothing
-        GC.Collect()
-        GC.WaitForPendingFinalizers()
-        GC.Collect()
+    Protected Overrides Sub Render(
+        ByVal writer As System.Web.UI.HtmlTextWriter
+    )
+
+        If mPdfBytes Is Nothing OrElse mPdfBytes.Length = 0 Then
+            MyBase.Render(writer)
+            Return
+        End If
+
+        'STEP 3: Display the PDF using the converted bytes.
+        Response.Clear()
+        Response.Buffer = True
+        Response.ContentType = "application/pdf"
+
+        Response.Cache.SetCacheability(
+            System.Web.HttpCacheability.NoCache
+        )
+        Response.Cache.SetNoStore()
+
+        Response.AddHeader(
+            "Content-Disposition",
+            "inline; filename=""" & mPdfFileName & """"
+        )
+
+        Response.BinaryWrite(mPdfBytes)
+
+        'Do not call MyBase.Render here:
+        'the response must contain PDF bytes only, without page HTML.
     End Sub
+
 End Class

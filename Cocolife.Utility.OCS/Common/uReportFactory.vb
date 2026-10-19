@@ -190,6 +190,77 @@ Namespace Common
             End Try
 
         End Sub
+        Public Shared Function GenerateDMCMReceiptPDF(
+    ByVal pReportPath As String,
+    ByVal pSiteCode As Long,
+    ByVal pDocNumber As Long,
+    ByVal pUserId As Long
+) As Byte()
+
+            If Not File.Exists(pReportPath) Then
+                Throw New FileNotFoundException(
+                    "The DMCM report template was not found.",
+                    pReportPath
+                )
+            End If
+
+            Dim report As New ReportDocument()
+
+            Try
+                report.Load(
+                    pReportPath,
+                    OpenReportMethod.OpenReportByTempCopy
+                )
+
+                report.SetParameterValue("pSiteCode", pSiteCode)
+                report.SetParameterValue("pDocNumber", pDocNumber)
+                report.SetParameterValue("pUserId", pUserId)
+
+                CRLogOnInfo(
+                    report,
+                    Cocolife.Utility.OCS.Classes.cCrystalConn.CRServerName,
+                    String.Empty,
+                    Cocolife.Utility.OCS.Classes.cCrystalConn.CRUserID,
+                    Cocolife.Utility.OCS.Classes.cCrystalConn.CRPassword
+                )
+
+                Using pdfStream As Stream =
+                    report.ExportToStream(ExportFormatType.PortableDocFormat)
+
+                    If pdfStream Is Nothing Then
+                        Throw New InvalidOperationException(
+                            "Crystal Reports did not return a PDF stream."
+                        )
+                    End If
+
+                    If pdfStream.CanSeek Then
+                        pdfStream.Position = 0
+                    End If
+
+                    Using memoryStream As New MemoryStream()
+                        pdfStream.CopyTo(memoryStream)
+
+                        Dim pdfBytes As Byte() = memoryStream.ToArray()
+
+                        If pdfBytes.Length = 0 Then
+                            Throw New InvalidOperationException(
+                                "The generated PDF is empty."
+                            )
+                        End If
+
+                        Return pdfBytes
+                    End Using
+                End Using
+
+            Finally
+                Try
+                    report.Close()
+                Finally
+                    report.Dispose()
+                End Try
+            End Try
+
+        End Function
 
 #End Region
 

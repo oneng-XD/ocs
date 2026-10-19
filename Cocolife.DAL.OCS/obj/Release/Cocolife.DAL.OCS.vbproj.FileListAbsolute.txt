@@ -95,27 +95,3 @@ C:\Users\jdoafallas\Documents\ocs\Cocolife.DAL.OCS\obj\Release\dalOCS.pdb
 C:\Users\jdoafallas\Documents\ocs\Cocolife.DAL.OCS\bin\Release\bllCommon.dll
 C:\Users\jdoafallas\Documents\ocs\Cocolife.DAL.OCS\bin\Release\dalCommon.dll
 C:\Users\jdoafallas\Documents\ocs\Cocolife.DAL.OCS\bin\Release\utiCommon.dll
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\bin\Release\dalOCS.dll
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\bin\Release\dalOCS.pdb
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\bin\Release\dalOCS.xml
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\bin\Release\utiOCS.dll
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\bin\Release\utiOCS.pdb
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\bin\Release\utiOCS.xml
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\obj\Release\Cocolife.DAL.OCS.vbprojResolveAssemblyReference.cache
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\obj\Release\Cocolife.DAL.OCS.Resources.resources
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\obj\Release\Cocolife.DAL.OCS.vbproj.GenerateResource.Cache
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\obj\Release\dalOCS.dll
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\obj\Release\dalOCS.xml
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment\ocs\Cocolife.DAL.OCS\obj\Release\dalOCS.pdb
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\bin\Release\dalOCS.dll
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\bin\Release\dalOCS.pdb
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\bin\Release\dalOCS.xml
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\bin\Release\utiOCS.dll
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\bin\Release\utiOCS.pdb
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\bin\Release\utiOCS.xml
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\obj\Release\Cocolife.DAL.OCS.vbprojResolveAssemblyReference.cache
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\obj\Release\Cocolife.DAL.OCS.Resources.resources
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\obj\Release\Cocolife.DAL.OCS.vbproj.GenerateResource.Cache
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\obj\Release\dalOCS.dll
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\obj\Release\dalOCS.xml
-C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\obj\Release\dalOCS.pdb

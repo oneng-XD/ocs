@@ -219,7 +219,7 @@ Namespace Payment
 
 
         End Sub
-        Public Sub PrintPaymentDebitCreditMemo() Implements IPaymentDebitCreditMemo.PrintPaymentDebitCreditMemo
+        Public Sub PrintPaymentDebitCreditMemo(ByVal pPdfBytes As Byte()) Implements IPaymentDebitCreditMemo.PrintPaymentDebitCreditMemo
             Dim strItem As String = String.Empty
             'Dim objARPayDetails As New bllStaging.BAckReceipt
             Dim objDal As New dalReference.DSiteDetails

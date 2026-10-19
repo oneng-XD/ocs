@@ -22,6 +22,7 @@ Imports bllWorking = Cocolife.BLL.OCS.Working
 Imports bllPayment = Cocolife.BLL.OCS.Payment
 Imports bllStaging = Cocolife.BLL.OCS.Staging
 Imports preSearch = Cocolife.Presenter.OCS.Search
+Imports Cocolife.Utility.OCS.Common
 Imports eReference = Cocolife.Utility.OCS.Enums.eReference
 Imports eReport = Cocolife.Utility.OCS.Enums.eReport
 Imports Cocolife.Utility.OCS.Classes
@@ -832,7 +833,25 @@ Namespace Payment
                                 .SendPaymentDebitCreditMemo()
                             Case eReference.DocSaveState.Print
                                 .IsSuccessful = True
-                                .PrintPaymentDebitCreditMemo()
+                                Dim reportPath As String =
+                                  Global.System.Web.HttpContext.Current.Server.MapPath(
+                                      "~/reports/ReceiptDMCM.rpt"
+                                  )
+
+
+                                Dim pdfBytes As Byte() =
+                                    uReportFactory.GenerateDMCMReceiptPDF(
+                                        reportPath,
+                                        vwPaymentDebitCreditMemo.SiteCode,
+                                        vwPaymentDebitCreditMemo.DMCMNumber,
+                                        vwPaymentDebitCreditMemo.UserID
+                                    )
+
+                                System.Diagnostics.Debug.WriteLine(
+                                    "PDF bytes to send: " & pdfBytes.Length.ToString()
+                                )
+
+                                .PrintPaymentDebitCreditMemo(pdfBytes)
 
                             Case eReference.DocSaveState.Cancel
                                 .IsSuccessful = True

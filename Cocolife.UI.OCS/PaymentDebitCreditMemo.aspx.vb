@@ -283,11 +283,11 @@ Partial Public Class PaymentDebitCreditMemo
                         btnDMCMPrint.Enabled = True
                     End If
 
-                    'If DMCMDate = Now.Date AndAlso Status = "PRINTED" Then
-                    '    btnDMCMCancel.Enabled = True
-                    'Else
-                    '    btnDMCMCancel.Enabled = False
-                    'End If
+                    If DMCMDate = Now.Date AndAlso Status = "PRINTED" Then
+                        btnDMCMCancel.Enabled = True
+                    Else
+                        btnDMCMCancel.Enabled = False
+                    End If
 
                     ManageDetails("EDITABLE", False)
                     ManageDetails("SEARCHREFNO", False)
@@ -1587,10 +1587,6 @@ Partial Public Class PaymentDebitCreditMemo
     End Sub
 
     Protected Sub txtBillStatNo_TextChanged(sender As Object, e As EventArgs) Handles txtBillStatNo.TextChanged
-
-    End Sub
-
-    Protected Sub gvwViewDMCM_SelectedIndexChanged(sender As Object, e As EventArgs) Handles gvwViewDMCM.SelectedIndexChanged
 
     End Sub
 End Class

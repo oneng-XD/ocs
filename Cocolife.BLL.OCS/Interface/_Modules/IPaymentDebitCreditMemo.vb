@@ -31,8 +31,9 @@ Namespace Payment
 #Region "Transactions"
         Sub ProcessPaymentDebitCreditMemo()
         Sub SendPaymentDebitCreditMemo()
-        Sub PrintPaymentDebitCreditMemo()
+        'Sub PrintPaymentDebitCreditMemo()
         'Sub PrintPaymentAckReceipt()
+        Sub PrintPaymentDebitCreditMemo(ByVal pPdfBytes As Byte())
         Sub CancelPaymentDebitCreditMemo()
 #End Region
 
