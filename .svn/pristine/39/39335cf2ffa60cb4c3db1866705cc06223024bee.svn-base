@@ -1,0 +1,100 @@
+<publishData>
+  <publishTarget publishUrl="C:\PROJECTS\ORBIT\_Publish\OCS_ASP35\">
+    <file relUrl="Cocolife.UI.OCS.vbproj" publishTime="11/26/2014 09:21:37" />
+    <file relUrl="bin/preCommon.dll" publishTime="11/04/2014 10:56:08" />
+    <file relUrl="Images/accGreenOn.png" publishTime="11/10/2014 09:44:16" />
+    <file relUrl="Images/PSD/three_2a.psd" publishTime="11/03/2014 14:48:03" />
+    <file relUrl="bin/bllCommon.pdb" publishTime="11/04/2014 10:56:08" />
+    <file relUrl="bin/DocumentFormat.OpenXml.dll" publishTime="01/21/2014 13:27:21" />
+    <file relUrl="Home.aspx" publishTime="11/18/2014 11:43:44" />
+    <file relUrl="bin/OCS.UI.xml" publishTime="11/26/2014 09:21:59" />
+    <file relUrl="bin/Microsoft.Office.Interop.Excel.dll" publishTime="04/26/2007 15:30:14" />
+    <file relUrl="Images/PSD/ContentHeader.psd" publishTime="11/10/2014 18:43:26" />
+    <file relUrl="Images/menu/arrow.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="bin/OCS.Utility.dll" publishTime="11/19/2014 11:16:28" />
+    <file relUrl="bin/Microsoft.Office.Interop.Excel.xml" publishTime="04/19/2005 14:48:30" />
+    <file relUrl="bin/OCS.BLL.dll" publishTime="11/26/2014 09:21:58" />
+    <file relUrl="Images/accGrayOn.png" publishTime="11/10/2014 09:44:56" />
+    <file relUrl="Images/accGreenOff.png" publishTime="11/10/2014 09:44:08" />
+    <file relUrl="bin/OCS.BLL.pdb" publishTime="11/26/2014 09:21:58" />
+    <file relUrl="PaymentNonPremiumRelated.aspx" publishTime="11/17/2014 11:23:10" />
+    <file relUrl="Web.config" publishTime="11/04/2014 09:47:40" />
+    <file relUrl="bin/dalCommon.dll" publishTime="11/04/2014 10:56:02" />
+    <file relUrl="Images/menu/Copy of three_2a.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="Images/PSD/arrow_over.psd" publishTime="11/03/2014 14:48:03" />
+    <file relUrl="PaymentPremiumRelated.aspx" publishTime="11/25/2014 16:58:01" />
+    <file relUrl="bin/dalCommon.pdb" publishTime="11/04/2014 10:56:02" />
+    <file relUrl="bin/OCS.BLL.xml" publishTime="11/26/2014 09:21:58" />
+    <file relUrl="Images/PSD/body.psd" publishTime="11/10/2014 09:18:48" />
+    <file relUrl="bin/OCS.Utility.pdb" publishTime="11/19/2014 11:16:28" />
+    <file relUrl="Images/menu/Copy of three_0a.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="Images/body.jpg" publishTime="11/03/2014 14:47:17" />
+    <file relUrl="bin/preCommon.pdb" publishTime="11/04/2014 10:56:08" />
+    <file relUrl="Images/PSD/FooterMain.psd" publishTime="11/07/2014 10:09:51" />
+    <file relUrl="Images/icons/info.png" publishTime="11/03/2014 14:47:36" />
+    <file relUrl="Images/chHome.png" publishTime="11/10/2014 18:43:07" />
+    <file relUrl="Images/menu/three_0a.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="bin/bllCommon.dll" publishTime="11/04/2014 10:56:08" />
+    <file relUrl="Images/accBlueOff.png" publishTime="11/10/2014 09:43:48" />
+    <file relUrl="Images/PSD/three_2.psd" publishTime="11/03/2014 14:48:03" />
+    <file relUrl="Images/icons/critical.png" publishTime="11/03/2014 14:47:36" />
+    <file relUrl="Images/Login.png" publishTime="11/07/2014 10:43:31" />
+    <file relUrl="Login.aspx" publishTime="11/18/2014 11:29:56" />
+    <file relUrl="Images/icons/warning.png" publishTime="11/03/2014 14:47:36" />
+    <file relUrl="Images/PSD/ContentFooter.psd" publishTime="11/10/2014 17:42:19" />
+    <file relUrl="bin/office.xml" publishTime="04/19/2005 14:42:28" />
+    <file relUrl="Images/chPaymentPremiumRelated.png" publishTime="11/10/2014 18:43:21" />
+    <file relUrl="Images/icons/question.png" publishTime="11/03/2014 14:47:36" />
+    <file relUrl="Images/BodyMain.png" publishTime="11/03/2014 14:47:17" />
+    <file relUrl="bin/bllCommon.xml" publishTime="11/04/2014 10:56:08" />
+    <file relUrl="Images/menu/arrow_over.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="Images/FooterMain.png" publishTime="11/07/2014 10:09:54" />
+    <file relUrl="CSS/MenuStyle.css" publishTime="11/10/2014 14:40:53" />
+    <file relUrl="bin/utiCommon.xml" publishTime="11/04/2014 10:56:02" />
+    <file relUrl="Images/cfSeparator.png" publishTime="11/10/2014 17:42:18" />
+    <file relUrl="bin/utiCommon.pdb" publishTime="11/04/2014 10:56:02" />
+    <file relUrl="Images/PSD/three_0a.psd" publishTime="11/03/2014 14:48:03" />
+    <file relUrl="Images/accBlueOn.png" publishTime="11/10/2014 09:43:56" />
+    <file relUrl="Images/menu/Copy of three_0.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="Images/loading.gif" publishTime="11/03/2014 14:47:17" />
+    <file relUrl="Images/PSD/BodyMain.psd" publishTime="11/03/2014 14:48:03" />
+    <file relUrl="bin/OCS.Presenter.xml" publishTime="11/26/2014 09:21:58" />
+    <file relUrl="Images/accOrangeOff.png" publishTime="11/10/2014 09:44:27" />
+    <file relUrl="Images/accOrangeOn.png" publishTime="11/10/2014 09:44:36" />
+    <file relUrl="Images/menu/three_2a.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="CSS/OCSStyle.css" publishTime="11/25/2014 16:58:07" />
+    <file relUrl="Images/menu/Copy of three_2.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="Images/menu/three_1a.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="bin/office.dll" publishTime="04/26/2007 15:30:18" />
+    <file relUrl="Images/PSD/accordion.psd" publishTime="11/10/2014 09:44:57" />
+    <file relUrl="Images/CocoIcon.ico" publishTime="11/03/2014 14:47:17" />
+    <file relUrl="Images/PSD/Login.psd" publishTime="11/07/2014 10:43:29" />
+    <file relUrl="bin/Microsoft.Vbe.Interop.dll" publishTime="04/26/2007 15:30:18" />
+    <file relUrl="bin/OCS.Utility.xml" publishTime="11/19/2014 11:16:28" />
+    <file relUrl="bin/utiCommon.dll" publishTime="11/04/2014 10:56:02" />
+    <file relUrl="Images/chPaymentNonPremiumRelated.png" publishTime="11/10/2014 18:43:31" />
+    <file relUrl="Images/accGrayOff.png" publishTime="11/10/2014 09:44:46" />
+    <file relUrl="OCS.Master" publishTime="11/26/2014 09:00:38" />
+    <file relUrl="Images/menu/Copy of three_1.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="Images/HeaderMain.png" publishTime="11/03/2014 14:47:17" />
+    <file relUrl="Images/menu/three_2.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="Images/menu/three_1.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="bin/OCS.UI.pdb" publishTime="11/26/2014 09:21:59" />
+    <file relUrl="Cocolife.UI.OCS.vbproj.user" publishTime="11/26/2014 09:21:37" />
+    <file relUrl="Images/PSD/three_0.psd" publishTime="11/03/2014 14:48:03" />
+    <file relUrl="CSS/AJAXStyle.css" publishTime="11/17/2014 14:42:56" />
+    <file relUrl="bin/AjaxControlToolkit.dll" publishTime="04/01/2011 17:09:12" />
+    <file relUrl="bin/OCS.Presenter.dll" publishTime="11/26/2014 09:21:58" />
+    <file relUrl="Images/PSD/three_1.psd" publishTime="11/03/2014 14:48:03" />
+    <file relUrl="bin/preCommon.xml" publishTime="11/04/2014 10:56:08" />
+    <file relUrl="Images/PSD/HeaderMain.psd" publishTime="11/07/2014 10:46:48" />
+    <file relUrl="JS/CommonScripts.js" publishTime="11/03/2014 14:51:52" />
+    <file relUrl="bin/dalCommon.xml" publishTime="11/04/2014 10:56:02" />
+    <file relUrl="bin/OCS.UI.dll" publishTime="11/26/2014 09:21:59" />
+    <file relUrl="bin/OCS.Presenter.pdb" publishTime="11/26/2014 09:21:58" />
+    <file relUrl="Images/PSD/three_1a.psd" publishTime="11/03/2014 14:48:03" />
+    <file relUrl="Images/menu/three_0.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="Images/menu/Copy of three_1a.gif" publishTime="11/03/2014 14:47:49" />
+    <file relUrl="Images/icons/search.gif" publishTime="11/03/2014 14:47:36" />
+  </publishTarget>
+</publishData>

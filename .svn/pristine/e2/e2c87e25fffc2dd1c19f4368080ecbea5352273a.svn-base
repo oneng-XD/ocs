@@ -1,0 +1,669 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{AD8A8AA8-E0DF-4847-9E33-573BE571E9EB}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Cocolife.UI.OCS</RootNamespace>
+    <AssemblyName>OCS.UI</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionStrict>Off</OptionStrict>
+    <OptionInfer>On</OptionInfer>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UseIISExpress>false</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>OCS.UI.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>OCS.UI.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AjaxControlToolkit, Version=3.5.50401.0, Culture=neutral, PublicKeyToken=28f01b0e84b6d53e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ASP.NET\AjaxControlToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="bllCommon, Version=5.4.0.302, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bllCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.CrystalReports.Design, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CrystalDecisions.Data.AdoDotNetInterop, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.ReportSource, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CrystalDecisions.Shared, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CrystalDecisions.VSDesigner, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.Web, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Common\SAP BusinessObjects Enterprise XI 4.0\win32_x86\dotnet\CrystalDecisions.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CrystalDecisions.Windows.Forms, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="dalCommon, Version=4.1.59.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\dalCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.0.5022.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="FlashControlV71, Version=1.0.3187.32366, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\Microsoft.Office.Interop.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Vbe.Interop, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\Microsoft.Vbe.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\office.dll</HintPath>
+    </Reference>
+    <Reference Include="preCommon, Version=4.1.59.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\preCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.Mobile" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="utiCommon, Version=6.1.209.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\utiCommon.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Collections.Specialized" />
+    <Import Include="System.Configuration" />
+    <Import Include="System.Text" />
+    <Import Include="System.Text.RegularExpressions" />
+    <Import Include="System.Web" />
+    <Import Include="System.Web.Caching" />
+    <Import Include="System.Web.SessionState" />
+    <Import Include="System.Web.Security" />
+    <Import Include="System.Web.Profile" />
+    <Import Include="System.Web.UI" />
+    <Import Include="System.Web.UI.WebControls" />
+    <Import Include="System.Web.UI.WebControls.WebParts" />
+    <Import Include="System.Web.UI.HtmlControls" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ChangePassword.aspx" />
+    <Content Include="Images\chPaymentDebitCreditMemo.png" />
+    <Content Include="Images\chPaymentDMCMApproval.png" />
+    <Content Include="PaymentAckReceipt.aspx" />
+    <Content Include="Images\chPaymentAckReceipt.png" />
+    <Content Include="Images\chPaymentSalesInvoice.png" />
+    <Content Include="Images\mhViewDocs.png" />
+    <Content Include="PaymentDebitCreditMemo.aspx" />
+    <Content Include="PaymentDMCMApproval.aspx" />
+    <Content Include="PaymentSalesInvoice.aspx" />
+    <Content Include="Images\chPaymentCheckTagging.png" />
+    <Content Include="Images\mhToDos.jpg" />
+    <Content Include="MaintSiteMerchantID.aspx" />
+    <Content Include="Images\chMaintenanceAgentsORSeries.png" />
+    <Content Include="Images\chMaintenanceChangePassword.png" />
+    <Content Include="Images\chMaintenanceOPRSeries.png" />
+    <Content Include="Images\chPaymentBatchPremiumRelated.png" />
+    <Content Include="Images\chReportsDailyCollectionReport.png" />
+    <Content Include="MaintAgentsORSeries.aspx" />
+    <Content Include="MaintOfficialReceipt.aspx" />
+    <Content Include="PaymentBatchPremiumRelated.aspx" />
+    <Content Include="Images\icons\accept.png" />
+    <Content Include="Images\icons\print.png" />
+    <Content Include="DailyCollectionReport.aspx" />
+    <Content Include="JS\jquery-3.2.1.min.js" />
+    <Content Include="JS\Placeholders.js" />
+    <Content Include="PaymentCheckTagging.aspx" />
+    <Content Include="Reports\ReceiptDMCM.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>ReceiptDMCM.vb</LastGenOutput>
+    </Content>
+    <Content Include="RptORReceipt.aspx" />
+    <Content Include="RptReceiptAppno.aspx" />
+    <Content Include="RptReceiptBatch.aspx" />
+    <Content Include="RptReceiptDMCM.aspx" />
+    <Content Include="RptReceiptDMCMPreview.aspx" />
+    <Content Include="RptSummaryNonPrem.aspx" />
+    <Content Include="RptSummaryPrem.aspx" />
+    <Content Include="RptDetailNonPrem.aspx" />
+    <Content Include="RptDetailPrem.aspx" />
+    <Content Include="CSS\AJAXStyle.css" />
+    <Content Include="CSS\MenuStyle.css" />
+    <Content Include="CSS\OCSStyle.css" />
+    <Content Include="Images\body.jpg" />
+    <Content Include="Images\BodyMain.png" />
+    <Content Include="Images\CocoIcon.ico" />
+    <Content Include="Images\FooterMain.png" />
+    <Content Include="Images\HeaderMain.png" />
+    <Content Include="Images\icons\add.png" />
+    <Content Include="Images\icons\add_person.png" />
+    <Content Include="Images\icons\calculator.png" />
+    <Content Include="Images\icons\CocoIcon.ico" />
+    <Content Include="Images\icons\copy.png" />
+    <Content Include="Images\icons\critical.png" />
+    <Content Include="Images\icons\delete.png" />
+    <Content Include="Images\icons\delete_person.png" />
+    <Content Include="Images\icons\eraser.png" />
+    <Content Include="Images\icons\info.png" />
+    <Content Include="Images\icons\information.png" />
+    <Content Include="Images\icons\list.png" />
+    <Content Include="Images\icons\question.png" />
+    <Content Include="Images\icons\refresh.png" />
+    <Content Include="Images\icons\search.gif" />
+    <Content Include="Images\icons\view.png" />
+    <Content Include="Images\icons\warning.png" />
+    <Content Include="Images\loading.gif" />
+    <Content Include="Images\Login.png" />
+    <Content Include="Images\menu\arrow.gif" />
+    <Content Include="Images\menu\arrow_over.gif" />
+    <Content Include="Images\menu\Copy of three_0.gif" />
+    <Content Include="Images\menu\Copy of three_0a.gif" />
+    <Content Include="Images\menu\Copy of three_1.gif" />
+    <Content Include="Images\menu\Copy of three_1a.gif" />
+    <Content Include="Images\menu\Copy of three_2.gif" />
+    <Content Include="Images\menu\Copy of three_2a.gif" />
+    <Content Include="Images\menu\three_0.gif" />
+    <Content Include="Images\menu\three_0a.gif" />
+    <Content Include="Images\menu\three_1.gif" />
+    <Content Include="Images\menu\three_1a.gif" />
+    <Content Include="Images\menu\three_2.gif" />
+    <Content Include="Images\menu\three_2a.gif" />
+    <Content Include="Images\mfSeparator.png" />
+    <Content Include="Images\mhSearchAgent.png" />
+    <Content Include="Images\mhSearchInsured.png" />
+    <Content Include="Images\mhSearchPayor.png" />
+    <Content Include="Images\mhSearchPolicy.png" />
+    <Content Include="Images\mhSearchPromoOff.png" />
+    <Content Include="Images\mhSearchSalesOff.png" />
+    <Content Include="Images\mhViewOPRs.png" />
+    <Content Include="JS\CommonScripts.js" />
+    <Content Include="RptReceipt.aspx" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ChangePassword.aspx.designer.vb">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ChangePassword.aspx.vb">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PaymentAckReceipt.aspx.designer.vb">
+      <DependentUpon>PaymentAckReceipt.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PaymentAckReceipt.aspx.vb">
+      <DependentUpon>PaymentAckReceipt.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PaymentDebitCreditMemo.aspx.designer.vb">
+      <DependentUpon>PaymentDebitCreditMemo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PaymentDebitCreditMemo.aspx.vb">
+      <DependentUpon>PaymentDebitCreditMemo.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="PaymentDMCMApproval.aspx.designer.vb">
+      <DependentUpon>PaymentDMCMApproval.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PaymentDMCMApproval.aspx.vb">
+      <DependentUpon>PaymentDMCMApproval.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="PaymentSalesInvoice.aspx.designer.vb">
+      <DependentUpon>PaymentSalesInvoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PaymentSalesInvoice.aspx.vb">
+      <DependentUpon>PaymentSalesInvoice.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="MaintSiteMerchantID.aspx.designer.vb">
+      <DependentUpon>MaintSiteMerchantID.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="MaintSiteMerchantID.aspx.vb">
+      <DependentUpon>MaintSiteMerchantID.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="MaintAgentsORSeries.aspx.designer.vb">
+      <DependentUpon>MaintAgentsORSeries.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="MaintAgentsORSeries.aspx.vb">
+      <DependentUpon>MaintAgentsORSeries.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="MaintOfficialReceipt.aspx.designer.vb">
+      <DependentUpon>MaintOfficialReceipt.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="MaintOfficialReceipt.aspx.vb">
+      <DependentUpon>MaintOfficialReceipt.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="PaymentBatchPremiumRelated.aspx.designer.vb">
+      <DependentUpon>PaymentBatchPremiumRelated.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PaymentBatchPremiumRelated.aspx.vb">
+      <DependentUpon>PaymentBatchPremiumRelated.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="DailyCollectionReport.aspx.designer.vb">
+      <DependentUpon>DailyCollectionReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DailyCollectionReport.aspx.vb">
+      <DependentUpon>DailyCollectionReport.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="PaymentCheckTagging.aspx.designer.vb">
+      <DependentUpon>PaymentCheckTagging.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PaymentCheckTagging.aspx.vb">
+      <DependentUpon>PaymentCheckTagging.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Reports\ReceiptDMCM.vb">
+      <DependentUpon>ReceiptDMCM.rpt</DependentUpon>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="Reports\ReceiptDMCMPreview.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReceiptDMCMPreview.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\SummaryPremium.vb">
+      <DependentUpon>SummaryPremium.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Reports\Receipt.vb">
+      <DependentUpon>Receipt.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Reports\ReceiptBatch.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReceiptBatch.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ReceiptOR.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReceiptOR.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RptORReceipt.aspx.designer.vb">
+      <DependentUpon>RptORReceipt.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptORReceipt.aspx.vb">
+      <DependentUpon>RptORReceipt.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="RptReceiptAppno.aspx.designer.vb">
+      <DependentUpon>RptReceiptAppno.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptReceiptAppno.aspx.vb">
+      <DependentUpon>RptReceiptAppno.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RptReceiptBatch.aspx.designer.vb">
+      <DependentUpon>RptReceiptBatch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptReceiptBatch.aspx.vb">
+      <DependentUpon>RptReceiptBatch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RptReceiptDMCM.aspx.designer.vb">
+      <DependentUpon>RptReceiptDMCM.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptReceiptDMCM.aspx.vb">
+      <DependentUpon>RptReceiptDMCM.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="RptReceiptDMCMPreview.aspx.designer.vb">
+      <DependentUpon>RptReceiptDMCMPreview.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptReceiptDMCMPreview.aspx.vb">
+      <DependentUpon>RptReceiptDMCMPreview.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="RptSummaryNonPrem.aspx.designer.vb">
+      <DependentUpon>RptSummaryNonPrem.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptSummaryNonPrem.aspx.vb">
+      <DependentUpon>RptSummaryNonPrem.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RptSummaryPrem.aspx.designer.vb">
+      <DependentUpon>RptSummaryPrem.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptSummaryPrem.aspx.vb">
+      <DependentUpon>RptSummaryPrem.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RptDetailNonPrem.aspx.designer.vb">
+      <DependentUpon>RptDetailNonPrem.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptDetailNonPrem.aspx.vb">
+      <DependentUpon>RptDetailNonPrem.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RptDetailPrem.aspx.designer.vb">
+      <DependentUpon>RptDetailPrem.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptDetailPrem.aspx.vb">
+      <DependentUpon>RptDetailPrem.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Home.aspx.designer.vb">
+      <DependentUpon>Home.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Home.aspx.vb">
+      <DependentUpon>Home.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Login.aspx.designer.vb">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Login.aspx.vb">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="OCS.Master.designer.vb">
+      <DependentUpon>OCS.Master</DependentUpon>
+    </Compile>
+    <Compile Include="OCS.Master.vb">
+      <DependentUpon>OCS.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PaymentNonPremiumRelated.aspx.designer.vb">
+      <DependentUpon>PaymentNonPremiumRelated.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PaymentNonPremiumRelated.aspx.vb">
+      <DependentUpon>PaymentNonPremiumRelated.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="PaymentPremiumRelated.aspx.designer.vb">
+      <DependentUpon>PaymentPremiumRelated.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PaymentPremiumRelated.aspx.vb">
+      <DependentUpon>PaymentPremiumRelated.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Reports\DetailNonPremium.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DetailNonPremium.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\DetailPremium.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DetailPremium.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ReceiptAppno.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReceiptAppno.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\SummaryNonPremium.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SummaryNonPremium.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RptReceipt.aspx.designer.vb">
+      <DependentUpon>RptReceipt.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptReceipt.aspx.vb">
+      <DependentUpon>RptReceipt.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Content Include="Reports\DetailNonPremium.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>DetailNonPremium.vb</LastGenOutput>
+    </Content>
+    <Content Include="Reports\DetailPremium.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>DetailPremium.vb</LastGenOutput>
+    </Content>
+    <Content Include="Reports\Receipt.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>Receipt.vb</LastGenOutput>
+    </Content>
+    <Content Include="Reports\SummaryPremium.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>SummaryPremium.vb</LastGenOutput>
+    </Content>
+    <EmbeddedResource Include="Reports\Receipt.resx">
+      <DependentUpon>Receipt.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Content Include="Reports\ReceiptAppno.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>ReceiptAppno.vb</LastGenOutput>
+    </Content>
+    <Content Include="Reports\ReceiptOR.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>ReceiptOR.vb</LastGenOutput>
+    </Content>
+    <Content Include="Reports\SummaryNonPremium.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>SummaryNonPremium.vb</LastGenOutput>
+    </Content>
+    <EmbeddedResource Include="Reports\ReceiptBatch.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>ReceiptBatch.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ReceiptDMCMPreview.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>ReceiptDMCMPreview.vb</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\PSD\accordion.psd" />
+    <None Include="Images\PSD\arrow_over.psd" />
+    <None Include="Images\PSD\body.psd" />
+    <None Include="Images\PSD\BodyMain.psd" />
+    <None Include="Images\PSD\ContentFooter.psd" />
+    <None Include="Images\PSD\ContentHeader.psd" />
+    <None Include="Images\PSD\FooterMain.psd" />
+    <None Include="Images\PSD\HeaderMain.psd" />
+    <None Include="Images\PSD\Login.psd" />
+    <None Include="Images\PSD\three_0.psd" />
+    <None Include="Images\PSD\three_0a.psd" />
+    <None Include="Images\PSD\three_1.psd" />
+    <None Include="Images\PSD\three_1a.psd" />
+    <None Include="Images\PSD\three_2.psd" />
+    <None Include="Images\PSD\three_2a.psd" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\PublishProfiles\ocs.pubxml" />
+    <None Include="My Project\PublishProfiles\ocsqat.pubxml" />
+    <None Include="My Project\PublishProfiles\ocstest.pubxml" />
+    <None Include="My Project\PublishProfiles\ocsuat.pubxml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="My Project\PublishProfiles\ocs_deploy.pubxml" />
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <Content Include="Home.aspx" />
+    <Content Include="Images\accBlueOff.png" />
+    <Content Include="Images\accBlueOn.png" />
+    <Content Include="Images\accGrayOff.png" />
+    <Content Include="Images\accGrayOn.png" />
+    <Content Include="Images\accGreenOff.png" />
+    <Content Include="Images\accGreenOn.png" />
+    <Content Include="Images\accOrangeOff.png" />
+    <Content Include="Images\accOrangeOn.png" />
+    <Content Include="Images\cfSeparator.png" />
+    <Content Include="Images\chHome.png" />
+    <Content Include="Images\chPaymentNonPremiumRelated.png" />
+    <Content Include="Images\chPaymentPremiumRelated.png" />
+    <Content Include="Login.aspx" />
+    <Content Include="OCS.Master" />
+    <Content Include="PaymentNonPremiumRelated.aspx" />
+    <Content Include="PaymentPremiumRelated.aspx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{C0C07587-41A7-46C8-8FBD-3F9C8EBE2DDC}" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="stdole">
+      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cocolife.DAL.OCS\Cocolife.DAL.OCS.vbproj">
+      <Project>{30a29717-6b09-44ca-aa48-fb8d5d884b2b}</Project>
+      <Name>Cocolife.DAL.OCS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cocolife.Presenter.OCS\Cocolife.Presenter.OCS.vbproj">
+      <Project>{cf4e6875-6200-4395-80ef-2477b3d9d27b}</Project>
+      <Name>Cocolife.Presenter.OCS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cocolife.Utility.OCS\Cocolife.Utility.OCS.vbproj">
+      <Project>{12b69a23-3dce-4418-9e03-f6d9f7e523da}</Project>
+      <Name>Cocolife.Utility.OCS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>50616</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

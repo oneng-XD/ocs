@@ -1,0 +1,223 @@
+﻿#Region "Description"
+' PAGE NAME     : SITE_ORDTL BLL
+' CREATED BY    : EJ
+' CREATED DATE  : 05/04/2015
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports System.Data.OracleClient
+Imports eAction = Cocolife.Utility.Common.Enums.eDBAction
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports bllCommon = Cocolife.BLL.Common
+Imports dalWorking = Cocolife.DAL.OCS.Working
+#End Region
+
+Namespace Working
+
+    Public Class BSiteORDtl
+        
+#Region "Implements"
+        Implements ISiteORDtl
+#End Region
+
+#Region "Variables"
+        Private mId As Long = cDataType.fLong.Empty
+        Private mORNmbr As Long = cDataType.fLong.Empty
+        Private mTrnxCode As Long = cDataType.fLong.Empty
+        Private mActType As String = cDataType.fString.Empty
+        Private mTrnxDesc As String = cDataType.fString.Empty
+        Private mAmount As Decimal = cDataType.fDecimal.Empty
+        Private mLineNmbr As Long = cDataType.fLong.Empty
+        Private mStatusId As Long = cDataType.fLong.Empty
+        Private mPostBy As Long = cDataType.fLong.Empty
+        Private mPostDate As Date = cDataType.fDate.Empty
+        Private mLastUpdateBy As Long = cDataType.fLong.Empty
+        Private mLastUpdate As Date = cDataType.fDate.Empty
+#End Region
+
+#Region "Properties"
+
+        Public Property Id As Long Implements ISiteORDtl.Id
+            Get
+                Return mId
+            End Get
+            Set(value As Long)
+                mId = value
+            End Set
+        End Property
+
+        Public Property ORNmbr() As Long Implements ISiteORDtl.ORNmbr
+            Get
+                Return mORNmbr
+            End Get
+            Set(value As Long)
+                mORNmbr = value
+            End Set
+        End Property
+
+        Public Property TrnxCode() As Long Implements ISiteORDtl.TrnxCode
+            Get
+                Return mTrnxCode
+            End Get
+            Set(value As Long)
+                mTrnxCode = value
+            End Set
+        End Property
+
+        Public Property ActType() As String Implements ISiteORDtl.ActType
+            Get
+                Return mActType
+            End Get
+            Set(value As String)
+                mActType = value
+            End Set
+        End Property
+
+        Public Property TrnxDesc() As String Implements ISiteORDtl.TrnxDesc
+            Get
+                Return mTrnxDesc
+            End Get
+            Set(value As String)
+                mTrnxDesc = value
+            End Set
+        End Property
+
+        Public Property Amount() As Decimal Implements ISiteORDtl.Amount
+            Get
+                Return mAmount
+            End Get
+            Set(value As Decimal)
+                mAmount = value
+            End Set
+        End Property
+
+        Public Property LineNmbr() As Long Implements ISiteORDtl.LineNmbr
+            Get
+                Return mLineNmbr
+            End Get
+            Set(value As Long)
+                mLineNmbr = value
+            End Set
+        End Property
+
+        Public Property StatusId As Integer Implements ISiteORDtl.StatusId
+            Get
+                Return mStatusId
+            End Get
+            Set(value As Integer)
+                mStatusId = value
+            End Set
+        End Property
+
+        Public Property PostBy As Long Implements ISiteORDtl.PostBy
+            Get
+                Return mPostBy
+            End Get
+            Set(value As Long)
+                mPostBy = value
+            End Set
+        End Property
+
+        Public Property PostDate As Date Implements ISiteORDtl.PostDate
+            Get
+                Return mPostDate
+            End Get
+            Set(value As Date)
+                mPostDate = value
+            End Set
+        End Property
+
+        Public Property LastUpdateBy As Long Implements ISiteORDtl.LastUpdateBy
+            Get
+                Return mLastUpdateBy
+            End Get
+            Set(value As Long)
+                mLastUpdateBy = value
+            End Set
+        End Property
+
+        Public Property LastUpdate As Date Implements ISiteORDtl.LastUpdate
+            Get
+                Return mLastUpdate
+            End Get
+            Set(value As Date)
+                mLastUpdate = value
+            End Set
+        End Property
+
+        
+#End Region
+
+#Region "Constructor"
+
+        Sub New()
+
+        End Sub
+
+        Sub New(ByVal pId As Long, ByVal pORNmbr As Long, ByVal pTrnxCode As Long, ByVal pActType As String,
+                ByVal pTrnxDesc As String, ByVal pAmount As Decimal, ByVal pLineNmbr As Long, ByVal pStatusId As Integer,
+                ByVal pPostBy As Long, ByVal pPostDate As Date, ByVal pLastUpdateBy As Long, ByVal pLastUpdate As Date)
+            Id = pId
+            ORNmbr = pORNmbr
+            TrnxCode = pTrnxCode
+            ActType = pActType
+            TrnxDesc = pTrnxDesc
+            Amount = pAmount
+            LineNmbr = pLineNmbr
+            StatusId = pStatusId
+            PostBy = pPostBy
+            PostDate = pPostDate
+            LastUpdateBy = pLastUpdateBy
+            LastUpdate = pLastUpdate
+        End Sub
+
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Data Retrieval"
+
+        Public Function GetORDtlDt(ByVal pDocNumber As Long, ByVal pUserId As Long) As DataTable
+            Try
+                Dim objDal As New dalWorking.DSiteORDtl
+                Dim dtLocal As DataTable
+
+                dtLocal = objDal.GetSiteORDtl(pDocNumber, pUserId)
+
+                Return dtLocal
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+
+#End Region
+
+#Region "Transactions"
+
+        Public Function Alter(ByVal pAction As String, ByRef pConn As Object, ByRef pTrans As Object) As Long
+
+            Try
+                Dim objDAL As New dalWorking.DSiteORDtl
+                objDAL.AlterSiteORDtl(Me, pAction, pConn, pTrans)
+                Return objDAL.Reference
+            Catch ex As Exception
+                Throw
+            End Try
+
+        End Function
+
+#End Region
+
+    End Class
+
+End Namespace

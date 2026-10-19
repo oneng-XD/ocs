@@ -1,0 +1,330 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+bllCommon
+</name>
+</assembly>
+<members>
+<member name="M:Cocolife.BLL.Common.Database.BSQL.newConnection(System.String,System.String,System.String,System.String)">
+	<summary>
+ Create new sql connection
+ </summary>
+	<param name="pDataSource">Data source name based on TNS</param>
+	<param name="pUserId">User Log In ID</param>
+	<param name="pUserCode">User Password</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Versioning.BVersioningAbs.#ctor">
+	<summary>
+ CONSTRUCTOR
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Versioning.BVersioningAbs.CheckVersion(System.String)">
+	<summary>
+ CHECK VALIDATE VERSIONING
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Versioning.BVersioningAbs.GetCurrVersion">
+	<summary>
+ GET CURRENT VERSION
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Versioning.BVersioningAbs.CompareVersion">
+	<summary>
+ COMPARE CURRENT VERSION FROM USER VERSION
+ </summary>
+	<remarks></remarks>
+</member><member name="T:Cocolife.BLL.Common.Versioning.BVersioningAbs">
+	<summary>
+ Base Class for Version checking used by all Winforms Application with versioning
+ </summary>
+	<remarks></remarks>
+</member><member name="P:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.Isopen">
+	<summary>
+ Returns True if the document has been opened.
+ </summary>
+	<value></value>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.BuildDefinedNamesTable(DocumentFormat.OpenXml.Packaging.WorkbookPart)">
+	<summary>
+ Get all Defined Name Tables in workbook
+ </summary>
+	<param name="pWorkBookPart"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.GetWorkSheetPart(Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.DefinedNameVal)">
+	<summary>
+ Get worksheet based on defined name 
+ </summary>
+	<param name="pDefinedName"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.GetWorkSheetPart(System.String)">
+	<summary>
+ Get worksheetpart based on  worksheet name
+ </summary>
+	<param name="pWorkSheetName"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.GetWorkSheetData(DocumentFormat.OpenXml.Packaging.WorksheetPart,Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.DefinedNameVal)">
+	<summary>
+ Get worksheet based on defined name 
+ </summary>
+	<param name="pWorksheetPart"></param>
+	<param name="pDefinedName"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.GetWorkSheetData(DocumentFormat.OpenXml.Packaging.WorksheetPart)">
+	<summary>
+ Get default
+ </summary>
+	<param name="pWorksheetPart"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.GetContentRow(DocumentFormat.OpenXml.Spreadsheet.SheetData,System.Int32)">
+	<summary>
+ Get row from sheet data based on row index
+ </summary>
+	<param name="SheetData"></param>
+	<param name="index"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.GetColumnNumberFromColumnId(System.String)">
+	<summary>
+ [Sampled from http://www.codeplex.com/PowerTools]
+ Returns the column number from the cell reference received as parameter
+ </summary>
+	<param name="pColumnId"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.GetColumnAlpha(System.Int32)">
+	<summary>
+ Return Alpha equivalent of column number
+ </summary>
+	<param name="pColumnNumber"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.GetValue(DocumentFormat.OpenXml.Spreadsheet.Cell)">
+	<summary>
+ Return inner text value of the cell
+ </summary>
+	<param name="pCell"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.CreateCellFromTemplate(System.String,System.Int32,DocumentFormat.OpenXml.Spreadsheet.Cell,System.Object)">
+	<summary>
+ Create new cell based on templateCell and add cell value
+ </summary>
+	<param name="header"></param>
+	<param name="index"></param>
+	<param name="templateCell"></param>
+	<param name="value"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.InsertSharedStringItem(System.String)">
+	<summary>
+ [Code sampled from http://msdn.microsoft.com/en-us/library/cc861607%28office.14%29.aspx]
+ Given text and a SharedStringTablePart, creates a SharedStringItem with the specified text 
+ and inserts it into the SharedStringTablePart. If the item already exists, returns its index.
+ </summary>
+	<param name="text"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.Open(System.Byte[])">
+	<summary>
+ Opens the specified Document file.
+ This loads it in memory for later modification.
+ </summary>
+	<param name="pSourceBytes"></param>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.Open(System.String)">
+	<summary>
+ Opens the specified Document file.
+ This loads it in memory for later modification.
+ </summary>
+	<param name="pFileName"></param>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.SaveAs(System.String)">
+	<summary>
+ Takes the in-memory Document and saves it to the specified file. Overwriting if necessary.
+ </summary>
+	<param name="pFileName"></param>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.CloseInMemoryDocument">
+	<summary>
+  Closes and disposes the in-memory document
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.CloseInMemoryStream">
+	<summary>
+ Closes and disposes the memory stream
+ </summary>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.UpdateRowIndexes(DocumentFormat.OpenXml.Packaging.WorksheetPart,System.UInt32,System.Boolean)">
+	<summary>
+ Update row indexes
+ </summary>
+	<param name="worksheetPart"></param>
+	<param name="rowIndex"></param>
+	<param name="isDeletedRow"></param>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.CloneWorksheet(System.String,System.String)">
+	<summary>
+ [Sample Code from http://blogs.msdn.com/b/brian_jones/archive/2009/02/19/how-to-copy-a-worksheet-within-a-workbook.aspx]
+ </summary>
+	<param name="pWorkSheetName"></param>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.CleanView(DocumentFormat.OpenXml.Packaging.WorksheetPart)">
+	<summary>
+ Remove any view reference in the cloned worksheet.
+ </summary>
+	<param name="worksheetPart"></param>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.FixupTableParts(DocumentFormat.OpenXml.Packaging.WorksheetPart,System.Int32)">
+	<summary>
+ Fix all table unique id and name
+ </summary>
+	<param name="worksheetPart"></param>
+	<param name="numTableDefParts"></param>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCommon.RemoveWorkSheet(System.String)">
+	<summary>
+ [Sample Code from http://blogs.msdn.com/b/vsod/archive/2010/02/05/how-to-delete-a-worksheet-from-excel-using-open-xml-sdk-2-0.aspx]
+ Remove worksheet by worksheet name
+ </summary>
+	<param name="pWorkSheetName"></param>
+	<remarks></remarks>
+</member><member name="F:Cocolife.BLL.Common.Security.BCryptography.Salt">
+	<summary>
+ Salt String
+ </summary>
+</member><member name="M:Cocolife.BLL.Common.Security.BCryptography.HashPassword(System.String)">
+	<summary>
+ Hash password
+ </summary>
+	<param name="input">Input hash to decode</param>
+	<returns>Byte array of hashed password</returns>
+	<remarks>This replaces the now dubious MD5 version</remarks>
+</member><member name="M:Cocolife.BLL.Common.Security.BCryptography.HashStringToHexString(System.String)">
+	<summary>
+ Hash string to hex string
+ </summary>
+	<param name="input">Input hash to decode</param>
+	<returns>Hashed string</returns>
+</member><member name="M:Cocolife.BLL.Common.Security.BCryptography.HashStringToString(System.String)">
+	<summary>
+ Hash string
+ </summary>
+	<param name="input">Input hash to decode</param>
+	<returns>Hashed string</returns>
+</member><member name="M:Cocolife.BLL.Common.Security.BCryptography.HashStringToHexString(System.String,System.Int32)">
+	<summary>
+ Hash string
+ </summary>
+	<param name="input">Input hash to decode</param>
+	<param name="number">number e.g. id of user </param>
+	<returns>Hashed string</returns>
+</member><member name="M:Cocolife.BLL.Common.Security.BCryptography.HashStringToString(System.String,System.Int32)">
+	<summary>
+ Hash string to hex string
+ </summary>
+	<param name="input">Input hash to decode</param>
+	<param name="number">number e.g. id of user </param>
+	<returns>Hashed string</returns>
+</member><member name="M:Cocolife.BLL.Common.Security.BCryptography.HashToHexString(System.Byte[])">
+	<summary>
+ Convert Byte Array to hexadecimal string
+ </summary>
+	<param name="hashedValue">hash string to decode</param>
+	<returns>base 16 version of hash array</returns>
+</member><member name="M:Cocolife.BLL.Common.Security.BCryptography.HashToString(System.Byte[])">
+	<summary>
+ Convert Byte Array to string
+ </summary>
+	<param name="hashedValue">hash string to decode</param>
+	<returns>base 10 version of hash array</returns>
+</member><member name="F:Cocolife.BLL.Common.Security.BChangePassword._Format">
+	<summary>
+ kgf 11182013
+ ^ - start of string
+ (?=pattern) - sub expression (positive look ahead)
+ . - any single char except new line (at least one char)
+ * - match preceding char/sub expression 0 or more times
+ ^[a-zA-Z] - starts with letter
+ \d - digit (0-9)
+ [a-z] - lowercase range
+ [A-Z] - upper case range
+ {n,m} - at least n to m char 
+ [\S] - any non-whitespace char
+ $ - end of string
+ </summary>
+	<remarks>
+ for reference http://msdn.microsoft.com/en-us/library/ae5bf541(v=vs.90).aspx
+ </remarks>
+</member><member name="T:Cocolife.BLL.Common.Security.BChangePassword">
+	<summary>
+ User change password abstract class
+ </summary>
+	<remarks></remarks>
+</member><member name="T:Cocolife.BLL.Common.Office.OpenXML.SpreadSheet.BCreateFromTemplate">
+	<summary>
+ Create/Stream new spreadsheet from template
+ IMPORTANT NOTE/S:
+ 1. This class is for excel template with Header/Detail/Summary format only.
+ 2. This class will only work for a SINGLE ROW NAMED RANGE.
+ 3. Template should have named range for header and details.
+ 4. NamedRange Naming rules:
+     a. Header range must contain "Header", if any
+     b. Detail range must contain "Range".
+     c. Summary range must contain "Summary", if any
+     d. Column names should starts with "["  and end with "]".
+     e. Don't leave a blank cell. All columns in NamedRange should have a value. Use "[BlankString]" for uniformity.
+     f. All column names in NamedRange should have an equivalent column in DataTable. Datatable should have BlankString too, if any.
+ </summary>
+	<remarks>For enhancement/s:
+ 1. Able to use multiple row for NamedRange.
+ </remarks>
+</member><member name="M:Cocolife.BLL.Common.Database.BOracleFactory.getConnectionType(Cocolife.Utility.Common.Enums.SystemType.ApplicationType,Cocolife.Utility.Common.Enums.SystemType.UserInterfaceType)">
+	<summary>
+ get Oracle connection instance for specific application
+ </summary>
+	<param name="pApplication"></param>
+	<param name="pUserInterface"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.BLL.Common.Database.BOracleFactory.EstablishBatchConnection(Cocolife.Utility.Common.Enums.SystemType.ConnectionType,System.String,System.String)">
+	<summary>
+ This function will establish all connection for all application
+ </summary>
+	<param name="pConnType"></param>
+	<param name="pUserID"></param>
+	<param name="pUserCode"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="P:Cocolife.BLL.Common.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:Cocolife.BLL.Common.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:Cocolife.BLL.Common.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:Cocolife.BLL.Common.Database.BOracle.newConnection(System.String,System.String,System.String)">
+	<summary>
+ Create new oracle connection
+ </summary>
+	<param name="pDataSource">Data source name based on TNS</param>
+	<param name="pUserId">User Log In ID</param>
+	<param name="pUserCode">User Password</param>
+	<returns></returns>
+	<remarks></remarks>
+</member>
+</members>
+</doc>

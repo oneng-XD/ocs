@@ -1,0 +1,552 @@
+﻿#Region "Description"
+' PAGE NAME     : PAYSLIP BLL
+' CREATED BY    : EJ
+' CREATED DATE  : 10/01/2018
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports System.Data.OracleClient
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports bllCommon = Cocolife.BLL.Common
+Imports dalReference = Cocolife.DAL.OCS.Reference
+Imports System.Configuration
+#End Region
+
+Namespace Reference
+
+    Public Class BHMOPayslip
+
+#Region "Implements"
+        Implements IHMOPayslip
+#End Region
+
+#Region "Variables"
+        Private mCollHdrId As Long = cDataType.fLong.Empty
+        Private mHeaderId As Long = cDataType.fLong.Empty
+        Private mRemitCode As String = cDataType.fString.Empty
+        Private mRemitAmount As Decimal = cDataType.fDecimal.Empty
+        Private mPayorTypeId As Integer = cDataType.fInteger.Empty
+        Private mPayorId As String = cDataType.fString.Empty
+        Private mPayorCode As String = cDataType.fString.Empty
+        Private mAprNumber As String = cDataType.fString.Empty
+        Private mAprDate As Date = cDataType.fDate.Empty
+        Private mCheckNumber As String = cDataType.fString.Empty
+        Private mPaymentForm As String = cDataType.fString.Empty
+        Private mStatusId As Integer = cDataType.fInteger.Empty
+        Private mPostBy As String = cDataType.fString.Empty
+        Private mPostDate As Date = cDataType.fDate.Empty
+        Private mLastUpdate As Date = cDataType.fDate.Empty
+        Private mLastUpdateBy As String = cDataType.fString.Empty
+        Private mCompanyname As String = cDataType.fString.Empty
+        Private mPayorName As String = cDataType.fString.Empty
+        Private mGrossPayment As Decimal = cDataType.fDecimal.Empty
+        Private mTotDeductibles As Decimal = cDataType.fDecimal.Empty
+        Private mNetPayment As Decimal = cDataType.fDecimal.Empty
+        Private mParticulars As String = cDataType.fString.Empty
+        Private mChargeTo As String = cDataType.fString.Empty
+        Private mPaymentMode As String = cDataType.fString.Empty
+        Private mUserName As String = cDataType.fString.Empty
+        Private mEwt As Decimal = cDataType.fDecimal.Empty
+        Private mPolicyNumber As String = cDataType.fString.Empty
+        Private mPayslipCode As String = cDataType.fString.Empty
+        Private mOrNumber As String = cDataType.fString.Empty
+        Private mPaymentType As Integer = cDataType.fInteger.Empty
+        Private mCheckDate As Date = cDataType.fDate.Empty
+        Private mIssuingBank As String = cDataType.fString.Empty
+        Private mIssuingBranch As String = cDataType.fString.Empty
+        Private mIncome As Decimal = cDataType.fDecimal.Empty
+        Private mVatableAmt As Decimal = cDataType.fDecimal.Empty
+        Private mVatExempt As Decimal = cDataType.fDecimal.Empty
+        Private mVatAmount As Decimal = cDataType.fDecimal.Empty
+        Private mIssuedBy As String = cDataType.fString.Empty
+        'added by junie
+        Private mPayorTin As String = cDataType.fString.Empty
+        Private mPayorAddress As String = cDataType.fString.Empty
+        ' -------------------------------------------------------------------------------
+        Private mIsRecordExist As Boolean = False
+#End Region
+
+#Region "Properties"
+
+        Public Property CollHdrId As Long Implements IHMOPayslip.CollHdrId
+            Get
+                Return mCollHdrId
+            End Get
+            Set(value As Long)
+                mCollHdrId = value
+            End Set
+        End Property
+
+        Public Property HeaderId As Long Implements IHMOPayslip.HeaderId
+            Get
+                Return mHeaderId
+            End Get
+            Set(value As Long)
+                mHeaderId = value
+            End Set
+        End Property
+
+        Public Property RemitCode As String Implements IHMOPayslip.RemitCode
+            Get
+                Return mRemitCode
+            End Get
+            Set(value As String)
+                mRemitCode = value
+            End Set
+        End Property
+
+        Public Property RemitAmount As Decimal Implements IHMOPayslip.RemitAmount
+            Get
+                Return mRemitAmount
+            End Get
+            Set(value As Decimal)
+                mRemitAmount = value
+            End Set
+        End Property
+
+        Public Property PayorTypeId As Integer Implements IHMOPayslip.PayorTypeId
+            Get
+                Return mPayorTypeId
+            End Get
+            Set(value As Integer)
+                mPayorTypeId = value
+            End Set
+        End Property
+
+        Public Property PayorId As String Implements IHMOPayslip.PayorId
+            Get
+                Return mPayorId
+            End Get
+            Set(value As String)
+                mPayorId = value
+            End Set
+        End Property
+
+        Public Property PayorCode As String Implements IHMOPayslip.PayorCode
+            Get
+                Return mPayorCode
+            End Get
+            Set(value As String)
+                mPayorCode = value
+            End Set
+        End Property
+
+        Public Property AprNumber As String Implements IHMOPayslip.AprNumber
+            Get
+                Return mAprNumber
+            End Get
+            Set(value As String)
+                mAprNumber = value
+            End Set
+        End Property
+
+        Public Property AprDate As Date Implements IHMOPayslip.AprDate
+            Get
+                Return mAprDate
+            End Get
+            Set(value As Date)
+                mAprDate = value
+            End Set
+        End Property
+
+        Public Property CheckNumber As String Implements IHMOPayslip.CheckNumber
+            Get
+                Return mCheckNumber
+            End Get
+            Set(value As String)
+                mCheckNumber = value
+            End Set
+        End Property
+
+        Public Property PaymentForm As String Implements IHMOPayslip.PaymentForm
+            Get
+                Return mPaymentForm
+            End Get
+            Set(value As String)
+                mPaymentForm = value
+            End Set
+        End Property
+
+        Public Property StatusId As Integer Implements IHMOPayslip.StatusId
+            Get
+                Return mStatusId
+            End Get
+            Set(value As Integer)
+                mStatusId = value
+            End Set
+        End Property
+
+        Public Property PostBy As String Implements IHMOPayslip.PostBy
+            Get
+                Return mPostBy
+            End Get
+            Set(value As String)
+                mPostBy = value
+            End Set
+        End Property
+
+        Public Property PostDate As Date Implements IHMOPayslip.PostDate
+            Get
+                Return mPostDate
+            End Get
+            Set(value As Date)
+                mPostDate = value
+            End Set
+        End Property
+
+        Public Property LastUpdate As Date Implements IHMOPayslip.LastUpdate
+            Get
+                Return mLastUpdate
+            End Get
+            Set(value As Date)
+                mLastUpdate = value
+            End Set
+        End Property
+
+        Public Property LastUpdateBy As String Implements IHMOPayslip.LastUpdateBy
+            Get
+                Return mLastUpdateBy
+            End Get
+            Set(value As String)
+                mLastUpdateBy = value
+            End Set
+        End Property
+
+        Public Property Companyname As String Implements IHMOPayslip.Companyname
+            Get
+                Return mCompanyname
+            End Get
+            Set(value As String)
+                mCompanyname = value
+            End Set
+        End Property
+
+        Public Property PayorName As String Implements IHMOPayslip.PayorName
+            Get
+                Return mPayorName
+            End Get
+            Set(value As String)
+                mPayorName = value
+            End Set
+        End Property
+
+        Public Property GrossPayment As Decimal Implements IHMOPayslip.GrossPayment
+            Get
+                Return mGrossPayment
+            End Get
+            Set(value As Decimal)
+                mGrossPayment = value
+            End Set
+        End Property
+
+        Public Property TotDeductibles As Decimal Implements IHMOPayslip.TotDeductibles
+            Get
+                Return mTotDeductibles
+            End Get
+            Set(value As Decimal)
+                mTotDeductibles = value
+            End Set
+        End Property
+
+        Public Property NetPayment As Decimal Implements IHMOPayslip.NetPayment
+            Get
+                Return mNetPayment
+            End Get
+            Set(value As Decimal)
+                mNetPayment = value
+            End Set
+        End Property
+
+        Public Property Particulars As String Implements IHMOPayslip.Particulars
+            Get
+                Return mParticulars
+            End Get
+            Set(value As String)
+                mParticulars = value
+            End Set
+        End Property
+
+        Public Property ChargeTo As String Implements IHMOPayslip.ChargeTo
+            Get
+                Return mChargeTo
+            End Get
+            Set(value As String)
+                mChargeTo = value
+            End Set
+        End Property
+
+        Public Property PaymentMode As String Implements IHMOPayslip.PaymentMode
+            Get
+                Return mPaymentMode
+            End Get
+            Set(value As String)
+                mPaymentMode = value
+            End Set
+        End Property
+
+        Public Property UserName As String Implements IHMOPayslip.UserName
+            Get
+                Return mUserName
+            End Get
+            Set(value As String)
+                mUserName = value
+            End Set
+        End Property
+
+        Public Property Ewt As Decimal Implements IHMOPayslip.Ewt
+            Get
+                Return mEwt
+            End Get
+            Set(value As Decimal)
+                mEwt = value
+            End Set
+        End Property
+
+        Public Property PolicyNumber As String Implements IHMOPayslip.PolicyNumber
+            Get
+                Return mPolicyNumber
+            End Get
+            Set(value As String)
+                mPolicyNumber = value
+            End Set
+        End Property
+
+        Public Property PayslipCode As String Implements IHMOPayslip.PayslipCode
+            Get
+                Return mPayslipCode
+            End Get
+            Set(value As String)
+                mPayslipCode = value
+            End Set
+        End Property
+
+        Public Property OrNumber As String Implements IHMOPayslip.OrNumber
+            Get
+                Return mOrNumber
+            End Get
+            Set(value As String)
+                mOrNumber = value
+            End Set
+        End Property
+
+        Public Property PaymentType As Integer Implements IHMOPayslip.PaymentType
+            Get
+                Return mPaymentType
+            End Get
+            Set(value As Integer)
+                mPaymentType = value
+            End Set
+        End Property
+
+        Public Property CheckDate As Date Implements IHMOPayslip.CheckDate
+            Get
+                Return mCheckDate
+            End Get
+            Set(value As Date)
+                mCheckDate = value
+            End Set
+        End Property
+
+        Public Property IssuingBank As String Implements IHMOPayslip.IssuingBank
+            Get
+                Return mIssuingBank
+            End Get
+            Set(value As String)
+                mIssuingBank = value
+            End Set
+        End Property
+
+        Public Property IssuingBranch As String Implements IHMOPayslip.IssuingBranch
+            Get
+                Return mIssuingBranch
+            End Get
+            Set(value As String)
+                mIssuingBranch = value
+            End Set
+        End Property
+
+        Public Property Income As Decimal Implements IHMOPayslip.Income
+            Get
+                Return mIncome
+            End Get
+            Set(value As Decimal)
+                mIncome = value
+            End Set
+        End Property
+
+        Public Property VatableAmt As Decimal Implements IHMOPayslip.VatableAmt
+            Get
+                Return mVatableAmt
+            End Get
+            Set(value As Decimal)
+                mVatableAmt = value
+            End Set
+        End Property
+
+        Public Property VatExempt As Decimal Implements IHMOPayslip.VatExempt
+            Get
+                Return mVatExempt
+            End Get
+            Set(value As Decimal)
+                mVatExempt = value
+            End Set
+        End Property
+
+        Public Property VatAmount As Decimal Implements IHMOPayslip.VatAmount
+            Get
+                Return mVatAmount
+            End Get
+            Set(value As Decimal)
+                mVatAmount = value
+            End Set
+        End Property
+
+        Public Property IssuedBy As String Implements IHMOPayslip.IssuedBy
+            Get
+                Return mIssuedBy
+            End Get
+            Set(value As String)
+                mIssuedBy = value
+            End Set
+        End Property
+
+      
+        Public Property PayorTin As String Implements IHMOPayslip.PayorTin
+            Get
+                Return mPayorTin
+            End Get
+            Set(value As String)
+                mPayorTin = value
+            End Set
+        End Property
+        Public Property PayorAddress As String Implements IHMOPayslip.PayorAddress
+            Get
+                Return mPayorAddress
+            End Get
+            Set(value As String)
+                mPayorAddress = value
+            End Set
+        End Property
+
+        ' -------------------------------------------------------------------------------
+
+        Public Property IsRecordExist() As Boolean Implements IHMOPayslip.IsRecordExist
+            Get
+                Return mIsRecordExist
+            End Get
+            Set(ByVal value As Boolean)
+                mIsRecordExist = value
+            End Set
+        End Property
+
+#End Region
+
+#Region "Constructor"
+
+        Sub New()
+
+        End Sub
+
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Data Retrieval"
+
+        Property CardSite As String
+
+        Public Sub SearchPayslipCode(ByVal pPayslipCode As String) Implements IHMOPayslip.SearchPayslipCode
+            Dim objDal As New dalReference.DHMOPayslip
+            Dim dtLocal As DataTable
+
+            Try
+                If Boolean.Parse(If(ConfigurationManager.AppSettings("Newgen-HMO"), "false")) Then
+                    dtLocal = objDal.SearchPayslipCodeNGI(pPayslipCode)
+                Else
+                    dtLocal = objDal.SearchPayslipCode(pPayslipCode)
+                End If
+                dtLocal = objDal.SearchPayslipCodeNGI(pPayslipCode)
+                For Each dr As DataRow In dtLocal.Rows
+                    CollHdrId = cDataType.fLong.IfNull(dr.Item("colhdr_id"))
+                    HeaderId = cDataType.fLong.IfNull(dr.Item("header_id"))
+                    RemitCode = cDataType.fString.IfNull(dr.Item("remit_code"))
+                    RemitAmount = cDataType.fDecimal.IfNull(dr.Item("remit_amount"))
+                    PayorTypeId = cDataType.fInteger.IfNull(dr.Item("payor_type_id"))
+                    PayorId = cDataType.fString.IfNull(dr.Item("payor_id"))
+                    PayorCode = cDataType.fString.IfNull(dr.Item("payor_code"))
+                    AprNumber = cDataType.fString.IfNull(dr.Item("apr_number"))
+                    CheckNumber = cDataType.fString.IfNull(dr.Item("check_number"))
+                    PaymentForm = cDataType.fString.IfNull(dr.Item("payment_form"))
+                    StatusId = cDataType.fInteger.IfNull(dr.Item("status_id"))
+                    PostBy = cDataType.fString.IfNull(dr.Item("post_by"))
+                    PostDate = cDataType.fDate.IfNull(dr.Item("post_date"))
+                    LastUpdate = cDataType.fDate.IfNull(dr.Item("last_update"))
+                    LastUpdateBy = cDataType.fString.IfNull(dr.Item("last_update_by"))
+                    Companyname = cDataType.fString.IfNull(dr.Item("companyname"))
+                    PayorName = cDataType.fString.IfNull(dr.Item("payor_name"))
+                    GrossPayment = cDataType.fDecimal.IfNull(dr.Item("gross_payment"))
+                    TotDeductibles = cDataType.fDecimal.IfNull(dr.Item("tot_deductibles"))
+                    NetPayment = cDataType.fDecimal.IfNull(dr.Item("net_payment"))
+                    Particulars = cDataType.fString.IfNull(dr.Item("particulars"))
+                    ChargeTo = cDataType.fString.IfNull(dr.Item("charge_to"))
+                    PaymentMode = cDataType.fString.IfNull(dr.Item("payment_mode"))
+                    UserName = cDataType.fString.IfNull(dr.Item("user_name"))
+                    Ewt = cDataType.fDecimal.IfNull(dr.Item("ewt"))
+                    PolicyNumber = cDataType.fString.IfNull(dr.Item("policy_number"))
+                    PayslipCode = cDataType.fString.IfNull(dr.Item("payslip_code"))
+                    OrNumber = cDataType.fString.IfNull(dr.Item("or_number"))
+                    PaymentType = cDataType.fInteger.IfNull(dr.Item("payment_type"))
+                    CheckDate = cDataType.fDate.IfNull(dr.Item("check_date"))
+                    IssuingBank = cDataType.fString.IfNull(dr.Item("issuing_bank"))
+                    'IssuingBranch = cDataType.fString.IfNull(dr.Item("issuing_branch")) 'commented by junie  this throws error idk why
+                    Income = cDataType.fDecimal.IfNull(dr.Item("income"))
+                    VatableAmt = cDataType.fDecimal.IfNull(dr.Item("vatable_amt"))
+                    VatExempt = cDataType.fDecimal.IfNull(dr.Item("vat_exempt"))
+                    VatAmount = cDataType.fDecimal.IfNull(dr.Item("vat_amount"))
+                    IssuedBy = cDataType.fString.IfNull(dr.Item("issued_by"))
+                    AprDate = cDataType.fDate.IfNull(dr.Item("apr_date"))
+                    'added by junie
+                    PayorTin = cDataType.fString.IfNull(dr.Item("tin_id"))
+                    PayorAddress = cDataType.fString.IfNull(dr.Item("address"))
+
+                    IsRecordExist = True
+                    Exit For
+
+                Next
+
+            Catch ex As Exception
+                Throw
+            End Try
+        End Sub
+
+#End Region
+
+#Region "Transactions"
+        Public Function Alter(ByVal pPayslipCode As String, ByVal pReceiptNo As String, ByVal pReceiptDate As String, ByRef pConn As Object, ByRef pTrans As Object) As String
+
+            Try
+                Dim objDAL As New dalReference.DHMOPayslip
+                objDAL.Alter(pPayslipCode, pReceiptNo, pReceiptDate, pConn, pTrans)
+                Return objDAL.Reference
+            Catch ex As Exception
+                Throw
+            End Try
+
+        End Function
+#End Region
+
+    End Class
+
+End Namespace
+
+

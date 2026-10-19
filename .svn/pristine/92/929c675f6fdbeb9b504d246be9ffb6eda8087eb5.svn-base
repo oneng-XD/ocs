@@ -1,0 +1,84 @@
+﻿#Region "Description"
+' PAGE NAME     : HMO PAYSLIP Interface 
+' CREATED BY    : EJ
+' CREATED DATE  : 11/13/2024
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports Cocolife.Utility.OCS.Classes
+#End Region
+
+Namespace Staging
+
+    Public Interface IAckReceipt
+
+#Region "Variables"
+
+#End Region
+
+#Region "Properties"
+        Property AckReceiptID As Long
+        Property BillReferenceNo As String
+        Property PayorName As String
+        Property PayorAddress As String
+        Property PayorTIN As String
+        Property InsuredClientName As String
+        Property PolicyNumber As String
+        Property InvoiceCovFrom As Date
+        Property InvoiceCovTo As Date
+        Property InvoiceCurrency As String
+        Property PayCurrency As String
+        Property PayAmount As Decimal
+        Property TotalSales As Decimal
+        Property WitholdingTax As Decimal
+        Property NetOfWitholdingTax As Decimal
+        Property Discount As Decimal
+        Property DiscountIdNo As String
+        Property PaymentTerm As String
+        Property NextDueDate As Date
+        Property AgentName As String
+        Property AgentCode As String
+        Property CommissionAmount As Decimal
+        Property AckReceiptRemarks As String
+        Property AckReceiptOtherInfo As String
+        Property InvoiceNumber As Long
+        Property InvoiceDate As Date
+        Property AckReceiptNumber As Long
+        Property ARDate As Date
+        Property SIPrintStatus As String
+        Property ARPrintStatus As String
+        Property UploadDate As Date
+        Property SiteCode As Long
+        Property ARPrintedBy As String
+        Property Particulars As String
+        Property SISourcetype As String
+        Property lstSIDetails As DataTable
+        Property lstARPayDetails As DataTable
+        '------------------------------------
+        Property IsRecordExist() As Boolean
+#End Region
+
+#Region "Single Point Functions"
+        Function IsNewAckReceiptAllowed(ByVal pNextDocNumber As String) As Boolean
+        Function LoadViewAR(pPrspid As Long, pDocNumber As Long, pType As Integer) As DataTable
+        Function LoadViewAR(pPrspid As Long, Optional pStartDate As Date? = Nothing, Optional pEndDate As Date? = Nothing) As DataTable
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Transactions"
+        Sub LoadNewAckReceipt(pSiteId As Long, pUserId As Long, Optional ByRef pConn As Object = Nothing, Optional ByRef pTrans As Object = Nothing)
+        Sub SearchAckReceipt(ByVal pDocNo As Long, ByVal pUsedId As Long)
+#End Region
+
+    End Interface
+
+End Namespace
+
+

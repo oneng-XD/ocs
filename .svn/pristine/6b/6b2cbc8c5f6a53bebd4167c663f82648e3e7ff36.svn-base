@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Cocolife.UI.OCS", "Cocolife.UI.OCS\Cocolife.UI.OCS.vbproj", "{AD8A8AA8-E0DF-4847-9E33-573BE571E9EB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{30A29717-6B09-44CA-AA48-FB8D5D884B2B} = {30A29717-6B09-44CA-AA48-FB8D5D884B2B}
+		{12B69A23-3DCE-4418-9E03-F6D9F7E523DA} = {12B69A23-3DCE-4418-9E03-F6D9F7E523DA}
+		{CF4E6875-6200-4395-80EF-2477B3D9D27B} = {CF4E6875-6200-4395-80EF-2477B3D9D27B}
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Cocolife.DAL.OCS", "Cocolife.DAL.OCS\Cocolife.DAL.OCS.vbproj", "{30A29717-6B09-44CA-AA48-FB8D5D884B2B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{12B69A23-3DCE-4418-9E03-F6D9F7E523DA} = {12B69A23-3DCE-4418-9E03-F6D9F7E523DA}
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Cocolife.BLL.OCS", "Cocolife.BLL.OCS\Cocolife.BLL.OCS.vbproj", "{1F5FEDDA-CCAD-42D2-B189-6B5F4ECB96A2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{30A29717-6B09-44CA-AA48-FB8D5D884B2B} = {30A29717-6B09-44CA-AA48-FB8D5D884B2B}
+		{12B69A23-3DCE-4418-9E03-F6D9F7E523DA} = {12B69A23-3DCE-4418-9E03-F6D9F7E523DA}
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Cocolife.Presenter.OCS", "Cocolife.Presenter.OCS\Cocolife.Presenter.OCS.vbproj", "{CF4E6875-6200-4395-80EF-2477B3D9D27B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{12B69A23-3DCE-4418-9E03-F6D9F7E523DA} = {12B69A23-3DCE-4418-9E03-F6D9F7E523DA}
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Cocolife.Utility.OCS", "Cocolife.Utility.OCS\Cocolife.Utility.OCS.vbproj", "{12B69A23-3DCE-4418-9E03-F6D9F7E523DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD8A8AA8-E0DF-4847-9E33-573BE571E9EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD8A8AA8-E0DF-4847-9E33-573BE571E9EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD8A8AA8-E0DF-4847-9E33-573BE571E9EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD8A8AA8-E0DF-4847-9E33-573BE571E9EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30A29717-6B09-44CA-AA48-FB8D5D884B2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30A29717-6B09-44CA-AA48-FB8D5D884B2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30A29717-6B09-44CA-AA48-FB8D5D884B2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30A29717-6B09-44CA-AA48-FB8D5D884B2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F5FEDDA-CCAD-42D2-B189-6B5F4ECB96A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F5FEDDA-CCAD-42D2-B189-6B5F4ECB96A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F5FEDDA-CCAD-42D2-B189-6B5F4ECB96A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F5FEDDA-CCAD-42D2-B189-6B5F4ECB96A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF4E6875-6200-4395-80EF-2477B3D9D27B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF4E6875-6200-4395-80EF-2477B3D9D27B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF4E6875-6200-4395-80EF-2477B3D9D27B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF4E6875-6200-4395-80EF-2477B3D9D27B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12B69A23-3DCE-4418-9E03-F6D9F7E523DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12B69A23-3DCE-4418-9E03-F6D9F7E523DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12B69A23-3DCE-4418-9E03-F6D9F7E523DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12B69A23-3DCE-4418-9E03-F6D9F7E523DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

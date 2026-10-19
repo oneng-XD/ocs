@@ -1,0 +1,42 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+utiCommon
+</name>
+</assembly>
+<members>
+<member name="M:Cocolife.Utility.Common.DataType.fString.IfDBNull(System.Object,System.Object)">
+	<summary>
+ checking if object is DBNull 
+ APPLICATION to ORACLE
+ </summary>
+	<param name="pValue"></param>
+	<param name="pValueIfNull"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:Cocolife.Utility.Common.DataType.fString.IfNull(System.Object,System.Object)">
+	<summary>
+ checking if object is DBNull
+ ORACLE to APPLICATION
+ </summary>
+	<param name="pValue"></param>
+	<param name="pValueIfNull"></param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="P:Cocolife.Utility.Common.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:Cocolife.Utility.Common.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:Cocolife.Utility.Common.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+</members>
+</doc>

@@ -1,0 +1,1253 @@
+﻿#Region "Description"
+' PAGE NAME     : Payment : Sales Invoice
+' CREATED BY    : Ej
+' CREATED DATE  : 11/07/2024
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports preSecurity = Cocolife.Presenter.Common.Security
+Imports preMessages = Cocolife.Utility.OCS.Messages
+Imports prePayment = Cocolife.Presenter.OCS.Payment
+Imports preSearch = Cocolife.Presenter.OCS.Search
+Imports preReport = Cocolife.Presenter.OCS.Report
+Imports eSystemMessage = Cocolife.Utility.Common.Enums.eSystemMessage
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports eCSS = Cocolife.Utility.OCS.Enums.eCSS
+Imports ePage = Cocolife.Utility.OCS.Enums.ePage
+Imports eReference = Cocolife.Utility.OCS.Enums.eReference
+Imports eDocSaveState = Cocolife.Utility.OCS.Enums.eReference.DocSaveState
+Imports eSession = Cocolife.Utility.OCS.Enums.eSession
+Imports eReport = Cocolife.Utility.OCS.Enums.eReport
+Imports Cocolife.Utility.OCS.Classes
+Imports System.Linq
+Imports System.Reflection
+Imports CrystalDecisions.CrystalReports.Engine
+Imports CrystalDecisions.Shared
+Imports cCrystalConn = Cocolife.Utility.OCS.Classes.cCrystalConn
+Imports System.Globalization
+
+#End Region
+
+Partial Public Class PaymentSalesInvoice
+    Inherits System.Web.UI.Page
+
+#Region "Implements"
+    Implements preSecurity.ISystemMessage
+    Implements preMessages.IConfirmationMessage
+    Implements prePayment.IPaymentSalesInvoice
+#End Region
+
+#Region "Variables"
+    Private pSystemMessage As preSecurity.PSystemMessage
+    Private pConfirmationMessage As preMessages.PConfirmationMessage
+    Private pPaymentSalesInvoice As prePayment.PPaymentSalesInvoice
+    Private mIsSuccessful As Boolean
+#End Region
+
+#Region "ISystemMessage"
+
+#Region "Property"
+
+    Public WriteOnly Property Message() As String Implements preSecurity.ISystemMessage.Message
+        Set(ByVal value As String)
+            lblMessage.Text = value
+        End Set
+    End Property
+
+    Public WriteOnly Property MessageType() As String Implements preSecurity.ISystemMessage.MessageType
+        Set(ByVal value As String)
+            imgMessage.ImageUrl = value
+        End Set
+    End Property
+
+    Public WriteOnly Property IsMessage() As Boolean Implements preSecurity.ISystemMessage.isMessage
+        Set(ByVal value As Boolean)
+            If value Then
+                mpeMessage.Show()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+
+#End Region
+
+#End Region
+
+#Region "IConfirmationMessage"
+
+#Region "Property"
+
+    Public Property ConfirmCaller() As String Implements preMessages.IConfirmationMessage.ConfirmCaller
+        Get
+            Return cDataType.fString.IfNull(hdnConfirmCaller.Value)
+        End Get
+        Set(value As String)
+            hdnConfirmCaller.Value = value
+        End Set
+    End Property
+
+    Public Property ConfirmClickState() As Boolean Implements preMessages.IConfirmationMessage.ClickedState
+        Get
+            Return cDataType.fBoolean.IfNull(hdnClickStateTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnClickStateTag.Value = value
+        End Set
+    End Property
+
+    Public Property UserResponse() As Boolean Implements preMessages.IConfirmationMessage.UserResponse
+        Get
+            Return cDataType.fBoolean.IfNull(hdnConfirmTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnConfirmTag.Value = value
+        End Set
+    End Property
+
+    Public WriteOnly Property ConfirmMessage() As String Implements preMessages.IConfirmationMessage.Message
+        Set(ByVal value As String)
+            lblConfirm.Text = value
+        End Set
+    End Property
+
+    Public WriteOnly Property IsConfirmMessage() As Boolean Implements preMessages.IConfirmationMessage.isMessage
+        Set(ByVal value As Boolean)
+            If value Then
+                mpeConfirm.Show()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+
+#End Region
+
+#End Region
+
+#Region "IPaymentSalesInvoice"
+
+#Region "Property"
+
+#Region "Invoice Details"
+
+    Public Property DocPrinted As Boolean Implements prePayment.IPaymentSalesInvoice.DocPrinted
+        Get
+            Return cDataType.fBoolean.IfNull(hdnDocPrinted.Value)
+        End Get
+        Set(value As Boolean)
+            hdnDocPrinted.Value = value
+        End Set
+    End Property
+
+    Public Property DocSaveState As Integer Implements prePayment.IPaymentSalesInvoice.DocSaveState
+        Get
+            Return cDataType.fInteger.IfNull(hdnDocSaveState.Value)
+        End Get
+        Set(value As Integer)
+            hdnDocSaveState.Value = value
+
+            ManageMain(value)
+
+            Select Case value
+                Case eDocSaveState.Initial
+                    ibtnViewDocs.Visible = True
+                    btnInvoiceAddNew.Enabled = True
+                    btnInvoiceSave.Enabled = False
+                    btnInvoiceSave.Text = "Save"
+                    btnInvoicePrint.Enabled = False
+                    btnInvoiceCancel.Enabled = False
+
+                    RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+                Case eDocSaveState.ViewNoEdit
+                    ibtnViewDocs.Visible = True
+                    ibtnSearchRefNo.Visible = False
+                    btnInvoiceAddNew.Enabled = True
+                    btnInvoiceSave.Enabled = False
+                    If InvoiceNumber > 0 Then
+                        btnInvoicePrint.Enabled = True
+                    Else
+                        btnInvoicePrint.Enabled = False
+                    End If
+                    If InvoiceNumber > 0 Or SIPrintStatus <> "PRINTED" Then
+                        btnInvoiceCancel.Enabled = True
+                    Else
+                        btnInvoiceCancel.Enabled = False
+                    End If
+                    ibtnSearchRefNo.Visible = False
+                    ibtnClearRefNo.Visible = False
+                    ManageDetails("EDIT", False)
+                Case eDocSaveState.AddNew
+                    ibtnViewDocs.Visible = True
+                    txtInvoiceRemarks.Enabled = True
+                    btnInvoiceAddNew.Enabled = False
+                    btnInvoiceSave.Enabled = True
+                    btnInvoiceSave.Text = "Save"
+                    btnInvoicePrint.Enabled = False
+                    btnInvoiceCancel.Enabled = False
+                    ManageDetails("SEARCHREFNO", False)
+                Case eDocSaveState.Cancel
+                    ibtnViewDocs.Visible = True
+                    btnInvoiceAddNew.Enabled = True
+                    btnInvoiceSave.Enabled = False
+                    btnInvoiceSave.Text = "Save"
+                    btnInvoicePrint.Enabled = False
+                    btnInvoiceCancel.Enabled = False
+                    ibtnSearchRefNo.Visible = False
+                    ibtnClearRefNo.Visible = False
+                    ManageDetails("EDIT", False)
+                Case eDocSaveState.Print
+                    ibtnViewDocs.Visible = True
+                    btnInvoiceAddNew.Enabled = True
+                    btnInvoiceSave.Enabled = False
+                    btnInvoicePrint.Enabled = True
+                    ibtnSearchRefNo.Visible = False
+                    ibtnClearRefNo.Visible = False
+                    If InvoiceDate = Now.Date AndAlso AckReceiptNumber = 0 AndAlso SIPrintStatus = "PRINTED" Then
+                        btnInvoiceCancel.Enabled = True
+                    Else
+                        btnInvoiceCancel.Enabled = False
+                    End If
+            End Select
+        End Set
+    End Property
+
+    Public ReadOnly Property DocType As String Implements prePayment.IPaymentSalesInvoice.DocType
+        Get
+            Return eReference.DocTypeOPR
+        End Get
+    End Property
+
+    Public ReadOnly Property SiteCode As Long Implements prePayment.IPaymentSalesInvoice.SiteCode
+        Get
+            Return Master.SiteID
+        End Get
+    End Property
+
+    Public ReadOnly Property UserID As Long Implements prePayment.IPaymentSalesInvoice.UserID
+        Get
+            Return Master.UserPrsPID
+        End Get
+    End Property
+
+
+    Public Property ReceiptByCode As String Implements prePayment.IPaymentSalesInvoice.ReceiptByCode
+        Get
+            Return cDataType.fString.IfNull(hdnReceiptByCode.Value)
+        End Get
+        Set(value As String)
+            hdnReceiptByCode.Value = value
+        End Set
+    End Property
+
+    Public Property ReceiptById As Long Implements prePayment.IPaymentSalesInvoice.ReceiptById
+        Get
+            Return cDataType.fString.IfNull(hdnReceiptById.Value)
+        End Get
+        Set(value As Long)
+            hdnReceiptById.Value = value
+        End Set
+    End Property
+
+    Public Property IsSuccessful As Boolean Implements prePayment.IPaymentSalesInvoice.IsSuccessful
+        Get
+            Return mIsSuccessful
+        End Get
+        Set(value As Boolean)
+            mIsSuccessful = value
+        End Set
+    End Property
+
+    Public Property IsSourceSiteLocked() As Boolean Implements prePayment.IPaymentSalesInvoice.IsSourceSiteLocked
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsSourceSiteLocked.Value)
+        End Get
+        Set(ByVal value As Boolean)
+            If value Then
+                If DocSaveState = eReference.DocSaveState.AddNew Or DocSaveState = eReference.DocSaveState.Edit Then
+                    RaiseEvent CheckSourceSite(Me, EventArgs.Empty)
+                    value = IsSuccessful
+                End If
+            End If
+            hdnIsSourceSiteLocked.Value = value
+            ManageDetails("SOURCESITE", value)
+        End Set
+    End Property
+
+    Public Property SourceSite As String Implements prePayment.IPaymentSalesInvoice.SourceSite
+        Get
+            Return cDataType.fString.IfNull(ddlSourceSite.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlSourceSite.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property ReservedDocNo As Long Implements prePayment.IPaymentSalesInvoice.ReservedDocNo
+        Get
+            Return cDataType.fLong.IfNull(hdnReservedDocNo.value)
+        End Get
+        Set(value As Long)
+            hdnReservedDocNo.value = value
+        End Set
+    End Property
+
+    Public Property SalesInvoiceID As Long Implements prePayment.IPaymentSalesInvoice.SalesInvoiceID
+        Get
+            Return cDataType.fLong.IfNull(hdnSalesInvoiceID.Value)
+        End Get
+        Set(value As Long)
+            hdnSalesInvoiceID.Value = value
+        End Set
+    End Property
+
+    Public Property UploadTag As String Implements prePayment.IPaymentSalesInvoice.UploadTag
+        Get
+            Return cDataType.fString.IfNull(hdnUploadTag.Value)
+        End Get
+        Set(value As String)
+            hdnUploadTag.Value = value
+        End Set
+    End Property
+
+    Public Property ReferenceNo As String Implements prePayment.IPaymentSalesInvoice.ReferenceNo
+        Get
+            Return cDataType.fString.IfNull(txtReferenceNo.Text)
+        End Get
+        Set(value As String)
+            txtReferenceNo.Text = value
+        End Set
+    End Property
+
+    Public Property PayorName As String Implements prePayment.IPaymentSalesInvoice.PayorName
+        Get
+            Return cDataType.fString.IfNull(txtPayorName.Text)
+        End Get
+        Set(value As String)
+            txtPayorName.Text = value
+        End Set
+    End Property
+
+    Public Property PayorAddress As String Implements prePayment.IPaymentSalesInvoice.PayorAddress
+        Get
+            Return cDataType.fString.IfNull(txtPayorAddress.Text)
+        End Get
+        Set(value As String)
+            txtPayorAddress.Text = value
+        End Set
+    End Property
+
+    Public Property PayorTIN As String Implements prePayment.IPaymentSalesInvoice.PayorTIN
+        Get
+            Return cDataType.fString.IfNull(txtPayorTin.Text)
+        End Get
+        Set(value As String)
+            txtPayorTin.Text = value
+        End Set
+    End Property
+
+    Public Property InsuredClientName As String Implements prePayment.IPaymentSalesInvoice.InsuredClientName
+        Get
+            Return cDataType.fString.IfNull(txtInsuredClientName.Text)
+        End Get
+        Set(value As String)
+            txtInsuredClientName.Text = value
+        End Set
+    End Property
+
+    Public Property PolicyNumber As String Implements prePayment.IPaymentSalesInvoice.PolicyNumber
+        Get
+            Return cDataType.fString.IfNull(txtPolicyNumber.Text)
+        End Get
+        Set(value As String)
+            txtPolicyNumber.Text = value
+        End Set
+    End Property
+
+    Public Property CoveragePeriodFrom As Date Implements prePayment.IPaymentSalesInvoice.CoveragePeriodFrom
+        Get
+            Return cDataType.fDate.IfNull(txtCoveragePeriodFrom.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtCoveragePeriodFrom.Text = ""
+            Else
+                txtCoveragePeriodFrom.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property CoveragePeriodTo As Date Implements prePayment.IPaymentSalesInvoice.CoveragePeriodTo
+        Get
+            Return cDataType.fDate.IfNull(txtCoveragePeriodTo.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtCoveragePeriodTo.Text = ""
+            Else
+                txtCoveragePeriodTo.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property InvoiceCurrency As String Implements prePayment.IPaymentSalesInvoice.InvoiceCurrency
+        Get
+            Return cDataType.fString.IfNull(ddlInvoiceCurrency.Text)
+        End Get
+        Set(value As String)
+            If value = "USD" Then
+                ddlInvoiceCurrency.Text = value
+            Else
+                ddlInvoiceCurrency.Text = "PHP"
+            End If
+        End Set
+    End Property
+
+    Public Property InvoiceAmount As Decimal Implements prePayment.IPaymentSalesInvoice.InvoiceAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtInvoiceAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtInvoiceAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property VATable As Decimal Implements prePayment.IPaymentSalesInvoice.VATable
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATable.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATable.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property VATExempt As Decimal Implements prePayment.IPaymentSalesInvoice.VATExempt
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATExempt.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATExempt.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property VATAmount As Decimal Implements prePayment.IPaymentSalesInvoice.VATAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property NonVAT As Decimal Implements prePayment.IPaymentSalesInvoice.NonVAT
+        Get
+            Return cDataType.fDecimal.IfNull(txtNonVAT.Text)
+        End Get
+        Set(value As Decimal)
+            txtNonVAT.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property TotalSales As Decimal Implements prePayment.IPaymentSalesInvoice.TotalSales
+        Get
+            Return cDataType.fDecimal.IfNull(txtTotalSales.Text)
+        End Get
+        Set(value As Decimal)
+            txtTotalSales.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property WitholdingTax As Decimal Implements prePayment.IPaymentSalesInvoice.WitholdingTax
+        Get
+            Return cDataType.fDecimal.IfNull(txtWitholdingTax.Text)
+        End Get
+        Set(value As Decimal)
+            txtWitholdingTax.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property NetOfWitholdingTax As Decimal Implements prePayment.IPaymentSalesInvoice.NetOfWitholdingTax
+        Get
+            Return cDataType.fDecimal.IfNull(txtNetOfWitholdingTax.Text)
+        End Get
+        Set(value As Decimal)
+            txtNetOfWitholdingTax.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property Discount As Decimal Implements prePayment.IPaymentSalesInvoice.Discount
+        Get
+            Return cDataType.fDecimal.IfNull(txtDiscount.Text)
+        End Get
+        Set(value As Decimal)
+            txtDiscount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property DiscountIdNo As String Implements prePayment.IPaymentSalesInvoice.DiscountIdNo
+        Get
+            Return cDataType.fString.IfNull(txtDiscountIdNo.Text)
+        End Get
+        Set(value As String)
+            txtDiscountIdNo.Text = value
+        End Set
+    End Property
+
+    Public Property PaymentTerm As String Implements prePayment.IPaymentSalesInvoice.PaymentTerm
+        Get
+            Return cDataType.fString.IfNull(txtPaymentTerm.Text)
+        End Get
+        Set(value As String)
+            txtPaymentTerm.Text = value
+        End Set
+    End Property
+
+    Public Property NextDueDate As Date Implements prePayment.IPaymentSalesInvoice.NextDueDate
+        Get
+            Return cDataType.fDate.IfNull(txtNextDueDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtNextDueDate.Text = ""
+            Else
+                txtNextDueDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property IsFromNewgenAPI As Boolean Implements prePayment.IPaymentSalesInvoice.IsFromNewgenAPI
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsFromNewgenAPI.Value)
+        End Get
+        Set(value As Boolean)
+            hdnIsFromNewgenAPI.Value = value
+        End Set
+    End Property
+
+    Public Property ParticularsRaw As String Implements prePayment.IPaymentSalesInvoice.ParticularsRaw
+        Get
+            Return cDataType.fString.IfNull(hdnParticularsRaw.Value)
+        End Get
+        Set(value As String)
+            hdnParticularsRaw.Value = value
+        End Set
+    End Property
+
+    Public Property AgentName As String Implements prePayment.IPaymentSalesInvoice.AgentName
+        Get
+            Return cDataType.fString.IfNull(txtAgentName.Text)
+        End Get
+        Set(value As String)
+            txtAgentName.Text = value
+        End Set
+    End Property
+
+    Public Property AgentCode As String Implements prePayment.IPaymentSalesInvoice.AgentCode
+        Get
+            Return cDataType.fString.IfNull(txtAgentCode.Text)
+        End Get
+        Set(value As String)
+            txtAgentCode.Text = value
+        End Set
+    End Property
+
+    Public Property InvoiceRemarks As String Implements prePayment.IPaymentSalesInvoice.InvoiceRemarks
+        Get
+            Return cDataType.fString.IfNull(txtInvoiceRemarks.Text)
+        End Get
+        Set(value As String)
+            txtInvoiceRemarks.Text = value
+        End Set
+    End Property
+
+    Public Property CancellationReason As String Implements prePayment.IPaymentSalesInvoice.CancellationReason
+        Get
+            Return cDataType.fString.IfNull(txtCancellationReason.Text)
+        End Get
+        Set(value As String)
+            txtCancellationReason.Text = value
+        End Set
+    End Property
+
+    Public Property InvoiceOtherInfo As String Implements prePayment.IPaymentSalesInvoice.InvoiceOtherInfo
+        Get
+            Return cDataType.fString.IfNull(txtInvoiceOtherInfo.Text)
+        End Get
+        Set(value As String)
+            txtInvoiceOtherInfo.Text = value
+        End Set
+    End Property
+
+    Public Property InvoiceNumber As Long Implements prePayment.IPaymentSalesInvoice.InvoiceNumber
+        Get
+            Return cDataType.fLong.IfNull(txtInvoiceNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtInvoiceNumber.Text = "AUTO"
+            Else
+                txtInvoiceNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property InvoiceDate() As Date Implements prePayment.IPaymentSalesInvoice.InvoiceDate
+        Get
+            Return cDataType.fDate.IfNull(txtInvoiceDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtInvoiceDate.Text = ""
+            Else
+                txtInvoiceDate.Text = value
+            End If
+        End Set
+    End Property
+
+
+    Public Property AckReceiptNumber As Long Implements prePayment.IPaymentSalesInvoice.AckReceiptNumber
+        Get
+            Return cDataType.fLong.IfNull(hdnAckReceiptNumber.Value)
+        End Get
+        Set(value As Long)
+            hdnAckReceiptNumber.Value = value
+        End Set
+    End Property
+
+    Public Property ARDate() As Date Implements prePayment.IPaymentSalesInvoice.ARDate
+        Get
+            Return cDataType.fString.IfNull(hdnARDate.Value)
+        End Get
+        Set(value As Date)
+            hdnARDate.Value = value
+        End Set
+    End Property
+
+    Public Property UploadDate() As Date Implements prePayment.IPaymentSalesInvoice.UploadDate
+        Get
+            Return cDataType.fDate.IfNull(txtUploadDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtUploadDate.Text = ""
+            Else
+                txtUploadDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property SIPrintStatus() As String Implements prePayment.IPaymentSalesInvoice.SIPrintStatus
+        Get
+            Return cDataType.fString.IfNull(hdnSIPrintStatus.Value)
+        End Get
+        Set(value As String)
+            hdnSIPrintStatus.Value = value
+        End Set
+    End Property
+
+    Public Property ARPrintStatus() As String Implements prePayment.IPaymentSalesInvoice.ARPrintStatus
+        Get
+            Return cDataType.fString.IfNull(hdnARPrintStatus.Value)
+        End Get
+        Set(value As String)
+            hdnARPrintStatus.Value = value
+        End Set
+    End Property
+
+    Public WriteOnly Property lstSIDetails As List(Of cSIDetails) Implements prePayment.IPaymentSalesInvoice.lstSIDetails
+        Set(ByVal value As List(Of cSIDetails))
+            txtParticularsTotalAmount.Text = CDec(value.Sum(Function(c) c.Amount)).ToString("#,##0.00")
+
+            gvwParticulars.DataSource = value
+            gvwParticulars.DataBind()
+        End Set
+    End Property
+
+    Public Property ViewDocFrom As Date Implements prePayment.IPaymentSalesInvoice.ViewDocFrom
+        Get
+            Return cDataType.fDate.IfNull(txtFromDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtFromDate.Text = cDataType.fDate.Current.AddDays(-3)
+            Else
+                txtFromDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewDocTo As Date Implements prePayment.IPaymentSalesInvoice.ViewDocTo
+        Get
+            Return cDataType.fDate.IfNull(txtToDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtToDate.Text = cDataType.fDate.Current
+            Else
+                txtToDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewDocNumber As Long Implements prePayment.IPaymentSalesInvoice.ViewDocNumber
+        Get
+            Return cDataType.fLong.IfNull(txtViewInvoiceNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtViewInvoiceNumber.Text = Nothing
+            Else
+                txtViewInvoiceNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewReferenceNumber As String Implements prePayment.IPaymentSalesInvoice.ViewReferenceNumber
+        Get
+            Return cDataType.fString.IfNull(txtViewReferenceNo.Text)
+        End Get
+        Set(value As String)
+            txtViewReferenceNo.Text = value
+        End Set
+    End Property
+
+    Public Property IsReferenceNoExisting() As Boolean Implements prePayment.IPaymentSalesInvoice.IsReferenceNoExisting
+        Get
+            Return cDataType.fBoolean.IfNull(hdnReferenceNoExisting.Value)
+        End Get
+        Set(ByVal value As Boolean)
+            hdnReferenceNoExisting.value = value
+        End Set
+    End Property
+
+
+
+#End Region
+
+#Region "Tag"
+
+    Public Property GroupTag As Boolean Implements prePayment.IPaymentSalesInvoice.GroupTag
+        Get
+            Return IIf(ddlPolicyType.SelectedValue = "GRP", True, False)
+        End Get
+        Set(value As Boolean)
+            If value Then
+                ddlPolicyType.SelectedValue = "GRP"
+            Else
+                ddlPolicyType.SelectedValue = String.Empty
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "DataTable"
+
+    Public WriteOnly Property dtViewDoc As DataTable Implements prePayment.IPaymentSalesInvoice.dtViewDoc
+        Set(value As DataTable)
+            gvwViewDoc.DataSource = value
+            gvwViewDoc.DataBind()
+        End Set
+    End Property
+
+    Public WriteOnly Property dtSourceSite As DataTable Implements prePayment.IPaymentSalesInvoice.dtSourceSite
+        Set(value As DataTable)
+            Call SetDropDownList(ddlSourceSite, value, "PRSNME", "PRSPID", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtCurrency As DataTable Implements prePayment.IPaymentSalesInvoice.dtCurrency
+        Set(value As DataTable)
+            Call SetDropDownList(ddlInvoiceCurrency, value, "CURNAM", "CURCOD", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+#End Region
+#End Region
+
+#Region "Event"
+    Public Event ClearScreenMain(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.ClearScreenMain
+    Public Event ClearScreenInfo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.ClearScreenInfo
+    Public Event ClearScreenViewDoc(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentSalesInvoice.ClearScreenViewDoc
+    ' -------------------------------------------------------------------------------
+    Public Event LoadSourceSite(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.LoadSourceSite
+    Public Event LoadCurrency(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.LoadCurrency
+    Public Event CheckSourceSite(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.CheckSourceSite
+    ' -------------------------------------------------------------------------------
+    Public Event ConfirmCancel(sender As Object, e As EventArgs) Implements prePayment.IPaymentSalesInvoice.ConfirmCancel
+    Public Event ConfirmSave(sender As Object, e As EventArgs) Implements prePayment.IPaymentSalesInvoice.ConfirmSave
+    Public Event ConfirmPrint(sender As Object, e As EventArgs) Implements prePayment.IPaymentSalesInvoice.ConfirmPrint
+    Public Event ProcessSalesInvoice(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.ProcessSalesInvoice
+    Public Event LoadSalesInvoice(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.LoadSalesInvoice
+    Public Event LoadNewSalesInvoice(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.LoadNewSalesInvoice
+    Public Event LoadViewDoc(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.LoadViewDoc
+    Public Event GenerateReport(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.GenerateReport
+#End Region
+
+#End Region
+
+#Region "Event Handlers"
+
+#Region "Page"
+
+    Private Sub PaymentSalesInvoice_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Init
+        pSystemMessage = New preSecurity.PSystemMessage(Me)
+        pConfirmationMessage = New preMessages.PConfirmationMessage(Me)
+        pPaymentSalesInvoice = New prePayment.PPaymentSalesInvoice(Me)
+    End Sub
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        Page.MaintainScrollPositionOnPostBack = True
+
+        If Not IsPostBack Then
+            Call AddAttributes()
+            Call LoadReference()
+            Call ClearFields()
+            Call ManageMain(eDocSaveState.Initial)
+        End If
+
+    End Sub
+
+#End Region
+
+#Region "Button"
+
+    Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
+        Call ClearSession()
+        Response.Redirect(ePage.PaymentSalesInvoice, False)
+    End Sub
+
+    Private Sub btnMessageOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnMessageOk.Click
+        mpeMessage.Hide()
+        Select Case Session(eSession.Modal)
+            Case "mpeViewDocs"
+                Call SetModalSession(mpeViewDocs, True, btnLoadViewDoc)
+        End Select
+
+        Call ClearSession()
+    End Sub
+
+    Private Sub btnLoadViewDoc_Click(sender As Object, e As EventArgs) Handles btnLoadViewDoc.Click
+        dtViewDoc = Nothing
+        RaiseEvent LoadViewDoc(Me, EventArgs.Empty)
+        Call SetModalSession(mpeViewDocs, True, btnLoadViewDoc)
+        upPaymentSalesInvoice.Update()
+    End Sub
+
+    Private Sub btnViewDocsClose_Click(sender As Object, e As EventArgs) Handles btnViewDocsClose.Click
+        Call ClearSession()
+        Call SetModalSession(mpeViewDocs, False, ibtnViewDocs)
+        RaiseEvent ClearScreenViewDoc(sender, e)
+    End Sub
+
+    Private Sub btnInvoiceAddNew_Click(sender As Object, e As EventArgs) Handles btnInvoiceAddNew.Click 'heyy
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+        RaiseEvent LoadNewSalesInvoice(Me, EventArgs.Empty)
+        Call SetDefaults()
+        If IsSuccessful Then
+            DocSaveState = eDocSaveState.AddNew
+            IsSourceSiteLocked = True
+        Else
+            DocSaveState = eDocSaveState.Initial
+        End If
+        upPaymentSalesInvoice.Update()
+    End Sub
+
+    Private Sub btnInvoiceSave_Click(sender As Object, e As EventArgs) Handles btnInvoiceSave.Click
+        Select Case DocSaveState
+            Case eDocSaveState.ViewEdit
+                DocSaveState = eReference.DocSaveState.Edit
+                ManageMain(DocSaveState)
+                IsSourceSiteLocked = True
+            Case eDocSaveState.AddNew, eDocSaveState.Edit
+                RaiseEvent ConfirmSave(Me, EventArgs.Empty)
+        End Select
+    End Sub
+
+    Private Sub btnConfirmNo_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnConfirmNo.Click
+        ConfirmClickState = True
+
+        Call ClearSession()
+        SetModalSession(mpeConfirm, False, btnConfirmYes)
+    End Sub
+
+    Private Sub btnConfirmYes_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnConfirmYes.Click
+        ConfirmClickState = True
+        mpeConfirm.Hide()
+
+        Call ClearSession()
+        Select Case ConfirmCaller
+            Case "CANCEL"
+                DocSaveState = eDocSaveState.Cancel
+                RaiseEvent ProcessSalesInvoice(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    ReceiptById = UserID
+                    RaiseEvent LoadSalesInvoice(Me, EventArgs.Empty)
+                Else
+                    DocSaveState = eDocSaveState.ViewNoEdit
+                End If
+                Call SetModalSession(mpeConfirm, False, btnInvoiceCancel)
+
+            Case "SAVE"
+                RaiseEvent ProcessSalesInvoice(Me, EventArgs.Empty)
+                DocSaveState = eDocSaveState.ViewNoEdit
+                If IsSuccessful Then
+                    ReceiptById = UserID
+                    RaiseEvent LoadSalesInvoice(Me, EventArgs.Empty)
+                End If
+
+            Case "PRINT"
+                RaiseEvent GenerateReport(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    DocSaveState = eDocSaveState.Print
+                    RaiseEvent ProcessSalesInvoice(Me, EventArgs.Empty)
+                    If IsSuccessful Then
+                        ReceiptById = UserID
+                        RaiseEvent LoadSalesInvoice(Me, EventArgs.Empty)
+                    Else
+                        DocSaveState = eDocSaveState.ViewNoEdit
+                    End If
+                End If
+
+        End Select
+        upPaymentSalesInvoice.Update()
+    End Sub
+
+    Private Sub btnInvoiceCancel_Click(sender As Object, e As EventArgs) Handles btnInvoiceCancel.Click
+        RaiseEvent ConfirmCancel(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub btnCancelYes_Click(sender As Object, e As EventArgs) Handles btnCancelYes.Click
+        ConfirmClickState = True
+        mpeConfirm.Hide()
+
+        Call ClearSession()
+
+        DocSaveState = eDocSaveState.Cancel
+        RaiseEvent ProcessSalesInvoice(Me, EventArgs.Empty)
+        If IsSuccessful Then
+            ReceiptById = UserID
+            RaiseEvent LoadSalesInvoice(Me, EventArgs.Empty)
+        Else
+            DocSaveState = eDocSaveState.ViewNoEdit
+        End If
+        Call SetModalSession(mpeConfirm, False, btnInvoiceCancel)
+
+
+        upPaymentSalesInvoice.Update()
+    End Sub
+  
+#End Region
+
+#Region "CheckBox"
+
+#End Region
+
+#Region "DropDownList"
+
+#End Region
+
+#Region "ImageButton"
+    Private Sub ibtnViewDocs_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnViewDocs.Click
+        RaiseEvent ClearScreenViewDoc(Me, EventArgs.Empty)
+        RaiseEvent LoadViewDoc(Me, EventArgs.Empty)
+
+        Call ClearSession()
+        Call SetModalSession(mpeViewDocs, True, btnLoadViewDoc)
+    End Sub
+
+    Private Sub ibtnSearchRefNo_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchRefNo.Click
+        Call ClearSession()
+        RaiseEvent LoadSalesInvoice(Me, EventArgs.Empty)
+        ManageDetails("SEARCHREFNO", IsReferenceNoExisting)
+        upPaymentSalesInvoice.Update()
+    End Sub
+
+    Private Sub ibtnClearRefNo_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearRefNo.Click
+        Call ClearSession()
+        ManageDetails("SEARCHREFNO", False)
+        RaiseEvent ClearScreenInfo(Me, EventArgs.Empty)
+        upPaymentSalesInvoice.Update()
+    End Sub
+
+#End Region
+
+#Region "GridView"
+
+
+#End Region
+
+#Region "Radio Button"
+    Protected Sub radSelectViewDoc_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentSalesInvoice.radSelectDoc
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+        ReferenceNo = cDataType.fString.IfNull(gvrSelect.Cells(2).Text.Trim)
+        ReceiptByCode = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(8).Text.Trim))
+        SourceSite = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(10).Text.Trim))
+
+        RaiseEvent LoadSalesInvoice(Me, EventArgs.Empty)
+        DocSaveState = eReference.DocSaveState.ViewNoEdit
+
+        If ReceiptByCode <> Master.UserCode Then
+            btnInvoiceSave.Enabled = False
+            btnInvoicePrint.Enabled = False
+            btnInvoiceCancel.Enabled = False
+        End If
+        'Manage controls
+
+        Call SetModalSession(mpeViewDocs, False, ibtnViewDocs)
+        upPaymentSalesInvoice.Update()
+
+    End Sub
+#End Region
+
+#End Region
+
+#Region "Custom Method"
+
+#Region "Sub"
+
+    Private Sub AddAttributes()
+        Call SetFocusBlur(txtInvoiceRemarks, eCSS.TextBoxInputTextArea2Focus, eCSS.TextBoxInputTextArea2)
+        ' -------------------------------------------------------------------------------
+        Call SetButtonPostBack(btnCancel)
+        Call SetButtonPostBack(btnLoadViewDoc)
+        Call SetButtonPostBack(btnConfirmYes)
+        Call SetButtonPostBack(btnInvoiceAddNew)
+        Call SetButtonPostBack(btnInvoiceCancel)
+        ' -------------------------------------------------------------------------------        
+    End Sub
+
+    Private Sub ClearDropDownList(ByVal pDropDownList As DropDownList, ByVal pText As String, ByVal pValue As String)
+        With pDropDownList
+            .Items.Clear()
+            .Items.Insert(0, New ListItem(pText, pValue))
+        End With
+    End Sub
+
+    Private Sub ClearFields()
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub ClearSession()
+        Session(eSession.IsMessage) = Nothing
+        Session(eSession.Message) = Nothing
+        Session(eSession.MessageType) = Nothing
+        Session(eSession.Modal) = Nothing
+        Session(eSession.ReportParam) = Nothing
+    End Sub
+
+    Private Sub DeselectGridView(ByVal pGridview As GridView, ByVal pRadButtonID As RadioButton)
+        Dim radSelect As RadioButton
+
+        For Each dr As GridViewRow In pGridview.Rows
+            radSelect = DirectCast(dr.FindControl(pRadButtonID.ID), RadioButton)
+            If Not radSelect.UniqueID = pRadButtonID.UniqueID Then
+                radSelect.Checked = False
+            End If
+        Next
+    End Sub
+
+    Private Sub LoadReference()
+        RaiseEvent LoadSourceSite(Me, EventArgs.Empty)
+        RaiseEvent LoadCurrency(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub SetButtonPostBack(ByVal pButton As Button)
+        pButton.Attributes.Add("OnClick", "if(this.value === 'Processing...') { return false; } else { this.value = 'Processing...'; this.disabled = true; " + Page.ClientScript.GetPostBackEventReference(pButton, Nothing) + ";}")
+    End Sub
+
+    Private Sub SetCurrency(ByVal pTextbox As TextBox, ByVal pDecimal As Integer)
+        pTextbox.Attributes.Add("onkeypress", "return blockNonNumbers(this, event, true, false);")
+        Select Case pDecimal
+            Case -1 ' unlimited decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,-1,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,-1,false); javascript:this.value=Comma(this.value);")
+            Case 0 ' no decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,0,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,0,false); javascript:this.value=Comma(this.value);")
+            Case 2 ' 2 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,2,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,2,false); javascript:this.value=Comma(this.value);")
+            Case 3 ' 3 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,3,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,3,false); javascript:this.value=Comma(this.value);")
+            Case 4 ' 4 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,4,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,4,false); javascript:this.value=Comma(this.value);")
+        End Select
+    End Sub
+
+    Private Sub SetDefaults()
+        'TODO: Put default values here!
+        SourceSite = SiteCode
+    End Sub
+
+
+    Private Sub SetReportSessionScript(ByVal pReport As String)
+        If Session("script") = String.Empty Or Session("script") Is Nothing Then
+            Session("script") = "window.open('" + pReport + "','','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+            'Session("script") = "window.open('" + pReport + "','_blank','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+        Else
+            Session("script") = Session("script") & "window.open('" + pReport + "','','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+            'Session("script") = Session("script") & "window.open('" + pReport + "','_blank','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+        End If
+    End Sub
+
+    Private Sub ManageMain(ByVal pAction As Integer)
+        Select Case pAction
+            Case eDocSaveState.Initial
+                ManageDetails("ENABLED", False)
+            Case eDocSaveState.ViewNoEdit, eDocSaveState.ViewEdit, eDocSaveState.Print, eDocSaveState.Cancel
+                ManageDetails("ENABLED", True)
+            Case eDocSaveState.AddNew, eDocSaveState.Edit
+                ManageDetails("ENABLED", True)
+        End Select
+    End Sub
+
+    Private Sub ManageDetails(ByVal pAction As String, Optional ByVal pEnabled As Boolean? = Nothing)
+
+        Select Case pAction
+            Case "ENABLED"
+                pnlPaymentDetails1.Enabled = pEnabled
+                accInvoiceInformation.Visible = pEnabled
+                accParticulars.Visible = pEnabled
+                accVATComputation.Visible = pEnabled
+
+            Case "SEARCHREFNO"
+                txtReferenceNo.Enabled = Not pEnabled
+                txtPolicyNumber.Enabled = Not pEnabled
+                ibtnSearchRefNo.Visible = Not pEnabled
+                ibtnClearRefNo.Visible = pEnabled
+                ddlPolicyType.Enabled = Not pEnabled
+            Case "SOURCESITE"
+                ddlSourceSite.Enabled = Not pEnabled
+            Case "EDIT"
+                txtInvoiceRemarks.Enabled = pEnabled
+                txtInvoiceOtherInfo.Enabled = pEnabled
+                txtReferenceNo.Enabled = pEnabled
+                ibtnSearchRefNo.Visible = pEnabled
+                ibtnClearRefNo.Visible = pEnabled
+                ddlPolicyType.Enabled = pEnabled
+            Case Else
+                ddlSourceSite.Enabled = pEnabled
+
+        End Select
+
+    End Sub
+
+    Private Sub SetDropDownList(ByVal pDropDownList As DropDownList, ByVal pDataSource As DataTable, ByVal pDataTextField As String, _
+        ByVal pDataValueField As String, Optional ByVal pNewDataTextField As String = Nothing, Optional ByVal pNewDataValueField As String = Nothing)
+
+        With pDropDownList
+            .Items.Clear()
+            If Not IsNothing(pNewDataTextField) AndAlso Not IsNothing(pNewDataValueField) Then
+                If IsNothing(pNewDataTextField) Then pNewDataTextField = String.Empty
+                If IsNothing(pNewDataValueField) Then pNewDataValueField = String.Empty
+
+                .Items.Insert(0, New ListItem(pNewDataTextField, pNewDataValueField))
+            End If
+            .AppendDataBoundItems = True
+            If pDataSource.Rows.Count > 0 Then
+                .DataTextField = pDataTextField
+                .DataValueField = pDataValueField
+            End If
+            .DataSource = IIf(pDataSource.Rows.Count = 0, Nothing, pDataSource)
+            .DataBind()
+        End With
+
+    End Sub
+
+    Private Sub SetRadioButtonList(ByVal pRadioButtonList As RadioButtonList, ByVal pDataSource As DataTable, ByVal pDataTextField As String, _
+        ByVal pDataValueField As String)
+
+        With pRadioButtonList
+            .Items.Clear()
+            .AppendDataBoundItems = True
+            If pDataSource.Rows.Count > 0 Then
+                .DataTextField = pDataTextField
+                .DataValueField = pDataValueField
+            End If
+            .DataSource = IIf(pDataSource.Rows.Count = 0, Nothing, pDataSource)
+            .DataBind()
+            .SelectedIndex = 0
+        End With
+
+    End Sub
+
+    Private Sub SetDropDownListNewListItem(ByVal pDropDownList As DropDownList, ByVal pDataIndex As Integer, ByVal pDataTextField As String,
+                                           ByVal pDataValueField As String)
+        With pDropDownList
+            .Items.Insert(pDataIndex, New ListItem(pDataTextField, pDataValueField))
+            .AppendDataBoundItems = True
+            .DataBind()
+        End With
+    End Sub
+
+    Private Sub SetFocusBlur(ByVal pTextBox As TextBox, ByVal pFocus As String, ByVal pBlur As String, Optional ByVal pDecimal As Integer? = Nothing)
+
+        Dim mOnBlurValue As String = pTextBox.Attributes.Item("onblur")
+        Dim mOnFocusValue As String = pTextBox.Attributes.Item("onfocus")
+
+        mOnBlurValue &= "DoBlur(this, '" & pBlur & "');"
+        mOnFocusValue &= "DoFocus(this, '" & pFocus & "');"
+
+        If Not IsNothing(pDecimal) Then
+            mOnBlurValue &= String.Concat("extractNumber(this,", pDecimal, ",false); javascript:this.value=Comma(this.value);")
+        End If
+
+        pTextBox.Attributes.Add("onfocus", mOnFocusValue)
+        pTextBox.Attributes.Add("onblur", mOnBlurValue)
+
+    End Sub
+
+    Private Sub SetFocusEnterKey(ByVal pTextbox As TextBox, ByVal pSetFocusTextBox As Object)
+        pTextbox.Attributes.Add("onkeypress", "if (event.keyCode == 13){document.getElementById('" + pSetFocusTextBox.ClientID + "').focus()};")
+    End Sub
+
+    Private Sub SetModalSession(ByVal pModal As AjaxControlToolkit.ModalPopupExtender, ByVal pShow As Boolean, ByVal pSetFocus As Object)
+        Session(eSession.Modal) = IIf(pShow, pModal.ID, Nothing)
+        If pShow Then
+            pModal.Show()
+        Else
+            pModal.Hide()
+        End If
+        'FOCUS Me.Page.SetFocus(pSetFocus)
+    End Sub
+
+    Private Sub ShowMessageBox(ByVal pMessage As String, ByVal pMessageType As String)
+        Me.Message = pMessage
+        Me.MessageType = pMessageType
+        Me.IsMessage = True
+    End Sub
+
+#End Region
+
+#Region "Function"
+
+#End Region
+
+#End Region
+
+    Protected Sub btnInvoicePrint_Click(sender As Object, e As EventArgs) Handles btnInvoicePrint.Click
+
+    End Sub
+
+    Protected Sub gvwViewDoc_SelectedIndexChanged(sender As Object, e As EventArgs) Handles gvwViewDoc.SelectedIndexChanged
+
+    End Sub
+End Class

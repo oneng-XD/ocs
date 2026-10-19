@@ -1,0 +1,362 @@
+﻿#Region "Description"
+' PAGE NAME     : Login 
+' CREATED BY    : MPRO
+' CREATED DATE  : 11/03/2014
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports eSystemMessage = Cocolife.Utility.Common.Enums.eSystemMessage
+Imports eAppType = Cocolife.Utility.Common.Enums.SystemType.ApplicationType
+Imports eConnType = Cocolife.Utility.Common.Enums.SystemType.ConnectionType
+Imports eUserInterfaceType = Cocolife.Utility.Common.Enums.SystemType.UserInterfaceType
+Imports ePage = Cocolife.Utility.OCS.Enums.ePage
+Imports eSession = Cocolife.Utility.OCS.Enums.eSession
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports preSecurity = Cocolife.Presenter.Common.Security
+Imports bllSecurity = Cocolife.BLL.Common.Security
+#End Region
+
+Partial Public Class Login
+    Inherits System.Web.UI.Page
+
+#Region "Implements"
+    Implements preSecurity.ISystemMessage
+    Implements preSecurity.IDatabase
+    Implements preSecurity.ILogIn
+    Implements preSecurity.ISession
+#End Region
+
+#Region "Variables"
+    Private pSystemMessage As preSecurity.PSystemMessage
+    Private pDatabase As preSecurity.PDatabase
+    Private pLogin As preSecurity.PLogIn
+#End Region
+
+#Region "ISystemMessage"
+
+#Region "Property"
+
+    Public WriteOnly Property Message() As String Implements preSecurity.ISystemMessage.Message
+        Set(ByVal value As String)
+            lblMessage.Text = value
+        End Set
+    End Property
+
+    Public WriteOnly Property MessageType() As String Implements preSecurity.ISystemMessage.MessageType
+        Set(ByVal value As String)
+            imgMessage.ImageUrl = value
+        End Set
+    End Property
+
+    Public WriteOnly Property IsMessage() As Boolean Implements preSecurity.ISystemMessage.isMessage
+        Set(ByVal value As Boolean)
+            If value Then
+                Call SetModalSession(mpeMessage, True, btnMessageOk)
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+
+#End Region
+
+#End Region
+
+#Region "IDatabase"
+
+#Region "Property"
+
+
+    Public ReadOnly Property UserInterfaceType() As eUserInterfaceType Implements preSecurity.IDatabase.UserInterfaceType
+        Get
+            Return eUserInterfaceType.WebApplication
+        End Get
+    End Property
+
+    Public ReadOnly Property ApplicationType() As eAppType Implements preSecurity.IDatabase.ApplicationType
+        Get
+            Return eAppType.WebCollection
+        End Get
+    End Property
+
+    Public ReadOnly Property ConnectionType() As eConnType Implements preSecurity.IDatabase.ConnectionType
+        Get
+            'Return eConnType.Test
+            'Return eConnType.QAT
+            'Return eConnType.UAT
+            Return eConnType.Live
+        End Get
+    End Property
+
+    Public WriteOnly Property IsConnected() As Boolean Implements preSecurity.IDatabase.isConnected
+        Set(ByVal value As Boolean)
+            If value Then
+                RaiseEvent LogIn(Me, EventArgs.Empty)
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+    Public Event ConnectToDatabase(ByVal sender As Object, ByVal e As System.EventArgs) Implements preSecurity.IDatabase.ConnectToDatabase
+#End Region
+
+#End Region
+
+#Region "ILogIn"
+
+#Region "Property"
+
+    Public ReadOnly Property UserID() As String Implements preSecurity.ILogIn.UserId
+        Get
+            Return cDataType.fString.IfNull(txtUsername.Text.Trim)
+        End Get
+    End Property
+
+    Public ReadOnly Property Password() As String Implements preSecurity.ILogIn.Password
+        Get
+            Return txtPassword.Text.Trim
+        End Get
+    End Property
+
+    ' ------------------------------------------------------------------------------- 
+
+    Public WriteOnly Property IsSuccessful() As Boolean Implements preSecurity.ILogIn.isSuccessful
+        Set(ByVal value As Boolean)
+            If value Then
+                Session("ini") = "Y"
+                Response.Redirect(ePage.Home, False)
+            End If
+        End Set
+    End Property
+
+    Public WriteOnly Property IsValidForgotPassword() As Boolean Implements preSecurity.ILogIn.isValidForgotPassword
+        Set(ByVal value As Boolean)
+
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+    Public Event LogIn(ByVal sender As Object, ByVal e As System.EventArgs) Implements preSecurity.ILogIn.LogIn
+    Public Event ValidateForgotPword(ByVal sender As Object, ByVal e As System.EventArgs) Implements preSecurity.ILogIn.ValidateForgotPword
+#End Region
+
+#End Region
+
+#Region "ISession"
+
+#Region "Property"
+
+    Public WriteOnly Property MyAccessList() As System.Collections.Generic.List(Of BLL.Common.Security.BGrants) Implements Presenter.Common.Security.ISession.MyAccessList
+        Set(ByVal value As System.Collections.Generic.List(Of BLL.Common.Security.BGrants))
+            Session("acc") = value
+        End Set
+    End Property
+
+    Public WriteOnly Property MyUserDetails() As System.Collections.Generic.List(Of BLL.Common.Security.BUser) Implements Presenter.Common.Security.ISession.myUserDetails
+        Set(ByVal value As System.Collections.Generic.List(Of BLL.Common.Security.BUser))
+            Session("udt") = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+
+#End Region
+
+#End Region
+
+#Region "Event Handlers"
+
+#Region "Page"
+
+    Private Sub Login_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Init
+        pSystemMessage = New preSecurity.PSystemMessage(Me)
+        pDatabase = New preSecurity.PDatabase(Me)
+        pLogin = New preSecurity.PLogIn(Me)
+    End Sub
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+
+        If CType(Session("ism"), Boolean) Then
+            Call ShowMessageBox(Session("msg"), Session("sgn"))
+        End If
+
+        If Not IsPostBack Then
+            Call AddAttributes()
+            'Call InitializeTabIndex()
+            Call ClearFields()
+
+            lblVersion.Text = String.Concat("Version ", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString())
+        End If
+
+    End Sub
+
+#End Region
+
+#Region "Button"
+
+    Private Sub btnClear_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnClear.Click
+        Call ClearFields()
+    End Sub
+
+    Private Sub btnLogin_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnLogin.Click
+        Call ClearSession()
+        RaiseEvent ConnectToDatabase(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub btnMessageOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnMessageOk.Click
+        Call ClearSession()
+        Call SetModalSession(mpeMessage, False, txtUsername)
+    End Sub
+
+#End Region
+
+#Region "LinkButton"
+
+    Private Sub lnkFortgotPassword_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lnkFortgotPassword.Click
+
+    End Sub
+
+#End Region
+
+#End Region
+
+#Region "Custom Method"
+
+#Region "Sub"
+
+    Private Sub AddAttributes()
+        Call SetFocusBlur(txtUsername, "txtInputShortFocus", "txtInputShort")
+        Call SetFocusBlur(txtPassword, "txtInputShortFocus", "txtInputShort")
+        ' ------------------------------------------------------------------------------- 
+        Call SetButtonPostBack(btnClear)
+        Call SetButtonPostBack(btnLogin)
+        Call SetButtonPostBack(btnMessageOk)
+    End Sub
+
+    Private Sub ClearDropDownList(ByVal pDropDownList As DropDownList, ByVal pText As String, ByVal pValue As String)
+        With pDropDownList
+            .Items.Clear()
+            .Items.Insert(0, New ListItem(pText, pValue))
+        End With
+    End Sub
+
+    Private Sub ClearFields()
+        Call ClearSession()
+        txtUsername.Text = String.Empty
+        txtPassword.Text = String.Empty
+        Me.Page.SetFocus(txtUsername)
+    End Sub
+
+    Private Sub ClearSession()
+        Session(eSession.IsMessage) = Nothing
+        Session(eSession.Message) = Nothing
+        Session(eSession.MessageType) = Nothing
+        Session(eSession.Modal) = Nothing
+    End Sub
+
+    Private Sub InitializeTabIndex()
+        txtUsername.TabIndex = 0
+        txtPassword.TabIndex = 0
+        btnLogin.TabIndex = 0
+        btnClear.TabIndex = 0
+        btnMessageOk.TabIndex = 0
+        lnkFortgotPassword.TabIndex = 0
+    End Sub
+
+    Private Sub SetButtonPostBack(ByVal pButton As Button)
+        pButton.Attributes.Add("onclick", " this.disabled = true; " + Page.ClientScript.GetPostBackEventReference(pButton, Nothing) + ";")
+    End Sub
+
+    Private Sub SetCurrency(ByVal pTextbox As TextBox, ByVal pDecimal As Integer)
+        pTextbox.Attributes.Add("onkeypress", "return blockNonNumbers(this, event, true, false);")
+        Select Case pDecimal
+            Case -1 ' unlimited decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,-1,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,-1,false); javascript:this.value=Comma(this.value);")
+            Case 0 ' no decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,0,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,0,false); javascript:this.value=Comma(this.value);")
+            Case 2 ' 2 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,2,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,2,false); javascript:this.value=Comma(this.value);")
+            Case 3 ' 3 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,3,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,3,false); javascript:this.value=Comma(this.value);")
+            Case 4 ' 4 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,4,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,4,false); javascript:this.value=Comma(this.value);")
+        End Select
+    End Sub
+
+    Private Sub SetDropDownList(ByVal pDropDownList As DropDownList, ByVal pDataSource As DataTable, ByVal pDataTextField As String, _
+        ByVal pDataValueField As String, ByVal pNewDataTextField As String, ByVal pNewDataValueField As String)
+
+        With pDropDownList
+            .Items.Clear()
+            .Items.Insert(0, New ListItem(pNewDataTextField, pNewDataValueField))
+            .AppendDataBoundItems = True
+            If pDataSource.Rows.Count > 0 Then
+                .DataTextField = pDataTextField
+                .DataValueField = pDataValueField
+            End If
+            .DataSource = IIf(pDataSource.Rows.Count = 0, Nothing, pDataSource)
+            .DataBind()
+        End With
+
+    End Sub
+
+    Private Sub SetDropDownListNewListItem(ByVal pDropDownList As DropDownList, ByVal pDataIndex As Integer, ByVal pDataTextField As String, _
+        ByVal pDataValueField As String)
+        With pDropDownList
+            .Items.Insert(pDataIndex, New ListItem(pDataTextField, pDataValueField))
+            .AppendDataBoundItems = True
+            .DataBind()
+        End With
+    End Sub
+
+    Private Sub SetFocusBlur(ByVal pTextBox As TextBox, ByVal pFocus As String, ByVal pBlur As String)
+        pTextBox.Attributes.Add("onfocus", "DoFocus(this, '" & pFocus & "');")
+        pTextBox.Attributes.Add("onblur", "DoBlur(this, '" & pBlur & "');")
+    End Sub
+
+    Private Sub SetFocusEnterKey(ByVal pTextbox As TextBox, ByVal pSetFocusTextBox As Object)
+        pTextbox.Attributes.Add("onkeypress", "if (event.keyCode == 13){document.getElementById('" + pSetFocusTextBox.ClientID + "').focus()};")
+    End Sub
+
+    Private Sub SetModalSession(ByVal pModal As AjaxControlToolkit.ModalPopupExtender, ByVal pShow As Boolean, ByVal pSetFocus As Object)
+        Session(eSession.Modal) = IIf(pShow, pModal.ID, Nothing)
+        If pShow Then
+            pModal.Show()
+        Else
+            pModal.Hide()
+        End If
+        Me.Page.SetFocus(pSetFocus)
+    End Sub
+
+    Private Sub ShowMessageBox(ByVal pMessage As String, ByVal pMessageType As String)
+        Me.Message = pMessage
+        Me.MessageType = pMessageType
+        Call SetModalSession(mpeMessage, True, btnMessageOk)
+    End Sub
+
+#End Region
+
+#Region "Function"
+
+#End Region
+
+#End Region
+
+End Class

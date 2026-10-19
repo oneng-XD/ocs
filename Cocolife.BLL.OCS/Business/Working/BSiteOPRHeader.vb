@@ -1,0 +1,649 @@
+﻿#Region "Description"
+' PAGE NAME     : SITE_OPRHEADER BLL
+' CREATED BY    : EJ
+' CREATED DATE  : 05/04/2015
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports System.Data.OracleClient
+Imports eAction = Cocolife.Utility.Common.Enums.eDBAction
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports bllCommon = Cocolife.BLL.Common
+Imports dalWorking = Cocolife.DAL.OCS.Working
+#End Region
+
+Namespace Working
+
+    Public Class BSiteOPRHeader
+        
+#Region "Implements"
+        Implements ISiteOPRHeader
+#End Region
+
+#Region "Variables"
+        Private mId As Long = cDataType.fLong.Empty
+        Private mOPRRcptNo As Long = cDataType.fLong.Empty
+        Private mOPRDate As Date = cDataType.fDate.Empty
+        Private mOPRSrcBrnc As Long = cDataType.fLong.Empty
+        Private mOPRRemarks As String = cDataType.fString.Empty
+        Private mOPRApplctn As String = cDataType.fString.Empty
+        Private mOPRECRNo As Long = cDataType.fLong.Empty
+        Private mOPRECRDate As Date = cDataType.fDate.Empty
+        Private mOPRPolNum As String = cDataType.fString.Empty
+        Private mOPRPyrID As Long = cDataType.fLong.Empty
+        Private mOPRPyrFNam As String = cDataType.fString.Empty
+        Private mOPRPyrLNam As String = cDataType.fString.Empty
+        Private mOPRPyrMNam As String = cDataType.fString.Empty
+        Private mOPRInsID As Long = cDataType.fLong.Empty
+        Private mOPRInsFNam As String = cDataType.fString.Empty
+        Private mOPRInsLNam As String = cDataType.fString.Empty
+        Private mOPRInsMNam As String = cDataType.fString.Empty
+        Private mOPRAgID As Long = cDataType.fLong.Empty
+        Private mOPRAgFNam As String = cDataType.fString.Empty
+        Private mOPRAgLNam As String = cDataType.fString.Empty
+        Private mOPRAgMNam As String = cDataType.fString.Empty
+        Private mOPRBrID As Long = cDataType.fLong.Empty
+        Private mOPRBrFNam As String = cDataType.fString.Empty
+        Private mOPRBrLNam As String = cDataType.fString.Empty
+        Private mOPRBrMNam As String = cDataType.fString.Empty
+        Private mOPRDocTyp As String = cDataType.fString.Empty
+        Private mOPRTxNumb As Long = cDataType.fLong.Empty
+        Private mOPRPlnCry As String = cDataType.fString.Empty
+        Private mOPRFlags As String = cDataType.fString.Empty
+        Private mOPRIssue As Date = cDataType.fDate.Empty
+        Private mOPRLastBl As Date = cDataType.fDate.Empty
+        Private mCancelFlag As Integer = cDataType.fInteger.Empty
+        Private mPrtFlag As Integer = cDataType.fInteger.Empty
+        Private mNiFlag As Integer = cDataType.fInteger.Empty
+        Private mUserID As Integer = cDataType.fInteger.Empty
+        Private mSiteCode As Long = cDataType.fLong.Empty
+
+        Private mOPRPyrAdr As String = cDataType.fString.Empty
+        Private mOPRPyrTin As String = cDataType.fString.Empty
+        Private mBillNo As String = cDataType.fString.Empty
+        Private mSubsNo As String = cDataType.fString.Empty
+
+        Private mStatusId As Long = cDataType.fLong.Empty
+        Private mPostBy As Long = cDataType.fLong.Empty
+        Private mPostDate As Date = cDataType.fDate.Empty
+        Private mLastUpdateBy As Long = cDataType.fLong.Empty
+        Private mLastUpdate As Date = cDataType.fDate.Empty
+#End Region
+
+#Region "Properties"
+
+        Public Property Id As Long Implements ISiteOPRHeader.Id
+            Get
+                Return mId
+            End Get
+            Set(value As Long)
+                mId = value
+            End Set
+        End Property
+
+        Public Property LastUpdate As Date Implements ISiteOPRHeader.LastUpdate
+            Get
+                Return mLastUpdate
+            End Get
+            Set(value As Date)
+                mLastUpdate = value
+            End Set
+        End Property
+
+        Public Property LastUpdateBy As Long Implements ISiteOPRHeader.LastUpdateBy
+            Get
+                Return mLastUpdateBy
+            End Get
+            Set(value As Long)
+                mLastUpdateBy = value
+            End Set
+        End Property
+
+        Public Property PostBy As Long Implements ISiteOPRHeader.PostBy
+            Get
+                Return mPostBy
+            End Get
+            Set(value As Long)
+                mPostBy = value
+            End Set
+        End Property
+
+        Public Property PostDate As Date Implements ISiteOPRHeader.PostDate
+            Get
+                Return mPostDate
+            End Get
+            Set(value As Date)
+                mPostDate = value
+            End Set
+        End Property
+
+        Public Property StatusId As Integer Implements ISiteOPRHeader.StatusId
+            Get
+                Return mStatusId
+            End Get
+            Set(value As Integer)
+                mStatusId = value
+            End Set
+        End Property
+
+        Public Property OPRRcptNo() As Long Implements ISiteOPRHeader.OPRRcptNo
+            Get
+                Return mOPRRcptNo
+            End Get
+            Set(value As Long)
+                mOPRRcptNo = value
+            End Set
+        End Property
+
+        Public Property OPRDate() As Date Implements ISiteOPRHeader.OPRDate
+            Get
+                Return mOPRDate
+            End Get
+            Set(value As Date)
+                mOPRDate = value
+            End Set
+        End Property
+
+        Public Property OPRSrcBrnc() As Long Implements ISiteOPRHeader.OPRSrcBrnc
+            Get
+                Return mOPRSrcBrnc
+            End Get
+            Set(value As Long)
+                mOPRSrcBrnc = value
+            End Set
+        End Property
+
+        Public Property OPRRemarks() As String Implements ISiteOPRHeader.OPRRemarks
+            Get
+                Return mOPRRemarks
+            End Get
+            Set(value As String)
+                mOPRRemarks = value
+            End Set
+        End Property
+
+        Public Property OPRApplctn() As String Implements ISiteOPRHeader.OPRApplctn
+            Get
+                Return mOPRApplctn
+            End Get
+            Set(value As String)
+                mOPRApplctn = value
+            End Set
+        End Property
+
+        Public Property OPRECRNo() As Long Implements ISiteOPRHeader.OPRECRNo
+            Get
+                Return mOPRECRNo
+            End Get
+            Set(value As Long)
+                mOPRECRNo = value
+            End Set
+        End Property
+
+        Public Property OPRECRDate() As Date Implements ISiteOPRHeader.OPRECRDate
+            Get
+                Return mOPRECRDate
+            End Get
+            Set(value As Date)
+                mOPRECRDate = value
+            End Set
+        End Property
+
+        Public Property OPRPolNum() As String Implements ISiteOPRHeader.OPRPolNum
+            Get
+                Return mOPRPolNum
+            End Get
+            Set(value As String)
+                mOPRPolNum = value
+            End Set
+        End Property
+
+        Public Property OPRPyrID() As Long Implements ISiteOPRHeader.OPRPyrID
+            Get
+                Return mOPRPyrID
+            End Get
+            Set(value As Long)
+                mOPRPyrID = value
+            End Set
+        End Property
+
+        Public Property OPRPyrFNam() As String Implements ISiteOPRHeader.OPRPyrFNam
+            Get
+                Return mOPRPyrFNam
+            End Get
+            Set(value As String)
+                mOPRPyrFNam = value
+            End Set
+        End Property
+
+        Public Property OPRPyrLNam() As String Implements ISiteOPRHeader.OPRPyrLNam
+            Get
+                Return mOPRPyrLNam
+            End Get
+            Set(value As String)
+                mOPRPyrLNam = value
+            End Set
+        End Property
+
+        Public Property OPRPyrMNam() As String Implements ISiteOPRHeader.OPRPyrMNam
+            Get
+                Return mOPRPyrMNam
+            End Get
+            Set(value As String)
+                mOPRPyrMNam = value
+            End Set
+        End Property
+
+        Public Property OPRInsID() As Long Implements ISiteOPRHeader.OPRInsID
+            Get
+                Return mOPRInsID
+            End Get
+            Set(value As Long)
+                mOPRInsID = value
+            End Set
+        End Property
+
+        Public Property OPRInsFNam() As String Implements ISiteOPRHeader.OPRInsFNam
+            Get
+                Return mOPRInsFNam
+            End Get
+            Set(value As String)
+                mOPRInsFNam = value
+            End Set
+        End Property
+
+        Public Property OPRInsLNam() As String Implements ISiteOPRHeader.OPRInsLNam
+            Get
+                Return mOPRInsLNam
+            End Get
+            Set(value As String)
+                mOPRInsLNam = value
+            End Set
+        End Property
+
+        Public Property OPRInsMNam() As String Implements ISiteOPRHeader.OPRInsMNam
+            Get
+                Return mOPRInsMNam
+            End Get
+            Set(value As String)
+                mOPRInsMNam = value
+            End Set
+        End Property
+
+        Public Property OPRAgID() As Long Implements ISiteOPRHeader.OPRAgID
+            Get
+                Return mOPRAgID
+            End Get
+            Set(value As Long)
+                mOPRAgID = value
+            End Set
+        End Property
+
+        Public Property OPRAgFNam() As String Implements ISiteOPRHeader.OPRAgFNam
+            Get
+                Return mOPRAgFNam
+            End Get
+            Set(value As String)
+                mOPRAgFNam = value
+            End Set
+        End Property
+
+        Public Property OPRAgLNam() As String Implements ISiteOPRHeader.OPRAgLNam
+            Get
+                Return mOPRAgLNam
+            End Get
+            Set(value As String)
+                mOPRAgLNam = value
+            End Set
+        End Property
+
+        Public Property OPRAgMNam() As String Implements ISiteOPRHeader.OPRAgMNam
+            Get
+                Return mOPRAgMNam
+            End Get
+            Set(value As String)
+                mOPRAgMNam = value
+            End Set
+        End Property
+
+        Public Property OPRBrID() As Long Implements ISiteOPRHeader.OPRBrID
+            Get
+                Return mOPRBrID
+            End Get
+            Set(value As Long)
+                mOPRBrID = value
+            End Set
+        End Property
+
+        Public Property OPRBrFNam() As String Implements ISiteOPRHeader.OPRBrFNam
+            Get
+                Return mOPRBrFNam
+            End Get
+            Set(value As String)
+                mOPRBrFNam = value
+            End Set
+        End Property
+
+        Public Property OPRBrLNam() As String Implements ISiteOPRHeader.OPRBrLNam
+            Get
+                Return mOPRBrLNam
+            End Get
+            Set(value As String)
+                mOPRBrLNam = value
+            End Set
+        End Property
+
+        Public Property OPRBrMNam() As String Implements ISiteOPRHeader.OPRBrMNam
+            Get
+                Return mOPRBrMNam
+            End Get
+            Set(value As String)
+                mOPRBrMNam = value
+            End Set
+        End Property
+
+        Public Property OPRDocTyp() As String Implements ISiteOPRHeader.OPRDocTyp
+            Get
+                Return mOPRDocTyp
+            End Get
+            Set(value As String)
+                mOPRDocTyp = value
+            End Set
+        End Property
+
+        Public Property OPRTxNumb() As Long Implements ISiteOPRHeader.OPRTxNumb
+            Get
+                Return mOPRTxNumb
+            End Get
+            Set(value As Long)
+                mOPRTxNumb = value
+            End Set
+        End Property
+
+        Public Property OPRPlnCry() As String Implements ISiteOPRHeader.OPRPlnCry
+            Get
+                Return mOPRPlnCry
+            End Get
+            Set(value As String)
+                mOPRPlnCry = value
+            End Set
+        End Property
+
+        Public Property OPRFlags() As String Implements ISiteOPRHeader.OPRFlags
+            Get
+                Return mOPRFlags
+            End Get
+            Set(value As String)
+                mOPRFlags = value
+            End Set
+        End Property
+
+        Public Property OPRIssue() As Date Implements ISiteOPRHeader.OPRIssue
+            Get
+                Return mOPRIssue
+            End Get
+            Set(value As Date)
+                mOPRIssue = value
+            End Set
+        End Property
+
+        Public Property OPRLastBl() As Date Implements ISiteOPRHeader.OPRLastBl
+            Get
+                Return mOPRLastBl
+            End Get
+            Set(value As Date)
+                mOPRLastBl = value
+            End Set
+        End Property
+
+        Public Property CancelFlag() As Integer Implements ISiteOPRHeader.CancelFlag
+            Get
+                Return mCancelFlag
+            End Get
+            Set(value As Integer)
+                mCancelFlag = value
+            End Set
+        End Property
+
+        Public Property PrtFlag() As Integer Implements ISiteOPRHeader.PrtFlag
+            Get
+                Return mPrtFlag
+            End Get
+            Set(value As Integer)
+                mPrtFlag = value
+            End Set
+        End Property
+
+        Public Property NiFlag() As Integer Implements ISiteOPRHeader.NiFlag
+            Get
+                Return mNiFlag
+            End Get
+            Set(value As Integer)
+                mNiFlag = value
+            End Set
+        End Property
+
+        Public Property UserID() As Integer Implements ISiteOPRHeader.UserID
+            Get
+                Return mUserID
+            End Get
+            Set(value As Integer)
+                mUserID = value
+            End Set
+        End Property
+
+        Public Property SiteCode() As Long Implements ISiteOPRHeader.SiteCode
+            Get
+                Return mSiteCode
+            End Get
+            Set(value As Long)
+                mSiteCode = value
+            End Set
+        End Property
+
+        Public Property OPRPyrAdr() As String Implements ISiteOPRHeader.OPRPyrAdr
+            Get
+                Return mOPRPyrAdr
+            End Get
+            Set(value As String)
+                mOPRPyrAdr = value
+            End Set
+        End Property
+        Public Property OPRPyrTin() As String Implements ISiteOPRHeader.OPRPyrTin
+            Get
+                Return mOPRPyrTin
+            End Get
+            Set(value As String)
+                mOPRPyrTin = value
+            End Set
+        End Property
+        Public Property BillNo() As String Implements ISiteOPRHeader.BillNo
+            Get
+                Return mBillNo
+            End Get
+            Set(value As String)
+                mBillNo = value
+            End Set
+        End Property
+        Public Property SubsNo() As String Implements ISiteOPRHeader.SubsNo
+            Get
+                Return mSubsNo
+            End Get
+            Set(value As String)
+                mSubsNo = value
+            End Set
+        End Property
+        'end
+
+#End Region
+
+#Region "Constructor"
+
+        Sub New()
+
+        End Sub
+
+        Sub New(ByVal pId As Long, ByVal pOPRRcptNo As Long, ByVal pOPRDate As Date, ByVal pOPRSrcBrnc As Long,
+                ByVal pOPRRemarks As String, ByVal pOPRApplctn As String, ByVal pOPRECRNo As Long,
+                ByVal pOPRECRDate As Date, ByVal pOPRPolNum As String, ByVal pOPRPyrID As Long,
+                ByVal pOPRPyrFNam As String, ByVal pOPRPyrLNam As String, ByVal pOPRPyrMNam As String,
+                ByVal pOPRInsID As Long, ByVal pOPRInsFNam As String, ByVal pOPRInsLNam As String,
+                ByVal pOPRInsMNam As String, ByVal pOPRAgID As Long, ByVal pOPRAgFNam As String,
+                ByVal pOPRAgLNam As String, ByVal pOPRAgMNam As String, ByVal pOPRBrID As Long,
+                ByVal pOPRBrFNam As String, ByVal pOPRBrLNam As String, ByVal pOPRBrMNam As String,
+                ByVal pOPRDocTyp As String, ByVal pOPRTxNumb As Long, ByVal pOPRPlnCry As String,
+                ByVal pOPRFlags As String, ByVal pOPRIssue As Date, ByVal pOPRLastBl As Date,
+                ByVal pCancelFlag As Integer, ByVal pPrtFlag As Integer, ByVal pNiFlag As Integer,
+                ByVal pUserId As Long, ByVal pSiteCode As Long, ByVal pOPRPyrAdr As String, ByVal pOPRPyrTin As String, ByVal pStatusId As Integer,
+                ByVal pPostBy As Long, ByVal pPostDate As Date, ByVal pLastUpdateBy As Long, ByVal pLastUpdate As Date, ByVal pBillNo As String, ByVal pSubsNo As String)
+            Id = pId
+            OPRRcptNo = pOPRRcptNo
+            OPRDate = pOPRDate
+            OPRSrcBrnc = pOPRSrcBrnc
+            OPRRemarks = pOPRRemarks
+            OPRApplctn = pOPRApplctn
+            OPRECRNo = pOPRECRNo
+            OPRECRDate = pOPRECRDate
+            OPRPolNum = pOPRPolNum
+            OPRPyrID = pOPRPyrID
+            OPRPyrFNam = pOPRPyrFNam
+            OPRPyrLNam = pOPRPyrLNam
+            OPRPyrMNam = pOPRPyrMNam
+            OPRInsID = pOPRInsID
+            OPRInsFNam = pOPRInsFNam
+            OPRInsLNam = pOPRInsLNam
+            OPRInsMNam = pOPRInsMNam
+            OPRAgID = pOPRAgID
+            OPRAgFNam = pOPRAgFNam
+            OPRAgLNam = pOPRAgLNam
+            OPRAgMNam = pOPRAgMNam
+            OPRBrID = pOPRBrID
+            OPRBrFNam = pOPRBrFNam
+            OPRBrLNam = pOPRBrLNam
+            OPRBrMNam = pOPRBrMNam
+            OPRDocTyp = pOPRDocTyp
+            OPRTxNumb = pOPRTxNumb
+            OPRPlnCry = pOPRPlnCry
+            OPRFlags = pOPRFlags
+            OPRIssue = pOPRIssue
+            OPRLastBl = pOPRLastBl
+            CancelFlag = pCancelFlag
+            PrtFlag = pPrtFlag
+            NiFlag = pNiFlag
+            UserID = pUserId
+            SiteCode = pSiteCode
+
+            OPRPyrAdr = pOPRPyrAdr
+            OPRPyrTin = pOPRPyrTin
+
+            StatusId = pStatusId
+            PostBy = pPostBy
+            PostDate = pPostDate
+            LastUpdateBy = pLastUpdateBy
+            LastUpdate = pLastUpdate
+            BillNo = pBillNo
+            SubsNo = pSubsNo
+        End Sub
+
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Data Retrieval"
+        Public Sub GetOPRHeader(ByVal pDocNumber As Long, ByVal pUserId As Long)
+
+            Dim objDAL As New dalWorking.DSiteOPRHeader
+            Dim drLocal As OracleDataReader
+
+            Try
+
+                drLocal = objDAL.GetSiteOPRHeader(pDocNumber, pUserId)
+                With drLocal
+                    While .Read
+                        Id = cDataType.fLong.IfNull(.Item("id"))
+                        OPRRcptNo = cDataType.fLong.IfNull(.Item("oprrcptno"))
+                        OPRDate = cDataType.fDate.IfNull(.Item("oprdate"))
+                        OPRSrcBrnc = cDataType.fLong.IfNull(.Item("oprsrcbrnc"))
+                        OPRRemarks = cDataType.fString.IfNull(.Item("oprremarks"))
+                        OPRApplctn = cDataType.fString.IfNull(.Item("oprapplctn"))
+                        OPRECRNo = cDataType.fLong.IfNull(.Item("oprecrno"))
+                        OPRECRDate = cDataType.fDate.IfNull(.Item("oprecrdate"))
+                        OPRPolNum = cDataType.fString.IfNull(.Item("oprpolnum"))
+                        OPRPyrID = cDataType.fLong.IfNull(.Item("oprpyrid"))
+                        OPRPyrFNam = cDataType.fString.IfNull(.Item("oprpyrfnam"))
+                        OPRPyrLNam = cDataType.fString.IfNull(.Item("oprpyrlnam"))
+                        OPRPyrMNam = cDataType.fString.IfNull(.Item("oprpyrmnam"))
+                        OPRInsID = cDataType.fLong.IfNull(.Item("oprinsid"))
+                        OPRInsFNam = cDataType.fString.IfNull(.Item("oprinsfnam"))
+                        OPRInsLNam = cDataType.fString.IfNull(.Item("oprinslnam"))
+                        OPRInsMNam = cDataType.fString.IfNull(.Item("oprinsmnam"))
+                        OPRAgID = cDataType.fLong.IfNull(.Item("opragid"))
+                        OPRAgFNam = cDataType.fString.IfNull(.Item("opragfnam"))
+                        OPRAgLNam = cDataType.fString.IfNull(.Item("opraglnam"))
+                        OPRAgMNam = cDataType.fString.IfNull(.Item("opragmnam"))
+                        OPRBrID = cDataType.fLong.IfNull(.Item("oprbrid"))
+                        OPRBrFNam = cDataType.fString.IfNull(.Item("oprbrfnam"))
+                        OPRBrLNam = cDataType.fString.IfNull(.Item("oprbrlnam"))
+                        OPRBrMNam = cDataType.fString.IfNull(.Item("oprbrmnam"))
+                        OPRDocTyp = cDataType.fString.IfNull(.Item("oprdoctyp"))
+                        OPRTxNumb = cDataType.fLong.IfNull(.Item("oprtxnumb"))
+                        OPRPlnCry = cDataType.fString.IfNull(.Item("oprplncry"))
+                        OPRFlags = cDataType.fString.IfNull(.Item("oprflags"))
+                        OPRIssue = cDataType.fDate.IfNull(.Item("oprissue"))
+                        OPRLastBl = cDataType.fDate.IfNull(.Item("oprlastbl"))
+                        CancelFlag = cDataType.fInteger.IfNull(.Item("cancel_flag"))
+                        PrtFlag = cDataType.fInteger.IfNull(.Item("prt_flag"))
+                        NiFlag = cDataType.fInteger.IfNull(.Item("ni_flag"))
+                        UserID = cDataType.fString.IfNull(.Item("user_id"))
+                        SiteCode = cDataType.fLong.IfNull(.Item("site_code")) '
+
+                        OPRPyrAdr = cDataType.fString.IfNull(.Item("oprpyraddr"))
+                        OPRPyrTin = cDataType.fString.IfNull(.Item("oprpyrtin"))
+                       
+
+                        StatusId = cDataType.fLong.IfNull(.Item("status_id"))
+                        PostBy = cDataType.fString.IfNull(.Item("post_by"))
+                        PostDate = cDataType.fDate.IfNull(.Item("post_date"))
+                        LastUpdateBy = cDataType.fString.IfNull(.Item("last_update_by"))
+                        LastUpdate = cDataType.fDate.IfNull(.Item("last_update"))
+                        BillNo = cDataType.fString.IfNull(.Item("bill_no"))
+                        SubsNo = cDataType.fString.IfNull(.Item("subscriber_no"))
+                    End While
+                End With
+
+            Catch ex As Exception
+                Throw
+            End Try
+        End Sub
+
+#End Region
+
+#Region "Transactions"
+
+        Public Function Alter(ByVal pAction As String, ByRef pConn As Object, ByRef pTrans As Object) As Long
+
+            Try
+                Dim objDAL As New dalWorking.DSiteOPRHeader
+                objDAL.AlterSiteOPRHeader(Me, pAction, pConn, pTrans)
+                Return objDAL.Reference
+            Catch ex As Exception
+                Throw
+            End Try
+
+        End Function
+
+#End Region
+
+    End Class
+
+End Namespace

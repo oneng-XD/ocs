@@ -1,0 +1,89 @@
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.Resources.resources
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbproj.GenerateResource.Cache
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.dll
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.pdb
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.xml
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiCommon.dll
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiCommon.pdb
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiCommon.xml
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.dll
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.xml
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.pdb
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\bllCommon.dll
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\bllCommon.pdb
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\bllCommon.xml
+C:\Projects\TEST\OUTRE\trunk\ORIOL\OCS_ASP40 no Newgen\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbprojResolveAssemblyReference.cache
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.dll
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.pdb
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.xml
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\bllCommon.dll
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\dalCommon.dll
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\DocumentFormat.OpenXml.dll
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\preCommon.dll
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiCommon.dll
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\bllCommon.pdb
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\bllCommon.xml
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\dalCommon.pdb
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\dalCommon.xml
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\preCommon.pdb
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\preCommon.xml
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiCommon.pdb
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiCommon.xml
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbprojResolveAssemblyReference.cache
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.Resources.resources
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbproj.GenerateResource.Cache
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.dll
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.xml
+C:\Projects\OCS FUSION\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.pdb
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.dll
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.pdb
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.xml
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\bllCommon.dll
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\dalCommon.dll
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\preCommon.dll
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiCommon.dll
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\bllCommon.pdb
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\bllCommon.xml
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\dalCommon.pdb
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\dalCommon.xml
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\preCommon.pdb
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\preCommon.xml
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiCommon.pdb
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiCommon.xml
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbprojResolveAssemblyReference.cache
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.Resources.resources
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbproj.GenerateResource.Cache
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.dll
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.xml
+C:\TEST\OUTRE\ORIOL\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.pdb
+C:\Users\jdoafallas\Documents\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.dll
+C:\Users\jdoafallas\Documents\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.pdb
+C:\Users\jdoafallas\Documents\OCS_ASP40\Cocolife.Utility.OCS\bin\Debug\utiOCS.xml
+C:\Users\jdoafallas\Documents\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbprojResolveAssemblyReference.cache
+C:\Users\jdoafallas\Documents\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.Resources.resources
+C:\Users\jdoafallas\Documents\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbproj.GenerateResource.Cache
+C:\Users\jdoafallas\Documents\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.dll
+C:\Users\jdoafallas\Documents\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.xml
+C:\Users\jdoafallas\Documents\OCS_ASP40\Cocolife.Utility.OCS\obj\Debug\utiOCS.pdb
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\bin\Debug\utiOCS.dll
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\bin\Debug\utiOCS.pdb
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\bin\Debug\utiOCS.xml
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.Resources.resources
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbproj.GenerateResource.Cache
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.dll
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.xml
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.pdb
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\bin\Debug\bllCommon.dll
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\bin\Debug\dalCommon.dll
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\bin\Debug\preCommon.dll
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\bin\Debug\utiCommon.dll
+C:\Users\jdoafallas\Documents\ocs\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbprojResolveAssemblyReference.cache
+C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\bin\Debug\utiOCS.dll
+C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\bin\Debug\utiOCS.pdb
+C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\bin\Debug\utiOCS.xml
+C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbprojResolveAssemblyReference.cache
+C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.Resources.resources
+C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbproj.GenerateResource.Cache
+C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.dll
+C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.xml
+C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.pdb

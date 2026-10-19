@@ -1,0 +1,58 @@
+﻿#Region "Description"
+' PAGE NAME     : SITE_OPRCHKPY Interface  
+' CREATED BY    : EJ
+' CREATED DATE  : 07/15/2016
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+
+#End Region
+
+Namespace Working
+
+    Public Interface ISiteOPRChkPy
+
+#Region "Variables"
+
+#End Region
+
+#Region "Properties"
+        Property Id As Long
+        Property OPRNmbr As Long                ' 
+        Property ReceiptDate As Date
+        Property ChkNmbr As Long                ' 
+        Property Bank As String                 ' 
+        Property Branch As String               ' 
+        Property Amount As Decimal              ' 
+        Property LineNmbr As Integer            ' 
+        Property OTCFlag As Integer             ' 
+        Property DepositDate As Date            ' 
+        Property ClearingDate As Date           ' 
+        Property ClearingStatusId As Integer    ' 
+        Property Remarks As String              ' 
+        Property StatusId As Integer
+        Property PostBy As Long
+        Property PostDate As Date
+        Property LastUpdateBy As Long
+        Property LastUpdate As Date
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Transactions"
+
+#End Region
+
+    End Interface
+
+End Namespace

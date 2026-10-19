@@ -1,0 +1,73 @@
+﻿#Region "Description"
+' PAGE NAME     : PRSMAS Interface 
+' CREATED BY    : MPRO
+' CREATED DATE  : 04/24/2013
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+
+#End Region
+
+Namespace Person
+
+    Public Interface IPrsMas
+
+#Region "Variables"
+
+#End Region
+
+#Region "Properties"
+        Property PrsPID() As Long       ' Person ID
+        Property PrsNme() As String     ' Person name, company name
+        Property PrsTit() As String     ' Person title
+        Property PrsSex() As String     ' Gender
+        Property PrsSoc() As String     ' 
+        Property PrsPlc() As String     ' Place of birth/location
+        Property PrsDOB() As date   ' Date of birth
+        Property PrsEml() As String     ' Email address
+        Property PrsLnm() As String     ' Last name
+        Property PrsFnm() As String     ' First name
+        Property PrsMnm() As String     ' Middle name
+        Property PrsNsf() As String     '
+        Property PrsIdx() As String     ' Index value
+        Property PrsCel() As String     ' Cellular Phone Number
+        Property PrsPag() As String     ' Pager Number
+        Property DivNum() As String     '
+        Property StaNum() As String     '
+
+        Property Id_Number() As String
+        Property AddMas() As String
+        ' -------------------------------------------------------------------------------
+        Property IsRecordExist() As Boolean
+#End Region
+
+#Region "Single Point Functions"
+        Function GetPrsPID(ByVal pPrsNme As String, ByVal pPrsSex As String, ByVal pPrsDOB As date) As Long
+        ' -------------------------------------------------------------------------------
+        Sub GetPrsMas(ByVal pPrsPID As Long)
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Transactions"
+        Function InsertPrsMas(ByVal pList As IList(Of Person.BPrsMas), ByVal pSecoID As String, ByRef pConn As Object, ByRef pTrans As Object) As List(Of String)
+        ' -------------------------------------------------------------------------------
+        Function SearchPrsMasAll(ByVal pPrsPID As Long, ByVal pPrsNme As String) As DataTable
+        'Function SearchPrsMasInsured(ByVal pPrsPID As Long, ByVal pPrsNme As String) As DataTable
+        Function SearchPrsMasInsured(ByVal pPrsPID As Long, ByVal pPrsNme As String,Optional ByVal pPrsSex As String = "",Optional ByVal pSearchType As Integer = 0) As DataTable
+        Function SearchPrsMasPayor(ByVal pPrsPID As Long, ByVal pPrsNme As String, Optional ByVal pPrsSex As String = "", Optional ByVal pSearchType As Integer = 0) As DataTable
+        ' -------------------------------------------------------------------------------
+        Function UpdatePrsMas(ByVal pList As IList(Of Person.BPrsMas), ByVal pSecoID As String, ByRef pConn As Object, ByRef pTrans As Object) As List(Of String)
+#End Region
+
+    End Interface
+
+End Namespace
+
+

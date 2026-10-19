@@ -1,0 +1,159 @@
+﻿#Region "Description"
+' PAGE NAME     : STG_OPRHEADER DAL
+' CREATED BY    : MPRO 
+' CREATED DATE  : 04/27/2015
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports System.Data.OracleClient
+Imports bllConn = Cocolife.BLL.Common.Database.BCollectionWeb
+'Imports bllConn = Cocolife.BLL.Common.Database.BCisLife
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports eDBAction = Cocolife.Utility.Common.Enums.eDBAction
+Imports dConstant = Cocolife.DAL.OCS.DConstant
+#End Region
+
+Namespace Staging
+
+    Public Class DStgOPRHeader
+
+#Region "Variables"
+        Private mReference As Object = Nothing
+#End Region
+
+#Region "Property"
+
+        Property Reference As Object
+            Get
+                Return mReference
+            End Get
+            Set(value As Object)
+                mReference = value
+            End Set
+        End Property
+
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Data Retrieval"
+
+        Public Function GetStgOPRHeader(ByVal pDocNumber As Long) As OracleDataReader
+            Dim oraCmd As New OracleCommand(DConstant._spCISGetStgOprHeader)
+            Dim OraDR As OracleDataReader = Nothing
+
+            Try
+
+                With oraCmd
+                    .CommandType = CommandType.StoredProcedure
+                    .Connection = bllConn.Instance.Connection
+                    If bllConn.Instance.Transaction IsNot Nothing Then .Transaction = bllConn.Instance.Transaction
+
+                    With .Parameters
+                        .Add(New OracleParameter("pDocNumber", OracleType.Number)).Value = pDocNumber
+                        .Add(New OracleParameter("rsOut", OracleType.Cursor)).Direction = ParameterDirection.Output
+                    End With
+
+                    oradr = .ExecuteReader
+                End With
+
+                Return OraDR
+
+            Catch ex As Exception
+                Throw
+            Finally
+                oraCmd.Dispose()
+            End Try
+        End Function
+
+#End Region
+
+#Region "Transactions"
+
+        Public Sub AlterStgOPRHeader(ByVal pObject As Object, ByVal pAction As String, ByRef pOraConn As OracleConnection, ByRef pOraTrans As OracleTransaction)
+
+            Dim oraCmd As New OracleCommand(DConstant._spAlterStgOprHdr)
+            Dim oraDR As OracleDataReader = Nothing
+
+            Try
+
+                With oraCmd
+                    .CommandType = CommandType.StoredProcedure
+                    .Connection = pOraConn
+                    .Transaction = pOraTrans
+
+                    With .Parameters
+                        .Add(New OracleParameter("pOPRRcptNo", OracleType.Number)).Value = pObject.OPRRcptNo                    ' 1
+                        .Add(New OracleParameter("pOPRDate", OracleType.DateTime)).Value = pObject.OPRDate                      ' 2
+                        .Add(New OracleParameter("pOPRSrcBrnc", OracleType.Number)).Value = pObject.OPRSrcBrnc                  ' 3
+                        .Add(New OracleParameter("pOPRRemarks", OracleType.VarChar)).Value = pObject.OPRRemarks                 ' 4
+                        .Add(New OracleParameter("pOPRApplctn", OracleType.VarChar)).Value = pObject.OPRApplctn                 ' 5
+                        .Add(New OracleParameter("pOPRECRNo", OracleType.Number)).Value = pObject.OPRECRNo                      ' 6
+                        .Add(New OracleParameter("pOPRECRDate", OracleType.DateTime)).Value = IIf(pObject.OPRECRDate = #1/1/1900#, DBNull.Value, pObject.OPRECRDate) ' 7
+                        .Add(New OracleParameter("pOPRPolNum", OracleType.VarChar)).Value = pObject.OPRPolNum                   ' 8
+                        .Add(New OracleParameter("pOPRPyrID", OracleType.Number)).Value = pObject.OPRPyrID                      ' 9
+                        .Add(New OracleParameter("pOPRPyrFNam", OracleType.VarChar)).Value = pObject.OPRPyrFNam                 ' 10
+                        .Add(New OracleParameter("pOPRPyrLNam", OracleType.VarChar)).Value = pObject.OPRPyrLNam                 ' 11
+                        .Add(New OracleParameter("pOPRPyrMNam", OracleType.VarChar)).Value = pObject.OPRPyrMNam                 ' 12
+                        .Add(New OracleParameter("pOPRInsID", OracleType.Number)).Value = pObject.OPRInsID                      ' 13
+                        .Add(New OracleParameter("pOPRInsFNam", OracleType.VarChar)).Value = pObject.OPRInsFNam                 ' 14
+                        .Add(New OracleParameter("pOPRInsLNam", OracleType.VarChar)).Value = pObject.OPRInsLNam                 ' 15
+                        .Add(New OracleParameter("pOPRInsMNam", OracleType.VarChar)).Value = pObject.OPRInsMNam                 ' 16
+                        .Add(New OracleParameter("pOPRAgID", OracleType.Number)).Value = pObject.OPRAgID                        ' 17
+                        .Add(New OracleParameter("pOPRAgFNam", OracleType.VarChar)).Value = pObject.OPRAgFNam                   ' 18
+                        .Add(New OracleParameter("pOPRAgLNam", OracleType.VarChar)).Value = pObject.OPRAgLNam                   ' 19
+                        .Add(New OracleParameter("pOPRAgMNam", OracleType.VarChar)).Value = pObject.OPRAgMNam                   ' 20
+                        .Add(New OracleParameter("pOPRBrID", OracleType.Number)).Value = pObject.OPRBrID                        ' 21
+                        .Add(New OracleParameter("pOPRBrFNam", OracleType.VarChar)).Value = pObject.OPRBrFNam                   ' 22
+                        .Add(New OracleParameter("pOPRBrLNam", OracleType.VarChar)).Value = pObject.OPRBrLNam                   ' 23
+                        .Add(New OracleParameter("pOPRBrMNam", OracleType.VarChar)).Value = pObject.OPRBrMNam                   ' 24
+                        .Add(New OracleParameter("pOPRDocTyp", OracleType.VarChar)).Value = pObject.OPRDocTyp                   ' 25
+                        .Add(New OracleParameter("pOPRTxNumb", OracleType.Number)).Value = pObject.OPRTxNumb                    ' 26
+                        .Add(New OracleParameter("pOPRPlnCry", OracleType.VarChar)).Value = pObject.OPRPlnCry                   ' 27
+                        .Add(New OracleParameter("pOPRFlags", OracleType.VarChar)).Value = pObject.OPRFlags                     ' 28
+                        .Add(New OracleParameter("pOPRIssue", OracleType.DateTime)).Value = IIf(pObject.OPRIssue = #1/1/1900#, DBNull.Value, pObject.OPRIssue) ' 29
+                        .Add(New OracleParameter("pOPRLastBl", OracleType.DateTime)).Value = IIf(pObject.OPRLastBl = #1/1/1900#, DBNull.Value, pObject.OPRLastBl) ' 30
+                        .Add(New OracleParameter("pCancelFlag", OracleType.Number)).Value = pObject.CancelFlag                  ' 31
+                        .Add(New OracleParameter("pPrtFlag", OracleType.Number)).Value = pObject.PrtFlag                        ' 32
+                        .Add(New OracleParameter("pNiFlag", OracleType.Number)).Value = pObject.NiFlag                          ' 33
+                        .Add(New OracleParameter("pAction", OracleType.VarChar)).Value = pAction                                ' 34
+                        .Add(New OracleParameter("rsOut", OracleType.Cursor)).Direction = ParameterDirection.Output             ' 35
+                    End With
+
+                    oraDR = .ExecuteReader
+                    With oraDR
+                        Reference = 0
+                        While .Read
+                            If eDBAction.isSuccessful(.Item("message")) Then
+                                Reference = cDataType.fLong.getReference(.Item("message"))
+                            Else
+                                Throw New Exception(.Item("message"))
+                            End If
+                        End While
+                    End With
+
+                End With
+
+            Catch ex As Exception
+                Throw
+            Finally
+                oraCmd.Dispose()
+                If Not IsNothing(oraDR) Then
+                    oraDR.Dispose()
+                End If
+            End Try
+
+        End Sub
+
+#End Region
+
+    End Class
+
+End Namespace
+

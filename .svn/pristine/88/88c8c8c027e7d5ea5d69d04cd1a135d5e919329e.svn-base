@@ -1,0 +1,358 @@
+﻿/*----------------------------------------------------------------------------------------
+ORANGE  - #f4690e
+GREEN   - #63bc48
+BLUE    - #0052a1
+LBLUE   - #26a3ff
+-----------------------------------------------------------------------------------------*/
+
+
+/* DEFAULT */
+/*---------------------------------------------------------------------------------------*/
+html, body {background: url('../Images/body.jpg') no-repeat fixed; background-color: White; font-family: Arial, sans-serif; font-size: 11px; color: #555555;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* LOGIN PAGE */
+/*---------------------------------------------------------------------------------------*/
+#login {width: 500px; height: 300px; background: url('../Images/Login.png') no-repeat; border: 0px; margin: 100px auto 0px auto;}
+    #login-header {height: 40px;}
+    #login-body {height: 220px;}
+        #login-body div {float: left; margin: 0px; padding: 0px;}
+        #login-body-left {width: 230px; height: 100%; margin-left: 230px;}
+        #login-body-main {width: 240px; height: 100%; vertical-align: middle; margin-left: 470px;}
+            .login-body-main-table {width: 240px; height: 100%;}
+            .login-body-main-td1 {width: 75px;}
+            .login-body-main-td2 {width: 10px;}
+            .login-body-main-td3 {width: 155px;}
+            .login-body-main-tdall {text-align: center;}
+        #login-body-right {width: 30px; height: 100%; margin-left: 500px;}
+    #login-footer {height: 40px;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* MASTER PAGE */
+/*---------------------------------------------------------------------------------------*/
+#master {width: 980px; height: 100%; border: 0px; margin: 0px auto; position: relative; z-index: 0;}
+    #master-header {height: 115px; background: url('../Images/HeaderMain.png') no-repeat; margin: 0px auto; vertical-align: top;}
+        .master-header-td1 {width: 40px;}
+        .master-header-td2 {width: 20px;}
+        .master-header-td3 {width: 860px;}
+        .master-header-td4 {width: 20px;}
+        .master-header-td5 {width: 40px;}
+    #master-body {background: url('../Images/BodyMain.png'); margin: 0px auto; vertical-align: top;}
+        .master-body-td1 {width: 40px;}
+        .master-body-td2 {width: 900px; vertical-align: top; text-align: left;}
+        .master-body-td3 {width: 40px;}
+    #master-footer {height: 80px; background: url('../Images/FooterMain.png') no-repeat; margin: 0px auto; vertical-align: top;}
+        .master-footer-td1 {width: 40px;}
+        .master-footer-td2 {width: 700px; text-align: left; vertical-align: top;}
+        .master-footer-td3 {width: 200px; text-align: right; vertical-align: top;}
+        .master-footer-td4 {width: 40px;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* CONTENT PAGE */
+/*---------------------------------------------------------------------------------------*/
+#content {width: 900px; border: 0px; margin: 0px auto;}
+    .content-header {width: 900px; height: 50px;}
+#content-header-home {background: url(../images/chHome.png) no-repeat top;}
+#content-header-paymentnonpremiumrelated {background: url(../images/chPaymentNonPremiumRelated.png) no-repeat top;}
+#content-header-paymentpremiumrelated {background: url(../images/chPaymentPremiumRelated.png) no-repeat top;}
+#content-header-paymentbatchpremiumrelated {background: url(../images/chPaymentBatchPremiumRelated.png) no-repeat top;}
+#content-header-paymentsalesinvoice {background: url(../images/chPaymentSalesInvoice.png) no-repeat top;}
+#content-header-paymentackreceipt {background: url(../images/chPaymentAckReceipt.png) no-repeat top;}
+#content-header-paymentdebitcreditmemo {background: url(../images/chPaymentDebitCreditMemo.png) no-repeat top;} /* added by junie --DMCM */
+#content-header-paymentchecktagging {background: url(../images/chPaymentCheckTagging.png) no-repeat top;}
+#content-header-reportsdailycollectionreport {background: url(../images/chReportsDailyCollectionReport.png) no-repeat top;}
+#content-header-maintenanceoprseries {background: url(../images/chMaintenanceOPRSeries.png) no-repeat top;}
+#content-header-maintenancesitemerchantid {background: url(../images/chMaintenanceSiteMerchantID.png) no-repeat top;}
+#content-header-maintenanceagentsorseries {background: url(../images/chMaintenanceAgentsORSeries.png) no-repeat top;}
+#content-header-paymentdmcmapproval {background: url(../images/chPaymentDMCMApproval.png) no-repeat top;}/* added by junie --DMCM */
+#content-header-maintenancechangepassword {background: url(../images/chMaintenanceChangePassword.png) no-repeat top;}
+#content-body {width: 860px; margin: 0px auto;}
+    .content-body-accordion {width: 820px; padding: 10px 0px; margin: 0px auto;}
+    .content-body-accordion td {vertical-align: middle; padding: 4px 0px;}
+    .content-body-accordion-td1 {width: 150px;}
+    .content-body-accordion-td2 {width: 260px;}
+    .content-body-accordion-td3 {width: 150px;}
+    .content-body-accordion-td4 {width: 260px;}
+    .content-body-accordion-td234 {width: 670px;}
+    .content-body-accordion-button {text-align: center;}
+    .content-body-panel {width: 835px; background-color: White; border: solid 1px #dddddd; text-align: left; margin: 0px auto; padding: 10px 10px 20px 10px; text-align: right;}
+    .content-body-panel-header {font-weight: bold; font-size: 12px; color: #26a3ff; letter-spacing: 2px; margin: 0px auto; padding: 0px 0px 10px 0px; border-bottom: dashed 1px #dddddd; text-align: left;}
+    .content-body-panel-detail {width: 820px; margin: 0px auto; padding: 20px 0px 0px 0px; text-align: left;}
+    .content-body-panel-detail td {vertical-align: middle; padding: 4px 0px;}
+    .content-body-panel-td1 {width: 150px;}
+    .content-body-panel-td2 {width: 260px;}
+    .content-body-panel-td3 {width: 150px;}
+    .content-body-panel-td4 {width: 260px;}
+    .content-body-panel-td234 {width: 670px;}
+#content-footer {height: 40px; background: url(../images/cfSeparator.png) no-repeat; background-position: bottom;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* PANEL */
+/*---------------------------------------------------------------------------------------*/
+.panel-hidden {display: none;}
+.panel-button {width: 830px; background-color: White; border: solid 1px #dddddd; text-align: left; margin: 0px auto; padding: 10px 15px; text-align: right;}
+.panel-button-left {width: 830px; background-color: White; border: solid 1px #dddddd; text-align: left; margin: 0px auto; padding: 10px 15px; text-align: left;}
+.panel-messagebox {width: 300px; background-color: White; border: solid 1px #cccccc; text-align: left; padding: 20px;}
+    .panel-messagebox div {float: left;}
+    .panel-messagebox-td1 {width: 40px; height: 100%; text-align: center; vertical-align: top;}
+    .panel-messagebox-td2 {width: 10px; height: 100%; text-align: left;}
+    .panel-messagebox-td3 {width: 250px; height: 100%; text-align: left; padding: 15px 0px 0px 0px;}
+    .panel-messagebox-button {width: 300px; text-align: right; padding: 20px 0px 0px 0px;}
+.panel-modal-740 {width: 740px; background-color: White; border: solid 1px #cccccc; padding: 20px; text-align: left;}
+    .panel-modal-740 div {float: left;}
+    .panel-modal-740-left {width: 20px;}
+    .panel-modal-740-main {width: 700px;}
+        .panel-modal-740-main td {vertical-align: middle; margin: 0px auto; padding: 4px 0px; text-align: left;}
+        .panel-modal-740-main-td1 {width: 150px;}
+        .panel-modal-740-main-td2 {width: 200px;}
+        .panel-modal-740-main-td3 {width: 150px;}
+        .panel-modal-740-main-td4 {width: 200px;}
+    .panel-modal-740-right {width: 20px;}
+.panel-modal-370 {width: 370px; background-color: White; border: solid 1px #cccccc; padding: 20px; text-align: left;}
+    .panel-modal-370 div {float: left;}
+    .panel-modal-370-left {width: 20px;}
+    .panel-modal-370-main {width: 350px;}
+        .panel-modal-370-main td {vertical-align: middle; margin: 0px auto; padding: 4px 0px; text-align: left;}
+        .panel-modal-370-main-td1 {width: 75px;}
+        .panel-modal-370-main-td2 {width: 100px;}
+        .panel-modal-370-main-td3 {width: 75px;}
+        .panel-modal-370-main-td4 {width: 100px;}
+    .panel-modal-370-right {width: 20px;}
+.panel-progress {width: 225px; background-color: White; border: solid 1px #cccccc; padding: 20px; text-align: left;}
+    .panel-progress-image {width: 100%; text-align: center;}
+    .panel-progress-label {width: 100%; text-align: center; margin: 0px auto; padding: 5px;}
+.pnl860 legend {font-weight: bold; font-size: 12px; color: #26a3ff; text-align: left; letter-spacing: 1px;}
+.pnl860 fieldset {margin: 0px; padding: 0px; width: 860px; font-weight: bold; font-size: 12px; color: #26a3ff; text-align: left;}
+.pnl860Button fieldset {margin: 0px; padding: 0px; width: 860px; font-weight: bold; font-size: 12px; color: #ffffff; text-align: left;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* MODAL */
+/*---------------------------------------------------------------------------------------*/
+.modal {background-color: #cccccc; filter: alpha(opacity=50); opacity: 0.5;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* ACCORDION */
+/*---------------------------------------------------------------------------------------*/
+.accordion-content {width: 820px; padding: 10px; margin: 0px auto;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* BUTTON */
+/*---------------------------------------------------------------------------------------*/
+.btnShort {font-family: Arial; font-size: 11px; color: #000000; width: 100px; cursor: pointer;
+    height: 22px;
+}
+.btnLong {font-family: Arial; font-size: 11px; color: #000000; height: 25px; width: 150px; cursor: pointer;}
+.btnAuto {font-family: Arial; font-size: 11px; color: #000000; height: 25px; width: auto; cursor: pointer;}
+.btnModal100 {font-family: Arial; font-size: 11px; color: #000000; height: 25px; width: 100px; cursor: pointer;}
+.btnModal150 {font-family: Arial; font-size: 11px; color: #000000; height: 25px; width: 150px; cursor: pointer;}
+.btnModalAuto {font-family: Arial; font-size: 11px; color: #000000; height: 25px; width: auto; cursor: pointer;}
+.btnHidden {display: none; background-color: Transparent; width: 0px; height: 0px; border-style: none;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* IMAGE*/
+/*---------------------------------------------------------------------------------------*/
+.image-messagebox {width: 32px; height: 32px; margin: 0px; padding: 0px;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* LABEL */
+/*---------------------------------------------------------------------------------------*/
+.label-messagebox {font-size: 11px; font-weight: normal; color: #555555; text-align: justify; line-height: 15px; margin: 0px; padding: 0px;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* MODAL PAGE */
+/*---------------------------------------------------------------------------------------*/
+/* modal header */
+.mhSearch {font-family: Arial; font-size: large; color: darkorange; padding-left:20px; width: 740px; height: 30px;}
+.mhSearchAgent {background-image: url(../images/mhSearchAgent.png); width: 740px; height: 30px;}
+.mhSearchInsured {background-image: url(../images/mhSearchInsured.png); width: 740px; height: 30px;}
+.mhSearchPayor {background-image: url(../images/mhSearchPayor.png); width: 740px; height: 30px;}
+.mhSearchPolicy {background-image: url(../images/mhSearchPolicy.png); width: 740px; height: 30px;}
+.mhSearchPromoOff {background-image: url(../images/mhSearchPromoOff.png); width: 740px; height: 30px;}
+.mhSearchSalesOff {background-image: url(../images/mhSearchSalesOff.png); width: 740px; height: 30px;}
+.mhViewDocs {background-image: url(../images/mhViewDocs.png); width: 740px; height: 30px;}
+.mhToDos{background-image: url(../images/mhToDos.jpg); width: 740px; height: 30px;}
+.mhAddPayor {background-image: url(../images/mhAddPayor.png); font-family: Arial; font-size: large; color: darkorange; padding-left:20px; width: 740px; height: 30px;}
+.mhAddInsured {background-image: url(../images/mhAddInsured.png); font-family: Arial; font-size: large; color: darkorange; padding-left:20px; width: 740px; height: 30px;}
+/* modal footer */
+.mfSeparator {background-image: url(../images/mfSeparator.png); width: 740px; height: 20px;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* LABEL */
+/*---------------------------------------------------------------------------------------*/
+.lblMessageBox {font-size: 11px; font-weight: normal; color: #555555; text-align: justify; line-height: 15px;}
+.lblUserHeader {font-size: 11px; color: #26a3ff; font-weight: bold;}
+.lblUserFooter {font-size: 10px; color: #26a3ff; font-weight: bold;}
+.lblItalic10 {font-size: 10px; font-weight: normal; color: #555555; font-style: italic;}
+.lblItalic11 {font-size: 11px; font-weight: normal; color: #555555; font-style: italic;}
+.lblNormal10 {font-size: 10px; font-weight: normal; color: #555555;}
+.lblNormal11 {font-size: 11px; font-weight: normal; color: #555555;}
+.lblNormal10Red {font-size: 10px; font-weight: normal; color: #ff0000;}
+.lblNormal11Red {font-size: 11px; font-weight: normal; color: #ff0000;}
+.lblNormal10Justify {font-size: 10px; font-weight: normal; color: #555555; text-align: justify;}
+.lblNormal11Justify {font-size: 11px; font-weight: normal; color: #555555; text-align: justify;}
+.lblNormal9 {font-family: Arial; font-size: 9px; font-weight: normal; color: #555555;}
+.lblNormal9 {font-family: Arial; font-size: 9px; font-weight: normal; color: #555555;}
+.lblNormal10 {font-family: Arial; font-size: 10px; font-weight: normal; color: #555555;}
+.lblNormal11 {font-family: Arial; font-size: 11px; font-weight: normal; color: #555555;}
+.lblNormal12 {font-family: Arial; font-size: 12px; font-weight: normal; color: #555555;}
+.lblNormalRed9 {font-size: 9px; font-weight: normal; color: Red;}
+.lblBold10 {font-size: 10px; font-weight: bold; color: #555555;}
+.lblBold11 {font-size: 11px; font-weight: bold; color: #555555;}
+.lblBold10777777 {font-size: 10px; font-weight: bold; color: #777777;}
+.lblBold11777777 {font-size: 11px; font-weight: bold; color: #777777;}
+.lblBoldRed10 {font-size: 10px; font-weight: bold; color: Red;}
+.lblBoldRed11 {font-size: 11px; font-weight: bold; color: Red;}
+.lblBoldRed12 {font-size: 12px; font-weight: bold; color: Red;}
+.lblWaterMark{font-family: Arial; font-size: 11px; color: #cccccc; border-style: solid; border-width: 1px; border-color: #aaaaaa; text-transform: uppercase; width: inherit;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* TEXTBOX */
+/*---------------------------------------------------------------------------------------*/
+.txtInputShorter {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 50px; text-transform: uppercase;}
+.txtInputShorterFocus {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 50px; text-transform: uppercase; background-color: #FFFFDD;}
+.txtInputDate  {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 90px; text-transform: uppercase;}
+.txtInputDateFocus {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 90px; text-transform: uppercase; background-color: #FFFFDD;}
+.txtInputShort {border: 1px solid #aaaaaa;
+    font-family: Arial; font-size: 11px; color: #555555; width: 130px; text-transform: uppercase;
+    margin-bottom: 0px;
+}
+.txtInputShortFocus {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 130px; text-transform: uppercase; background-color: #FFFFDD;}
+.txtInputShortNumber {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 130px; text-transform: uppercase; text-align: right;}
+.txtInputShortNumberFocus {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 130px; text-transform: uppercase; text-align: right; background-color: #FFFFDD;}
+.txtInputLong {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 245px; text-transform: uppercase;}
+.txtInputLongFocus {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 245px; text-transform: uppercase; background-color: #FFFFDD;}
+.txtInputLong2 {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 395px; text-transform: uppercase;}
+.txtInputLong2Focus {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 395px; text-transform: uppercase; background-color: #FFFFDD;}
+.txtInputTextArea {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 245px; text-transform: uppercase;}
+.txtInputTextAreaFocus {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 245px; text-transform: uppercase; background-color: #FFFFDD;}
+.txtInputTextArea2 {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 395px; text-transform: uppercase;}
+.txtInputTextArea2Focus {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 395px; text-transform: uppercase; background-color: #FFFFDD;}
+.txtReadOnlyNumber {background-color: Transparent; font-family: Arial; font-size: 11px; color: #555555; border: solid 0px; border-bottom: solid 1px #aaaaaa; width: 130px; text-transform: uppercase; text-align: right;}
+.txtReadOnlyNumber2 {background-color: Transparent; font-family: Arial; font-size: 11px; color: #555555; border: solid 0px; border-bottom: solid 1px #aaaaaa; width: 65px; text-transform: uppercase; text-align: right;}
+.txtReadOnlyNumberBold2 {background-color: Transparent; font-family: Arial; font-size: 11px; font-weight: bold; color: #555555; border: solid 0px; border-bottom: solid 1px #aaaaaa; width: 65px; text-transform: uppercase; text-align: right;}
+.txtReadOnlyShort {background-color: Transparent; font-family: Arial; font-size: 11px; color: #555555; border: solid 0px; border-bottom: solid 1px #aaaaaa; width: 130px; text-transform: uppercase;}
+.txtReadOnlyShorter {background-color: Transparent; font-family: Arial; font-size: 11px; color: #555555; border: solid 0px; border-bottom: solid 1px #aaaaaa; width: 30px; text-transform: uppercase;}
+.txtReadOnlyLong {background-color: Transparent; font-family: Arial; font-size: 11px; color: #555555; border: solid 0px; border-bottom: solid 1px #aaaaaa; width: 245px; text-transform: uppercase;}
+.txtReadOnlyLong2 {background-color: Transparent; font-family: Arial; font-size: 11px; color: #555555; border: solid 0px; border-bottom: solid 1px #aaaaaa; width: 395px; text-transform: uppercase;}
+.txtReadOnlyLong3 {background-color: Transparent; font-family: Arial; font-size: 11px; color: #555555; border: solid 0px; border-bottom: solid 1px #aaaaaa; width: 695px; text-transform: uppercase;}
+.txtReadOnlyShortRed {background-color: Transparent; font-family: Arial; font-size: 11px; color: Red; border: solid 0px; border-bottom: solid 1px #aaaaaa; width: 130px; text-transform: uppercase;}
+.txtReadOnlyLongRed {background-color: Transparent; font-family: Arial; font-size: 11px; color: Red; border: solid 0px; border-bottom: solid 1px #aaaaaa; width: 245px; text-transform: uppercase;}
+.txtPaNumber {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 73px; text-transform: uppercase;}
+.txtPaNumberFocus {font-family: Arial; font-size: 11px; color: #555555; border-style: solid; border-width: 1px; border-color: #aaaaaa; width: 73px; text-transform: uppercase; background-color: #FFFFDD;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* CHECKBOX */
+/*---------------------------------------------------------------------------------------*/
+.chkNormal10 {margin: 0px; padding: 0px; font-size: 10px; font-weight: normal; color: #555555;}
+.chkNormal11 {margin: 0px; padding: 0px; font-size: 11px; font-weight: normal; color: #555555;}
+.chkNormal10Red {margin: 0px; padding: 0px; font-size: 10px; font-weight: normal; color: #ff0000;}
+.chkNormal11Red {margin: 0px; padding: 0px; font-size: 11px; font-weight: normal; color: #ff0000;}
+.chkBold10 {margin: 0px; padding: 0px; font-size: 10px; font-weight: bold; color: #555555;}
+.chkBold11 {margin: 0px; padding: 0px; font-size: 11px; font-weight: bold; color: #555555;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* RADIOBUTTON */
+/*---------------------------------------------------------------------------------------*/
+.rad {margin: 0px; padding: 0px; display: inline;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* DROP DOWNLIST */
+/*---------------------------------------------------------------------------------------*/
+.ddlShort {font-family: Arial; font-size: 11px; color: #555555; width: 134px; text-transform: uppercase;}
+.ddlPaPlan {font-family: Arial; font-size: 11px; color: #555555; width: 54px; text-transform: uppercase;}
+.ddlTime {font-family: Arial; font-size: 11px; color: #555555; width: 44px; text-transform: uppercase;}
+.ddlLong {font-family: Arial; font-size: 11px; color: #555555; width: 250px; text-transform: uppercase;}
+.ddlLong2 {font-family: Arial; font-size: 11px; color: #555555; width: 400px; text-transform: uppercase;}
+.ddlAuto {font-family: Arial; font-size: 11px; color: #555555; width: auto; text-transform: uppercase;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* IMAGE BUTTON */
+/*---------------------------------------------------------------------------------------*/
+.ibtn {border-style: none;
+    border-color: inherit;
+    border-width: 0px;
+    height: 16px; cursor: pointer; padding: 0px; margin: 0px 1px;
+}
+.ibtnAccept {background: transparent url('../Images/icons/accept.png') no-repeat center;}
+.ibtnAdd {background: transparent url('../Images/icons/add.png') no-repeat center;}
+.ibtnAddPerson {background: transparent url('../Images/icons/add_person.png') no-repeat center;}
+.ibtnCopy {background: transparent url('../Images/icons/copy.png') no-repeat center;}
+.ibtnDelete {background: transparent url('../Images/icons/delete.png') no-repeat center;}
+.ibtnDeletePerson {background: transparent url('../Images/icons/delete_person.png') no-repeat center;}
+.ibtnEraser {background: transparent url('../Images/icons/eraser.png') no-repeat center;}
+.ibtnList {background: transparent url('../Images/icons/list.png') no-repeat center;}
+.ibtnRefresh {background: transparent url('../Images/icons/refresh.png') no-repeat center;}
+.ibtnPrint {background: transparent url('../Images/icons/print.png') no-repeat center;}
+.ibtnSearch {background: transparent url('../Images/icons/search.gif') no-repeat center;}
+.ibtnView {background: transparent url('../Images/icons/view.png') no-repeat center;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* LINK BUTTON */
+/*---------------------------------------------------------------------------------------*/
+a {font-family: Arial;cursor: pointer;}
+    a.lnkHeader:link {font-size: 11px; font-weight: bold; color: #777777; text-decoration: none;}
+    a.lnkHeader:hover {color: #f4690e; text-decoration: none;}
+    a.lnkFooter:link {font-size: 10px; font-weight: bold; color: #777777; text-decoration: none;}
+    a.lnkFooter:hover {color: #f4690e; text-decoration: underline;}
+    a.lnkNormal10:link {font-size: 10px; font-weight: normal; color: #555555; text-decoration: none;}
+    a.lnkNormal10:hover {color: #63bc48; text-decoration: underline;}
+    a.lnkNormal11:link {font-size: 11px; font-weight: normal; color: #555555; text-decoration: none;}
+    a.lnkNormal11:hover {color: #63bc48; text-decoration: underline;}
+    a.lnkNormal10777777:link {font-size: 10px; font-weight: normal; color: #777777; text-decoration: none;}
+    a.lnkNormal10777777:hover {color: #63bc48; text-decoration: underline;}
+    a.lnkNormal11777777:link {font-size: 11px; font-weight: normal; color: #777777; text-decoration: none;}
+    a.lnkNormal11777777:hover {color: #63bc48; text-decoration: underline;}
+    a.lnkBold10:link {font-size: 10px; font-weight: bold; color: #555555; text-decoration: none;}
+    a.lnkBold10:hover {color: #63bc48; text-decoration: underline;}
+    a.lnkBold11:link {font-size: 11px; font-weight: bold; color: #555555; text-decoration: none;}
+    a.lnkBold11:hover {color: #63bc48; text-decoration: underline;}
+    a.lnkBold11777777:link {font-size: 11px; font-weight: bold; color: #777777; text-decoration: none;}
+    a.lnkBold11777777:hover {color: #63bc48; text-decoration: underline;}
+    a.lnkBold10777777:link {font-size: 10px; font-weight: bold; color: #777777; text-decoration: none;}
+    a.lnkBold10777777:hover {color: #63bc48; text-decoration: underline;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* GRID VIEW */
+/*---------------------------------------------------------------------------------------*/
+.gvwStyle {color: #333333; font-family: Arial; font-size: 11px; font-weight: normal;}
+.gvwHeader {background-color: #507CD1; color: White; font-weight: bold;}
+.gvwFooter {background-color: #507CD1; color: White; font-weight: bold;}
+.gvwRow {background-color: #EFF3FB;}
+.gvwPager {background-color: #2461BF; color: White; font-size: 10px;}
+.gvwSelectedRow {background-color: #D1DDF1; color: #333333; font-weight: bold;}
+.gvwEditRow {background-color: #CCCCCC;}
+.gvwAlternationRow {background-color: White;}
+/*---------------------------------------------------------------------------------------*/
+
+
+/* GRIDVIEW */
+/*---------------------------------------------------------------------------------------*/
+.gvwSearch {width: 100%; height: 200px; margin: 0px auto 0px auto; overflow: auto;}
+.gvwSearchVertical {width: auto; height: 200px; margin: 0px auto 0px auto; overflow: auto; overflow-x: hidden; -ms-overflow-x: hidden;}
+.gvwSearchHorizontal {width: auto; height: 200px; margin: 0px auto 0px auto; overflow: auto; overflow-y: hidden; -ms-overflow-y: hidden;}
+.gvwStyle {color: #333333; font-family: Arial; font-size: 11px; font-weight: normal;}
+.gvwStyle th {background-color: #507CD1; color: White; font-weight: bold; padding: 8px 10px 8px 10px;}
+.gvwStyle td {padding: 0px 10px 0px 10px;}
+.gvwStylePlain {color: #333333; font-family: Arial; font-size: 11px; font-weight: normal;}
+.gvwStylePlain th {background-color: #507CD1; color: White; font-weight: bold; padding: 8px 10px 8px 10px;}
+.gvwStylePlain td {padding: 5px 10px 5px 10px;}
+.gvwEmptyRow {background-color: #EFF3FB; color: Red; font-weight: bold;}
+.gvwHidden {display: none;}

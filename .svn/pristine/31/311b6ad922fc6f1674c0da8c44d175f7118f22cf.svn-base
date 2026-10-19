@@ -1,0 +1,2575 @@
+﻿#Region "Description"
+' PAGE NAME     : Payment : Sales Invoice
+' CREATED BY    : Ej
+' CREATED DATE  : 11/07/2024
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports preSecurity = Cocolife.Presenter.Common.Security
+Imports preMessages = Cocolife.Utility.OCS.Messages
+Imports prePayment = Cocolife.Presenter.OCS.Payment
+Imports preSearch = Cocolife.Presenter.OCS.Search
+Imports preReport = Cocolife.Presenter.OCS.Report
+Imports eSystemMessage = Cocolife.Utility.Common.Enums.eSystemMessage
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports eCSS = Cocolife.Utility.OCS.Enums.eCSS
+Imports ePage = Cocolife.Utility.OCS.Enums.ePage
+Imports eReference = Cocolife.Utility.OCS.Enums.eReference
+Imports eDocSaveState = Cocolife.Utility.OCS.Enums.eReference.DocSaveState
+Imports eSession = Cocolife.Utility.OCS.Enums.eSession
+Imports eReport = Cocolife.Utility.OCS.Enums.eReport
+Imports Cocolife.Utility.OCS.Classes
+Imports System.Linq
+Imports System.Reflection
+Imports CrystalDecisions.CrystalReports.Engine
+Imports CrystalDecisions.Shared
+Imports cCrystalConn = Cocolife.Utility.OCS.Classes.cCrystalConn
+Imports System.Globalization
+
+#End Region
+
+Partial Public Class PaymentAckReceipt
+    Inherits System.Web.UI.Page
+
+#Region "Implements"
+    Implements preSecurity.ISystemMessage
+    Implements preMessages.IConfirmationMessage
+    Implements prePayment.IPaymentAckReceipt
+#End Region
+
+#Region "Variables"
+    Private pSystemMessage As preSecurity.PSystemMessage
+    Private pConfirmationMessage As preMessages.PConfirmationMessage
+    Private pPaymentAckReceipt As prePayment.PPaymentAckReceipt
+    Private mIsPayTypeSuccessful As Boolean
+    Private mIsSuccessful As Boolean
+#End Region
+
+#Region "ISystemMessage"
+
+#Region "Property"
+
+    Public WriteOnly Property Message() As String Implements preSecurity.ISystemMessage.Message
+        Set(ByVal value As String)
+            lblMessage.Text = value
+        End Set
+    End Property
+
+    Public WriteOnly Property MessageType() As String Implements preSecurity.ISystemMessage.MessageType
+        Set(ByVal value As String)
+            imgMessage.ImageUrl = value
+        End Set
+    End Property
+
+    Public WriteOnly Property IsMessage() As Boolean Implements preSecurity.ISystemMessage.isMessage
+        Set(ByVal value As Boolean)
+            If value Then
+                mpeMessage.Show()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+
+#End Region
+
+#End Region
+
+#Region "IConfirmationMessage"
+
+#Region "Property"
+
+    Public Property ConfirmCaller() As String Implements preMessages.IConfirmationMessage.ConfirmCaller
+        Get
+            Return cDataType.fString.IfNull(hdnConfirmCaller.Value)
+        End Get
+        Set(value As String)
+            hdnConfirmCaller.Value = value
+        End Set
+    End Property
+
+    Public Property ConfirmClickState() As Boolean Implements preMessages.IConfirmationMessage.ClickedState
+        Get
+            Return cDataType.fBoolean.IfNull(hdnClickStateTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnClickStateTag.Value = value
+        End Set
+    End Property
+
+    Public Property UserResponse() As Boolean Implements preMessages.IConfirmationMessage.UserResponse
+        Get
+            Return cDataType.fBoolean.IfNull(hdnConfirmTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnConfirmTag.Value = value
+        End Set
+    End Property
+
+    Public WriteOnly Property ConfirmMessage() As String Implements preMessages.IConfirmationMessage.Message
+        Set(ByVal value As String)
+            lblConfirm.Text = value
+        End Set
+    End Property
+
+    Public WriteOnly Property IsConfirmMessage() As Boolean Implements preMessages.IConfirmationMessage.isMessage
+        Set(ByVal value As Boolean)
+            If value Then
+                mpeConfirm.Show()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+
+#End Region
+
+#End Region
+
+#Region "IPaymentAckReceipt"
+
+#Region "Property"
+
+#Region "Invoice Details"
+
+    Public Property DocPrinted As Boolean Implements prePayment.IPaymentAckReceipt.DocPrinted
+        Get
+            Return cDataType.fBoolean.IfNull(hdnDocPrinted.Value)
+        End Get
+        Set(value As Boolean)
+            hdnDocPrinted.Value = value
+        End Set
+    End Property
+
+    Public Property DocSaveState As Integer Implements prePayment.IPaymentAckReceipt.DocSaveState
+        Get
+            Return cDataType.fInteger.IfNull(hdnDocSaveState.Value)
+        End Get
+        Set(value As Integer)
+            hdnDocSaveState.Value = value
+
+            ManageMain(value)
+
+            Select Case value
+                Case eDocSaveState.Initial
+                    ibtnViewARs.Visible = True
+                    btnAckReceiptAddNew.Enabled = True
+                    btnAckReceiptSave.Enabled = False
+                    btnAckReceiptSave.Text = "Save"
+                    btnAckReceiptPrint.Enabled = False
+                    btnAckReceiptCancel.Enabled = False
+                    ibtnClearSourceSite.Visible = False
+
+                    RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+                    ManageDetails("EDIT", False)
+                Case eDocSaveState.ViewEdit
+                    ibtnViewARs.Visible = True
+                    ibtnSearchSalesInvoice.Visible = False
+                    btnAckReceiptAddNew.Enabled = False
+                    btnAckReceiptSave.Enabled = True
+                    btnAckReceiptSave.Text = "Modify"
+                    btnAckReceiptPrint.Enabled = True
+                    btnAckReceiptCancel.Enabled = False
+                    ManageDetails("SOURCESITE", True)
+                    ManageDetails("EDIT", False)
+                    ManagePaymentType("ENABLED", False)
+                Case eDocSaveState.ViewNoEdit
+                    ibtnViewARs.Visible = True
+                    ibtnSearchSalesInvoice.Visible = False
+                    btnAckReceiptAddNew.Enabled = True
+                    btnAckReceiptSave.Enabled = False
+                    btnAckReceiptSave.Text = "Modify"
+                    If AckReceiptNumber > 0 Then
+                        btnAckReceiptPrint.Enabled = True
+                    Else
+                        btnAckReceiptPrint.Enabled = False
+                    End If
+                    If AckReceiptNumber > 0 Or SIPrintStatus <> "PRINTED" Then
+                        btnAckReceiptCancel.Enabled = True
+                    Else
+                        btnAckReceiptCancel.Enabled = False
+                    End If
+                    ibtnSearchSalesInvoice.Visible = False
+                    ibtnClearGrossAmount.Visible = False
+                    ibtnClearSourceSite.Visible = False
+                    ibtnClearRefNo.Visible = False
+                    ibtnVerifyWTax.Visible = False
+                    ibtnVerifyDiscount.Visible = False
+                    ibtnVerifyComm.Visible = False
+                    ibtnClearWTax.Visible = False
+                    ibtnClearDiscount.Visible = False
+                    ibtnClearComm.Visible = False
+                    ManageDetails("EDIT", False)
+                    ManagePaymentType("ENABLED", False)
+                Case eDocSaveState.Edit
+                    ibtnViewARs.Visible = False
+                    btnAckReceiptAddNew.Enabled = False
+                    btnAckReceiptSave.Enabled = True
+                    btnAckReceiptSave.Text = "Update"
+                    btnAckReceiptPrint.Enabled = False
+                    btnAckReceiptCancel.Enabled = False
+                    ManageDetails("VATAMOUNTS", True)
+                    ManageDetails("EDIT", True)
+                    ManageDetails("SEARCHREFNO", True)
+                    ManagePaymentType("ENABLED", True)
+                    ibtnClearRefNo.Visible = False
+                    ibtnClearSourceSite.Visible = False
+                    'ManageDetails("SOURCESITE", True)
+                Case eDocSaveState.AddNew
+                    ibtnViewARs.Visible = False
+                    btnAckReceiptAddNew.Enabled = False
+                    btnAckReceiptSave.Enabled = True
+                    btnAckReceiptSave.Text = "Save"
+                    btnAckReceiptPrint.Enabled = False
+                    btnAckReceiptCancel.Enabled = False
+                    ManageDetails("VATAMOUNTS", True)
+                    ManageDetails("SEARCHREFNO", False)
+                    ManagePaymentType("ENABLED", True)
+                Case eDocSaveState.Cancel
+                    ibtnViewARs.Visible = True
+                    btnAckReceiptAddNew.Enabled = True
+                    btnAckReceiptSave.Enabled = False
+                    btnAckReceiptSave.Text = "Save"
+                    btnAckReceiptPrint.Enabled = False
+                    btnAckReceiptCancel.Enabled = False
+                    ibtnSearchSalesInvoice.Visible = False
+                    ibtnClearRefNo.Visible = False
+                    ibtnVerifyWTax.Visible = False
+                    ibtnVerifyDiscount.Visible = False
+                    ibtnVerifyComm.Visible = False
+                    ibtnClearWTax.Visible = False
+                    ibtnClearDiscount.Visible = False
+                    ibtnClearComm.Visible = False
+                    ManageDetails("EDIT", False)
+                    ManagePaymentType("ENABLED", False)
+                Case eDocSaveState.Print
+                    ibtnViewARs.Visible = True
+                    btnAckReceiptAddNew.Enabled = True
+                    btnAckReceiptSave.Enabled = False
+                    btnAckReceiptSave.Text = "Modify"
+                    btnAckReceiptPrint.Enabled = True
+                    ibtnSearchSalesInvoice.Visible = False
+                    ibtnClearSourceSite.Visible = False
+                    ibtnClearRefNo.Visible = False
+                    ibtnVerifyWTax.Visible = False
+                    ibtnVerifyDiscount.Visible = False
+                    ibtnVerifyComm.Visible = False
+                    ibtnClearWTax.Visible = False
+                    ibtnClearDiscount.Visible = False
+                    ibtnClearComm.Visible = False
+                    If ARDate = Now.Date AndAlso ARPrintStatus = "PRINTED" Then
+                        btnAckReceiptCancel.Enabled = True
+                    Else
+                        btnAckReceiptCancel.Enabled = False
+                    End If
+                    ManageDetails("EDIT", False)
+                    ManagePaymentType("ENABLED", False)
+            End Select
+        End Set
+    End Property
+
+    Public ReadOnly Property SiteCode As Long Implements prePayment.IPaymentAckReceipt.SiteCode
+        Get
+            Return Master.SiteID
+        End Get
+    End Property
+
+    Public ReadOnly Property UserID As Long Implements prePayment.IPaymentAckReceipt.UserID
+        Get
+            Return Master.UserPrsPID
+        End Get
+    End Property
+
+    Public Property ReceiptByCode As String Implements prePayment.IPaymentAckReceipt.ReceiptByCode
+        Get
+            Return cDataType.fString.IfNull(hdnReceiptByCode.Value)
+        End Get
+        Set(value As String)
+            hdnReceiptByCode.Value = value
+        End Set
+    End Property
+
+    Public Property ReceiptById As Long Implements prePayment.IPaymentAckReceipt.ReceiptById
+        Get
+            Return cDataType.fString.IfNull(hdnReceiptById.Value)
+        End Get
+        Set(value As Long)
+            hdnReceiptById.Value = value
+        End Set
+    End Property
+
+    Public Property IsSuccessful As Boolean Implements prePayment.IPaymentAckReceipt.IsSuccessful
+        Get
+            Return mIsSuccessful
+        End Get
+        Set(value As Boolean)
+            mIsSuccessful = value
+        End Set
+    End Property
+
+    Public Property IsSourceSiteLocked() As Boolean Implements prePayment.IPaymentAckReceipt.IsSourceSiteLocked
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsSourceSiteLocked.Value)
+        End Get
+        Set(ByVal value As Boolean)
+            If value Then
+                If DocSaveState = eReference.DocSaveState.AddNew Or DocSaveState = eReference.DocSaveState.Edit Then
+                    RaiseEvent CheckSourceSite(Me, EventArgs.Empty)
+                    value = IsSuccessful
+                End If
+            End If
+            hdnIsSourceSiteLocked.Value = value
+            If Not DocSaveState = eReference.DocSaveState.Edit Then
+                ManageDetails("SOURCESITE", value)
+            End If
+        End Set
+    End Property
+
+    Public Property SourceSite As String Implements prePayment.IPaymentAckReceipt.SourceSite
+        Get
+            Return cDataType.fString.IfNull(ddlSourceSite.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlSourceSite.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property ReservedDocNo As Long Implements prePayment.IPaymentAckReceipt.ReservedDocNo
+        Get
+            Return cDataType.fLong.IfNull(hdnReservedDocNo.Value)
+        End Get
+        Set(value As Long)
+            hdnReservedDocNo.Value = value
+        End Set
+    End Property
+
+    Public Property SourceType As String Implements prePayment.IPaymentAckReceipt.SourceType
+        Get
+            Return cDataType.fString.IfNull(ddlSourceType.Text)
+        End Get
+        Set(value As String)
+            If value = "USD" Then
+                ddlSourceType.Text = value
+            Else
+                ddlSourceType.Text = "SSO"
+            End If
+        End Set
+    End Property
+
+    Public Property AckReceiptID As Long Implements prePayment.IPaymentAckReceipt.AckReceiptID
+        Get
+            Return cDataType.fLong.IfNull(hdnAckReceiptID.Value)
+        End Get
+        Set(value As Long)
+            hdnAckReceiptID.Value = value
+        End Set
+    End Property
+
+    Public Property ReferenceNo As String Implements prePayment.IPaymentAckReceipt.ReferenceNo
+        Get
+            Return cDataType.fString.IfNull(txtReferenceNo.Text)
+        End Get
+        Set(value As String)
+            txtReferenceNo.Text = value
+        End Set
+    End Property
+
+    Public Property PayorName As String Implements prePayment.IPaymentAckReceipt.PayorName
+        Get
+            Return cDataType.fString.IfNull(txtPayorName.Text)
+        End Get
+        Set(value As String)
+            txtPayorName.Text = value
+        End Set
+    End Property
+
+    Public Property PayorAddress As String Implements prePayment.IPaymentAckReceipt.PayorAddress
+        Get
+            Return cDataType.fString.IfNull(txtPayorAddress.Text)
+        End Get
+        Set(value As String)
+            txtPayorAddress.Text = value
+        End Set
+    End Property
+
+    Public Property PayorTIN As String Implements prePayment.IPaymentAckReceipt.PayorTIN
+        Get
+            Return cDataType.fString.IfNull(txtPayorTin.Text)
+        End Get
+        Set(value As String)
+            txtPayorTin.Text = value
+        End Set
+    End Property
+
+    Public Property InsuredClientName As String Implements prePayment.IPaymentAckReceipt.InsuredClientName
+        Get
+            Return cDataType.fString.IfNull(txtInsuredClientName.Text)
+        End Get
+        Set(value As String)
+            txtInsuredClientName.Text = value
+        End Set
+    End Property
+
+    Public Property PolicyNumber As String Implements prePayment.IPaymentAckReceipt.PolicyNumber
+        Get
+            Return cDataType.fString.IfNull(txtPolicyNumber.Text)
+        End Get
+        Set(value As String)
+            txtPolicyNumber.Text = value
+        End Set
+    End Property
+
+    Public Property CoveragePeriodFrom As Date Implements prePayment.IPaymentAckReceipt.CoveragePeriodFrom
+        Get
+            Return cDataType.fDate.IfNull(txtCoveragePeriodFrom.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtCoveragePeriodFrom.Text = ""
+            Else
+                txtCoveragePeriodFrom.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property CoveragePeriodTo As Date Implements prePayment.IPaymentAckReceipt.CoveragePeriodTo
+        Get
+            Return cDataType.fDate.IfNull(txtCoveragePeriodTo.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtCoveragePeriodTo.Text = ""
+            Else
+                txtCoveragePeriodTo.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property InvoiceCurrency As String Implements prePayment.IPaymentAckReceipt.InvoiceCurrency
+        Get
+            Return cDataType.fString.IfNull(ddlInvoiceCurrency.Text)
+        End Get
+        Set(value As String)
+            If value = "USD" Then
+                ddlInvoiceCurrency.Text = value
+            Else
+                ddlInvoiceCurrency.Text = "PHP"
+            End If
+        End Set
+    End Property
+
+    Public Property InvoiceAmount As Decimal Implements prePayment.IPaymentAckReceipt.InvoiceAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtInvoiceAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtInvoiceAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property TotalSales As Decimal Implements prePayment.IPaymentAckReceipt.TotalSales
+        Get
+            Return cDataType.fDecimal.IfNull(txtTotalSales.Text)
+        End Get
+        Set(value As Decimal)
+            txtTotalSales.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            NetOfWitholdingTax = GrossAmount - WitholdingTax
+        End Set
+    End Property
+
+    Public Property WitholdingTax As Decimal Implements prePayment.IPaymentAckReceipt.WitholdingTax
+        Get
+            Return cDataType.fDecimal.IfNull(txtWitholdingTax.Text)
+        End Get
+        Set(value As Decimal)
+            txtWitholdingTax.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property NetOfWitholdingTax As Decimal Implements prePayment.IPaymentAckReceipt.NetOfWitholdingTax
+        Get
+            Return cDataType.fDecimal.IfNull(txtNetOfWitholdingTax.Text)
+        End Get
+        Set(value As Decimal)
+            txtNetOfWitholdingTax.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property Discount As Decimal Implements prePayment.IPaymentAckReceipt.Discount
+        Get
+            Return cDataType.fDecimal.IfNull(txtDiscount.Text)
+        End Get
+        Set(value As Decimal)
+            txtDiscount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property DiscountIdNo As String Implements prePayment.IPaymentAckReceipt.DiscountIdNo
+        Get
+            Return cDataType.fString.IfNull(txtDiscountIdNo.Text)
+        End Get
+        Set(value As String)
+            txtDiscountIdNo.Text = value
+        End Set
+    End Property
+
+    Public Property PaymentTerm As String Implements prePayment.IPaymentAckReceipt.PaymentTerm
+        Get
+            Return cDataType.fString.IfNull(txtPaymentTerm.Text)
+        End Get
+        Set(value As String)
+            txtPaymentTerm.Text = value
+        End Set
+    End Property
+
+    Public Property NextDueDate As Date Implements prePayment.IPaymentAckReceipt.NextDueDate
+        Get
+            Return cDataType.fDate.IfNull(txtNextDueDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtNextDueDate.Text = ""
+            Else
+                txtNextDueDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property AgentName As String Implements prePayment.IPaymentAckReceipt.AgentName
+        Get
+            Return cDataType.fString.IfNull(txtAgentName.Text)
+        End Get
+        Set(value As String)
+            txtAgentName.Text = value
+        End Set
+    End Property
+
+    Public Property AgentCode As String Implements prePayment.IPaymentAckReceipt.AgentCode
+        Get
+            Return cDataType.fString.IfNull(txtAgentCode.Text)
+        End Get
+        Set(value As String)
+            txtAgentCode.Text = value
+        End Set
+    End Property
+
+    Public Property AckReceiptRemarks As String Implements prePayment.IPaymentAckReceipt.AckReceiptRemarks
+        Get
+            Return cDataType.fString.IfNull(txtARRemarks.Text)
+        End Get
+        Set(value As String)
+            txtARRemarks.Text = value
+        End Set
+    End Property
+
+    Public Property CancellationReason As String Implements prePayment.IPaymentAckReceipt.CancellationReason
+        Get
+            Return cDataType.fString.IfNull(ddlCancellationReason.Text)
+        End Get
+        Set(value As String)
+            ddlCancellationReason.Text = value
+        End Set
+    End Property
+
+    Public Property AckReceiptOtherInfo As String Implements prePayment.IPaymentAckReceipt.AckReceiptOtherInfo
+        Get
+            Return cDataType.fString.IfNull(txtAROtherInfo.Text)
+        End Get
+        Set(value As String)
+            txtAROtherInfo.Text = value
+        End Set
+    End Property
+
+    Public Property InvoiceNumber As Long Implements prePayment.IPaymentAckReceipt.InvoiceNumber
+        Get
+            Return cDataType.fLong.IfNull(txtInvoiceNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtInvoiceNumber.Text = ""
+            Else
+                txtInvoiceNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property InvoiceDate() As Date Implements prePayment.IPaymentAckReceipt.InvoiceDate
+        Get
+            Return cDataType.fDate.IfNull(txtInvoiceDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtInvoiceDate.Text = ""
+            Else
+                txtInvoiceDate.Text = value
+            End If
+        End Set
+    End Property
+
+
+    Public Property AckReceiptNumber As Long Implements prePayment.IPaymentAckReceipt.AckReceiptNumber
+        Get
+            Return cDataType.fLong.IfNull(txtARNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtARNumber.Text = "AUTO"
+            Else
+                txtARNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ARDate() As Date Implements prePayment.IPaymentAckReceipt.ARDate
+        Get
+            Return cDataType.fString.IfNull(txtARDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtARDate.Text = ""
+            Else
+                txtARDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property SIPrintStatus() As String Implements prePayment.IPaymentAckReceipt.SIPrintStatus
+        Get
+            Return cDataType.fString.IfNull(hdnSIPrintStatus.Value)
+        End Get
+        Set(value As String)
+            hdnSIPrintStatus.Value = value
+        End Set
+    End Property
+
+    Public Property ARPrintStatus() As String Implements prePayment.IPaymentAckReceipt.ARPrintStatus
+        Get
+            Return cDataType.fString.IfNull(hdnARPrintStatus.Value)
+        End Get
+        Set(value As String)
+            hdnARPrintStatus.Value = value
+        End Set
+    End Property
+
+    Public Property Particulars() As String Implements prePayment.IPaymentAckReceipt.Particulars
+        Get
+            Return cDataType.fString.IfNull(txtARParticulars.Text)
+        End Get
+        Set(ByVal value As String)
+            txtARParticulars.Text = value
+        End Set
+    End Property
+
+    Public Property lstSIDetails As List(Of cSIDetails) Implements prePayment.IPaymentAckReceipt.lstSIDetails
+        Get
+            Return ConvertToList(Of cSIDetails)(gvwParticulars)
+        End Get
+        Set(ByVal value As List(Of cSIDetails))
+            txtParticularsTotalAmount.Text = CDec(value.Sum(Function(c) c.Amount)).ToString("#,##0.00")
+
+            gvwParticulars.DataSource = value
+            gvwParticulars.DataBind()
+        End Set
+    End Property
+
+    Public Property ViewARFrom As Date Implements prePayment.IPaymentAckReceipt.ViewARFrom
+        Get
+            Return cDataType.fDate.IfNull(txtViewARFromDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtViewARFromDate.Text = cDataType.fDate.Current.AddDays(-3)
+            Else
+                txtViewARFromDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewARTo As Date Implements prePayment.IPaymentAckReceipt.ViewARTo
+        Get
+            Return cDataType.fDate.IfNull(txtViewARToDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtViewARToDate.Text = cDataType.fDate.Current
+            Else
+                txtViewARToDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewARNumber As Long Implements prePayment.IPaymentAckReceipt.ViewARNumber
+        Get
+            Return cDataType.fLong.IfNull(txtViewARNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtViewARNumber.Text = Nothing
+            Else
+                txtViewARNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewARBySINo As Long Implements prePayment.IPaymentAckReceipt.ViewARBySINo
+        Get
+            Return cDataType.fLong.IfNull(txtViewARBySINo.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtViewARBySINo.Text = Nothing
+            Else
+                txtViewARBySINo.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewSIFrom As Date Implements prePayment.IPaymentAckReceipt.ViewSIFrom
+        Get
+            Return cDataType.fDate.IfNull(txtViewSIFromDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtViewSIFromDate.Text = cDataType.fDate.Current.AddMonths(-1)
+            Else
+                txtViewSIFromDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewSITo As Date Implements prePayment.IPaymentAckReceipt.ViewSITo
+        Get
+            Return cDataType.fDate.IfNull(txtViewSIToDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtViewSIToDate.Text = cDataType.fDate.Current
+            Else
+                txtViewSIToDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewSINumber As Long Implements prePayment.IPaymentAckReceipt.ViewSINumber
+        Get
+            Return cDataType.fLong.IfNull(txtViewSINumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtViewSINumber.Text = Nothing
+            Else
+                txtViewSINumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewSIReferenceNumber As String Implements prePayment.IPaymentAckReceipt.ViewSIReferenceNumber
+        Get
+            Return cDataType.fString.IfNull(txtViewSIReferenceNo.Text)
+        End Get
+        Set(value As String)
+            txtViewSIReferenceNo.Text = value
+        End Set
+    End Property
+
+    Public Property IsARNoExisting As Boolean Implements prePayment.IPaymentAckReceipt.IsARNoExisting
+        Get
+            Return cDataType.fBoolean.IfNull(hdnARNoExisting.Value)
+        End Get
+        Set(ByVal value As Boolean)
+            hdnARNoExisting.Value = value
+        End Set
+    End Property
+
+    Public Property IsInvoiceNoExisting As Boolean Implements prePayment.IPaymentAckReceipt.IsInvoiceNoExisting
+        Get
+            Return cDataType.fBoolean.IfNull(hdnInvoiceNoExisting.Value)
+        End Get
+        Set(ByVal value As Boolean)
+
+            hdnInvoiceNoExisting.Value = value
+        End Set
+    End Property
+    Public Property SISourceType As String Implements prePayment.IPaymentAckReceipt.SISourcetype
+        Get
+            Return cDataType.fString.IfNull(hdnSISourceType.Value)
+        End Get
+        Set(value As String)
+            hdnSISourceType.Value = value
+        End Set
+    End Property
+
+
+
+
+    Public Property PaymentType As String Implements prePayment.IPaymentAckReceipt.PaymentType
+        Get
+            Return cDataType.fString.IfNull(ddlPaymentType.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlPaymentType.SelectedValue = value
+            Call ddlPaymentType_SelectedIndexChanged(Me, EventArgs.Empty)
+        End Set
+    End Property
+
+    Public Property IsWTaxLocked As Boolean Implements prePayment.IPaymentAckReceipt.IsWTaxLocked
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsWTaxAmountLocked.Value)
+        End Get
+        Set(value As Boolean)
+            hdnIsWTaxAmountLocked.Value = value
+
+            ibtnClearWTax.Visible = value
+            ibtnVerifyWTax.Visible = Not value
+            txtWitholdingTax.Enabled = Not value
+        End Set
+    End Property
+
+    Public Property IsDiscountLocked As Boolean Implements prePayment.IPaymentAckReceipt.IsDiscountLocked
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsDiscountLocked.Value)
+        End Get
+        Set(value As Boolean)
+            hdnIsDiscountLocked.Value = value
+
+            ibtnClearDiscount.Visible = value
+            ibtnVerifyDiscount.Visible = Not value
+            txtDiscount.Enabled = Not value
+            txtDiscountIdNo.Enabled = Not value
+        End Set
+    End Property
+
+
+    Public Property IsCommLocked As Boolean Implements prePayment.IPaymentAckReceipt.IsCommLocked
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsDiscountLocked.Value)
+        End Get
+        Set(value As Boolean)
+            hdnIsDiscountLocked.Value = value
+
+            ibtnClearComm.Visible = value
+            ibtnVerifyComm.Visible = Not value
+            txtCommissionAmount.Enabled = Not value
+        End Set
+    End Property
+
+    Public Property IsGrossAmountLocked As Boolean Implements prePayment.IPaymentAckReceipt.IsGrossAmountLocked
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsGrossAmountLocked.Value)
+        End Get
+        Set(value As Boolean)
+            If value Then
+                If DocSaveState = eReference.DocSaveState.AddNew Or DocSaveState = eReference.DocSaveState.Edit Then
+                    RaiseEvent CheckGrossAmount(Me, EventArgs.Empty)
+                    value = IsSuccessful
+                    GrossAmount = FormatNumber(GrossAmount, 2, TriState.True, TriState.True, TriState.True)
+                End If
+            Else
+                TotalSales = GrossAmount
+                WitholdingTax = 0
+                NetOfWitholdingTax = 0
+                CommissionAmount = 0
+                Discount = 0
+                PaymentTypeTag = False
+            End If
+            hdnIsGrossAmountLocked.Value = value
+            ManageDetails("GROSSAMOUNT", IsGrossAmountLocked)
+        End Set
+    End Property
+
+    Public Property GrossAmount As Decimal Implements prePayment.IPaymentAckReceipt.GrossAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtGrossAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtGrossAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            If TotalSales = 0 Then
+                TotalSales = GrossAmount
+            End If
+        End Set
+    End Property
+
+    Public Property PayCurrency As String Implements prePayment.IPaymentAckReceipt.PayCurrency
+        Get
+            Return cDataType.fString.IfNull(ddlPayCurrency.Text)
+        End Get
+        Set(value As String)
+            If value = "USD" Then
+                ddlPayCurrency.Text = value
+            Else
+                ddlPayCurrency.Text = "PHP"
+            End If
+        End Set
+    End Property
+
+    Public Property CommissionAmount As Decimal Implements prePayment.IPaymentAckReceipt.CommissionAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtCommissionAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtCommissionAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+#End Region
+
+#Region "Payment Details"
+    Public Property lstPaymentTypeDetails As List(Of cPaymentType) Implements prePayment.IPaymentAckReceipt.lstPaymentTypeDetails
+        Get
+            Return ConvertToList(Of cPaymentType)(gvwPaymentTypeDetails)
+        End Get
+        Set(ByVal value As List(Of cPaymentType))
+            If value.Count > 0 Then '_ AndAlso TotalSales > cDataType.fDecimal.Empty AndAlso TotalSales = PaymentTotalAmount
+                'OPRDetailTag = True
+
+                'If CashTotalAmount > 0 Then
+                '    Dim decComm As Decimal
+
+                '    decComm = TotalSales * AgentCommRate * (1 - AgentTaxRate)
+                '    If decComm > CashTotalAmount Then decComm = CashTotalAmount
+
+                '    ReceiptCommissionAmount = decComm
+                '    ReceiptAmount = OPRGrossAmount - ReceiptCommissionAmount
+                'End If
+            Else
+                'OPRDetailTag = False
+            End If
+            gvwPaymentTypeDetails.DataSource = value
+            gvwPaymentTypeDetails.DataBind()
+        End Set
+    End Property
+
+
+#Region "Cash Details"
+    Public Property CashAmount As Decimal Implements prePayment.IPaymentAckReceipt.CashAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtCashAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtCashAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+#End Region
+
+#Region "Check Details"
+    Public Property CheckNumber As Long Implements prePayment.IPaymentAckReceipt.CheckNumber
+        Get
+            Return cDataType.fLong.IfNull(txtCheckNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtCheckNumber.Text = Nothing
+            Else
+                txtCheckNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property CheckAmount As Decimal Implements prePayment.IPaymentAckReceipt.CheckAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtCheckAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtCheckAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property CheckBankName As String Implements prePayment.IPaymentAckReceipt.CheckBankName
+        Get
+            If ddlCheckBankName.SelectedValue = "OTHER" Then
+                Return cDataType.fString.IfNull(txtOtherBank.Text)
+            Else
+                Return cDataType.fString.IfNull(ddlCheckBankName.SelectedValue)
+            End If
+        End Get
+        Set(value As String)
+            Try
+                ddlCheckBankName.SelectedValue = value
+                If value = "OTHER" Then
+                    txtOtherBank.Text = value
+                    txtOtherBank.Style.Remove("display")
+                    lblOtherBank.InnerText = "Others:"
+                Else
+                    txtOtherBank.Text = String.Empty
+                    lblOtherBank.InnerText = String.Empty
+                End If
+            Catch
+                ddlCheckBankName.SelectedValue = "OTHER"
+                txtOtherBank.Text = value
+                txtOtherBank.Style.Remove("display")
+                lblOtherBank.InnerText = "Others:"
+            End Try
+        End Set
+    End Property
+
+    Public Property CheckBankBranch As String Implements prePayment.IPaymentAckReceipt.CheckBankBranch
+        Get
+            Return cDataType.fString.IfNull(txtCheckBankBranch.Text)
+        End Get
+        Set(value As String)
+            txtCheckBankBranch.Text = value
+        End Set
+    End Property
+
+    Public Property CheckLineNumber As Integer Implements prePayment.IPaymentAckReceipt.CheckLineNumber
+    Public Property CheckOTCFlag As Integer Implements prePayment.IPaymentAckReceipt.CheckOTCFlag
+
+#End Region
+
+#Region "Credit Card Details"
+    Public Property CreditCardTerminalUse As String Implements prePayment.IPaymentAckReceipt.CreditCardTerminalUse
+        Get
+            Return cDataType.fString.IfNull(ddlCreditCardTerminalUse.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlCreditCardTerminalUse.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property CreditCardSwipeDate As Date Implements prePayment.IPaymentAckReceipt.CreditCardSwipeDate
+        Get
+            Return String.Concat(cDataType.fDate.IfNull(txtCreditCardSwipeDate.Text, cDataType.fDate.Empty).ToShortDateString, " ", CreditCardSwipeTime.TimeOfDay)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtCreditCardSwipeDate.Text = Nothing
+            Else
+                txtCreditCardSwipeDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property CreditCardSwipeTime As Date Implements prePayment.IPaymentAckReceipt.CreditCardSwipeTime
+        Get
+            Return DateTime.ParseExact(String.Concat(ddlCreditSwipeHour.SelectedValue, ":", ddlCreditSwipeMinute.SelectedValue, " ", ddlCreditSwipeAmPm.SelectedValue), "hh:mm tt", CultureInfo.InvariantCulture)
+        End Get
+        Set(value As Date)
+
+            ddlCreditSwipeHour.SelectedValue = IIf(value.TimeOfDay.Hours = 0, "12", IIf(value.TimeOfDay.Hours > 12, (value.TimeOfDay.Hours - 12).ToString("00"), value.TimeOfDay.Hours.ToString("00")))
+            ddlCreditSwipeMinute.SelectedValue = value.TimeOfDay.Minutes.ToString("00")
+            ddlCreditSwipeAmPm.SelectedValue = IIf(value.TimeOfDay.Hours >= 12, "PM", "AM")
+        End Set
+    End Property
+
+    Public Property CreditCardMerchant As String Implements prePayment.IPaymentAckReceipt.CreditCardMerchant
+        Get
+            Return cDataType.fString.IfNull(ddlCreditCardMerchant.SelectedValue)
+        End Get
+        Set(value As String)
+            Try
+                If ddlCreditCardMerchant.Items.Count > 1 Then
+                    ddlCreditCardMerchant.SelectedValue = value
+                End If
+            Catch
+                ddlCreditCardMerchant.SelectedIndex = -1
+            End Try
+        End Set
+    End Property
+
+    Public Property CreditCardNumberTag As Boolean Implements prePayment.IPaymentAckReceipt.CreditCardNumberTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnCreditCardNumberTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnCreditCardNumberTag.Value = value
+        End Set
+    End Property
+
+    Public Property CreditCardNumber As String Implements prePayment.IPaymentAckReceipt.CreditCardNumber
+        Get
+            Return cDataType.fString.IfNull(txtCreditCardNumber.Text)
+        End Get
+        Set(value As String)
+            txtCreditCardNumber.Text = value
+        End Set
+    End Property
+
+    Public Property CreditCardType As String Implements prePayment.IPaymentAckReceipt.CreditCardType
+        Get
+            Return cDataType.fString.IfNull(hdnCreditCardType.Value)
+        End Get
+        Set(value As String)
+            hdnCreditCardType.Value = value
+        End Set
+    End Property
+
+    Public Property CreditCardTypeDesc As String Implements prePayment.IPaymentAckReceipt.CreditCardTypeDesc
+        Get
+            Return cDataType.fString.IfNull(txtCreditCardType.Text)
+        End Get
+        Set(value As String)
+            txtCreditCardType.Text = value
+        End Set
+    End Property
+
+    Public Property CreditCardBatchNumber As Long Implements prePayment.IPaymentAckReceipt.CreditCardBatchNumber
+        Get
+            Return cDataType.fLong.IfNull(txtCreditCardBatchNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtCreditCardBatchNumber.Text = String.Empty
+            Else
+                txtCreditCardBatchNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property CreditCardApprovalCode As String Implements prePayment.IPaymentAckReceipt.CreditCardApprovalCode
+        Get
+            Return cDataType.fString.IfNull(txtCreditCardApprovalCode.Text)
+        End Get
+        Set(value As String)
+            txtCreditCardApprovalCode.Text = value
+        End Set
+    End Property
+
+    Public Property CreditCardAmount As Decimal Implements prePayment.IPaymentAckReceipt.CreditCardAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtCreditCardAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtCreditCardAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property CreditCardRemarks As String Implements prePayment.IPaymentAckReceipt.CreditCardRemarks
+        Get
+            Return cDataType.fString.IfNull(txtCreditCardRemarks.Text)
+        End Get
+        Set(value As String)
+            txtCreditCardRemarks.Text = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "Debit Card Details"
+    Public Property DebitCardTerminalUse As String Implements prePayment.IPaymentAckReceipt.DebitCardTerminalUse
+        Get
+            Return cDataType.fString.IfNull(ddlDebitCardTerminalUse.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlDebitCardTerminalUse.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property DebitCardSwipeDate As Date Implements prePayment.IPaymentAckReceipt.DebitCardSwipeDate
+        Get
+            Return cDataType.fDate.IfNull(String.Concat(cDataType.fDate.IfNull(txtDebitCardSwipeDate.Text, cDataType.fDate.Empty.Date).ToShortDateString, " ", DebitCardSwipeTime.TimeOfDay))
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtDebitCardSwipeDate.Text = Nothing
+            Else
+                txtDebitCardSwipeDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property DebitCardSwipeTime As Date Implements prePayment.IPaymentAckReceipt.DebitCardSwipeTime
+        Get
+            Return Date.ParseExact((String.Concat(ddlDebitSwipeHour.SelectedValue, ":", ddlDebitSwipeMinute.SelectedValue, " ", ddlDebitSwipeAmPm.SelectedValue)), "hh:mm tt", CultureInfo.InvariantCulture)
+        End Get
+        Set(value As Date)
+
+            ddlDebitSwipeHour.SelectedValue = IIf(value.TimeOfDay.Hours = 0, "12", IIf(value.TimeOfDay.Hours > 12, (value.TimeOfDay.Hours - 12).ToString("00"), value.TimeOfDay.Hours.ToString("00")))
+            ddlDebitSwipeMinute.SelectedValue = value.TimeOfDay.Minutes.ToString("00")
+            ddlDebitSwipeAmPm.SelectedValue = IIf(value.TimeOfDay.Hours >= 12, "PM", "AM")
+        End Set
+    End Property
+
+    Public Property DebitCardMerchant As String Implements prePayment.IPaymentAckReceipt.DebitCardMerchant
+        Get
+            Return cDataType.fString.IfNull(ddlDebitCardMerchant.SelectedValue)
+        End Get
+        Set(value As String)
+            Try
+                If ddlDebitCardMerchant.Items.Count > 1 Then
+                    ddlDebitCardMerchant.SelectedValue = value
+                End If
+            Catch
+                ddlDebitCardMerchant.SelectedIndex = -1
+            End Try
+        End Set
+    End Property
+
+    Public Property DebitCardBankNetwork As String Implements prePayment.IPaymentAckReceipt.DebitCardBankNetwork
+        Get
+            Return cDataType.fString.IfNull(ddlDebitCardBankNetwork.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlDebitCardBankNetwork.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property DebitCardBankName As String Implements prePayment.IPaymentAckReceipt.DebitCardBankName
+        Get
+            If ddlDebitCardBankName.SelectedValue = "OTHER" Then
+                Return cDataType.fString.IfNull(txtDebitCardOtherBank.Text)
+            Else
+                Return cDataType.fString.IfNull(ddlDebitCardBankName.SelectedValue)
+            End If
+        End Get
+        Set(value As String)
+            Try
+                ddlDebitCardBankName.SelectedValue = value
+                If value = "OTHER" Then
+                    txtDebitCardOtherBank.Text = value
+                    txtDebitCardOtherBank.Style.Remove("display")
+                    lblDebitCardOtherBank.InnerText = "Others:"
+                Else
+                    txtDebitCardOtherBank.Text = String.Empty
+                    lblDebitCardOtherBank.InnerText = String.Empty
+                End If
+            Catch
+                ddlDebitCardBankName.SelectedValue = "OTHER"
+                txtDebitCardOtherBank.Text = value
+                txtDebitCardOtherBank.Style.Remove("display")
+                lblDebitCardOtherBank.InnerText = "Others:"
+            End Try
+        End Set
+    End Property
+
+    Public Property DebitCardAccountType As String Implements prePayment.IPaymentAckReceipt.DebitCardAccountType
+        Get
+            Return cDataType.fString.IfNull(ddlDebitCardAccountType.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlDebitCardAccountType.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property DebitCardAccountNumber As String Implements prePayment.IPaymentAckReceipt.DebitCardAccountNumber
+        Get
+            Return cDataType.fString.IfNull(txtDebitCardAccountNumber.Text)
+        End Get
+        Set(value As String)
+            txtDebitCardAccountNumber.Text = value
+        End Set
+    End Property
+
+    Public Property DebitCardBatchNumber As Long Implements prePayment.IPaymentAckReceipt.DebitCardBatchNumber
+        Get
+            Return cDataType.fLong.IfNull(txtDebitCardBatchNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtDebitCardBatchNumber.Text = String.Empty
+            Else
+                txtDebitCardBatchNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property DebitCardChargeSlip As String Implements prePayment.IPaymentAckReceipt.DebitCardChargeSlip
+        Get
+            Return cDataType.fString.IfNull(txtDebitCardChargeSlip.Text)
+        End Get
+        Set(value As String)
+            txtDebitCardChargeSlip.Text = value
+        End Set
+    End Property
+
+    Public Property DebitCardAmount As Decimal Implements prePayment.IPaymentAckReceipt.DebitCardAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtDebitCardAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtDebitCardAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property DebitCardRemarks As String Implements prePayment.IPaymentAckReceipt.DebitCardRemarks
+        Get
+            Return cDataType.fString.IfNull(txtDebitCardRemarks.Text)
+        End Get
+        Set(value As String)
+            txtDebitCardRemarks.Text = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "IEpayDetails"
+    Public Property ECashPaymentChannel As String Implements prePayment.IPaymentAckReceipt.ECashPaymentChannel
+        Get
+            Return cDataType.fString.IfNull(ddlECashPaymentChannel.SelectedValue)
+        End Get
+        Set(value As String)
+            Try
+                If ddlECashPaymentChannel.Items.Count > 1 Then
+                    ddlECashPaymentChannel.SelectedValue = value
+                End If
+            Catch
+                ddlECashPaymentChannel.SelectedIndex = -1
+            End Try
+        End Set
+    End Property
+
+    Public Property ECashPaymentReferenceNumber As String Implements prePayment.IPaymentAckReceipt.ECashPaymentReferenceNumber
+        Get
+            Return cDataType.fString.IfNull(txtECashPaymentReferenceNumber.Text)
+        End Get
+        Set(value As String)
+            txtECashPaymentReferenceNumber.Text = value
+        End Set
+    End Property
+
+    Public Property ECashPaymentAmount As Decimal Implements prePayment.IPaymentAckReceipt.ECashPaymentAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtECashPaymentAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtECashPaymentAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property ECashPaymentRemarks As String Implements prePayment.IPaymentAckReceipt.ECashPaymentRemarks
+        Get
+            Return cDataType.fString.IfNull(txtECashPaymentRemarks.Text)
+        End Get
+        Set(value As String)
+            txtECashPaymentRemarks.Text = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "Payment Totals"
+
+    Public Property IsPayTypeSuccessful As Boolean Implements prePayment.IPaymentAckReceipt.IsPayTypeSuccessful
+        Get
+            Return cDataType.fBoolean.IfNull(mIsPayTypeSuccessful)
+        End Get
+        Set(value As Boolean)
+            mIsPayTypeSuccessful = value
+        End Set
+    End Property
+
+    Public Property CashTotalAmount As Decimal Implements prePayment.IPaymentAckReceipt.CashTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnCashTotalAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnCashTotalAmount.Value = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            txtPaymentTypeTotalAmount.Text = FormatNumber(PaymentTotalAmount, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property CheckTotalAmount As Decimal Implements prePayment.IPaymentAckReceipt.CheckTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnCheckTotalAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnCheckTotalAmount.Value = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            txtPaymentTypeTotalAmount.Text = FormatNumber(PaymentTotalAmount, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property CreditCardTotalAmount As Decimal Implements prePayment.IPaymentAckReceipt.CreditCardTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnCreditCardTotalAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnCreditCardTotalAmount.Value = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            txtPaymentTypeTotalAmount.Text = FormatNumber(PaymentTotalAmount, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property DebitCardTotalAmount As Decimal Implements prePayment.IPaymentAckReceipt.DebitCardTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnDebitCardTotalAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnDebitCardTotalAmount.Value = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            txtPaymentTypeTotalAmount.Text = FormatNumber(PaymentTotalAmount, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property ECashPaymentTotalAmount As Decimal Implements prePayment.IPaymentAckReceipt.ECashPaymentTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnECashPaymentTotalAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnECashPaymentTotalAmount.Value = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            txtPaymentTypeTotalAmount.Text = FormatNumber(PaymentTotalAmount, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public ReadOnly Property PaymentTotalAmount As Decimal Implements prePayment.IPaymentAckReceipt.PaymentTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(CashTotalAmount + CheckTotalAmount + CreditCardTotalAmount + DebitCardTotalAmount + ECashPaymentTotalAmount)
+        End Get
+    End Property
+
+    Public Property PaymentTypeID As String Implements prePayment.IPaymentAckReceipt.PaymentTypeID
+        Get
+            Return cDataType.fString.IfNull(hdnPaymentTypeID.Value)
+        End Get
+        Set(value As String)
+            hdnPaymentTypeID.Value = value
+            Call ddlPaymentType_SelectedIndexChanged(Me, EventArgs.Empty)
+        End Set
+    End Property
+
+#End Region
+
+#Region "Tag"
+
+    Public Property GroupTag As Boolean Implements prePayment.IPaymentAckReceipt.GroupTag
+    '    Get
+    '        Return IIf(ddlPolicyType.SelectedValue = "GRP", True, False)
+    '    End Get
+    '    Set(value As Boolean)
+    '        If value Then
+    '            ddlPolicyType.SelectedValue = "GRP"
+    '        Else
+    '            ddlPolicyType.SelectedValue = String.Empty
+    '        End If
+    '    End Set
+    'End Property
+
+    Public Property PrevPayType As String Implements prePayment.IPaymentAckReceipt.PrevPayType
+        Get
+            Return cDataType.fString.IfNull(hdnPrevPayType.Value)
+        End Get
+        Set(value As String)
+            hdnPrevPayType.Value = value
+        End Set
+    End Property
+
+    Public Property PaymentTypeAllowedArray As String Implements prePayment.IPaymentAckReceipt.PaymentTypeAllowedArray
+        Get
+            Return cDataType.fString.IfNull(hdnAllowedPaymentType.Value)
+        End Get
+        Set(value As String)
+            hdnAllowedPaymentType.Value = value
+        End Set
+    End Property
+
+    Public Property PaymentTypeTag As Boolean Implements prePayment.IPaymentAckReceipt.PaymentTypeTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnPaymentTypeTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnPaymentTypeTag.Value = value
+            accPaymentTypeDetails.Visible = value
+
+            RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+            RaiseEvent LoadAllowedPaymentType(Me, EventArgs.Empty)
+            CashTotalAmount = cDataType.fDecimal.Empty
+            CheckTotalAmount = cDataType.fDecimal.Empty
+            CreditCardTotalAmount = cDataType.fDecimal.Empty
+            DebitCardTotalAmount = cDataType.fDecimal.Empty
+            ECashPaymentTotalAmount = cDataType.fDecimal.Empty
+            PrevPayType = cDataType.fString.Empty
+            lstPaymentTypeDetails = New List(Of cPaymentType)
+            PaymentType = cDataType.fString.Empty
+
+            If value Then
+                'Manage Payment Type|Enable addition of Payment Type Details
+                ManagePaymentType(String.Empty, True)
+                If DocSaveState = eReference.DocSaveState.AddNew OrElse DocSaveState = eReference.DocSaveState.Edit Then
+                    ManagePaymentType("ENABLED", True)
+                    ddlPaymentType.SelectedValue = eReference.PayTypeCHQ
+                    CashPaymentTag = True
+                    CheckPaymentTag = True
+                End If
+            End If
+        End Set
+    End Property
+
+    Public Property CashPaymentTag As Boolean Implements prePayment.IPaymentAckReceipt.CashPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnCashPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnCashPaymentTag.Value = value
+            pnlCashDetails.Visible = value
+
+            RaiseEvent ClearScreenCashDetails(Me, EventArgs.Empty)
+
+        End Set
+    End Property
+
+    Public Property CheckPaymentTag As Boolean Implements prePayment.IPaymentAckReceipt.CheckPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnCheckPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnCheckPaymentTag.Value = value
+            pnlCheckDetails.Visible = value
+            ibtnAddCash.Visible = value
+
+            RaiseEvent ClearScreenCheckDetails(Me, EventArgs.Empty)
+
+        End Set
+    End Property
+
+    Public Property CreditCardPaymentTag As Boolean Implements prePayment.IPaymentAckReceipt.CreditCardPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnCreditCardPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnCreditCardPaymentTag.Value = value
+            pnlCreditCardDetails.Visible = value
+
+            RaiseEvent ClearScreenCreditCardDetails(Me, EventArgs.Empty)
+            If value Then
+                CreditCardSwipeDate = Now
+                CreditCardSwipeTime = Now
+            End If
+
+        End Set
+    End Property
+
+    Public Property DebitCardPaymentTag As Boolean Implements prePayment.IPaymentAckReceipt.DebitCardPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnDebitCardPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnDebitCardPaymentTag.Value = value
+            pnlDebitCardDetails.Visible = value
+
+            RaiseEvent ClearScreenDebitCardDetails(Me, EventArgs.Empty)
+            If value Then
+                DebitCardSwipeDate = Now
+                DebitCardSwipeTime = Now
+            End If
+
+        End Set
+    End Property
+
+    Public Property ECashPaymentTag As Boolean Implements prePayment.IPaymentAckReceipt.ECashPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnECashPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnECashPaymentTag.Value = value
+            pnlECashPaymentDetails.Visible = value
+
+            RaiseEvent ClearScreenECashPaymentDetails(Me, EventArgs.Empty)
+
+        End Set
+    End Property
+
+#End Region
+#End Region
+
+#Region "DataTable"
+
+    Public WriteOnly Property dtViewAR As DataTable Implements prePayment.IPaymentAckReceipt.dtViewAR
+        Set(value As DataTable)
+            gvwViewAR.DataSource = value
+            gvwViewAR.DataBind()
+        End Set
+    End Property
+
+    Public WriteOnly Property dtViewSI As DataTable Implements prePayment.IPaymentAckReceipt.dtViewSI
+        Set(value As DataTable)
+            gvwViewSI.DataSource = value
+            gvwViewSI.DataBind()
+        End Set
+    End Property
+
+    Public WriteOnly Property dtSourceSite As DataTable Implements prePayment.IPaymentAckReceipt.dtSourceSite
+        Set(value As DataTable)
+            Call SetDropDownList(ddlSourceSite, value, "PRSNME", "PRSPID", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtCurrency As DataTable Implements prePayment.IPaymentAckReceipt.dtCurrency
+        Set(value As DataTable)
+            Call SetDropDownList(ddlInvoiceCurrency, value, "CURNAM", "CURCOD", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlPayCurrency, value, "CURNAM", "CURCOD", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtMerchantId As DataTable Implements prePayment.IPaymentAckReceipt.dtMerchantId
+        Set(value As DataTable)
+            Dim dtMerch As New DataTable
+            Dim dtMerchCCA As New DataTable
+            Dim dtMerchDCA As New DataTable
+            Dim dtTerminal As New DataTable
+            Dim dtTerminalCCA As New DataTable
+            Dim dtTerminalDCA As New DataTable
+            Dim dtLocal As New DataTable
+
+            Dim dtFiltered = From c In value.AsEnumerable
+                             Where CDate(c.Item("eff_date")) <= Now _
+                             And (c.Item("term_date") >= Now Or c.Item("term_date") = Nothing Or c.Item("term_date") = #1/1/1900#) _
+                             And c.Item("status_id") = 1
+                             Select c
+
+            'And c.Item("terminal_id") = IIf(OPRPaymentType = eReference.PayTypeCCA, CreditCardTerminalUse, DebitCardTerminalUse) _
+            If dtFiltered.Any() Then
+                dtLocal = dtFiltered.CopyToDataTable
+
+                Dim results1 = From c In dtFiltered.AsEnumerable
+                               Where c.Item("terminal_id") = IIf(PaymentType = eReference.PayTypeCCA, CreditCardTerminalUse, DebitCardTerminalUse)
+                               Select c
+                If results1.Any Then
+                    dtMerch = results1.CopyToDataTable
+                End If
+
+                Dim results2 = (From c In dtLocal.AsEnumerable()
+                               Select Terminal_Id = c.Field(Of String)("terminal_id"), Descrp = c.Field(Of String)("descrp"), C_Type = c.Field(Of String)("ctype")).Distinct().ToList()
+
+                dtTerminal.Columns.Add(New DataColumn("terminal_id", GetType(String)))
+                dtTerminal.Columns.Add(New DataColumn("descrp", GetType(String)))
+                dtTerminal.Columns.Add(New DataColumn("ctype", GetType(String)))
+                For Each dataRow In results2
+                    Dim row As DataRow = dtTerminal.NewRow()
+                    row("terminal_id") = dataRow.Terminal_Id
+                    row("descrp") = dataRow.Descrp
+                    row("ctype") = dataRow.C_Type
+                    dtTerminal.Rows.Add(row)
+                Next
+            End If
+
+            Dim MerchCCA = From c In dtMerch.AsEnumerable
+                             Where c.Field(Of String)("Ctype") = "CCA"
+                             Select c
+            If MerchCCA.Any Then
+                dtMerchCCA = MerchCCA.CopyToDataTable
+            End If
+
+            Dim MerchDCA = From c In dtMerch.AsEnumerable
+                             Where c.Field(Of String)("Ctype") = "DCA"
+                             Select c
+            If MerchDCA.Any Then
+                dtMerchDCA = MerchDCA.CopyToDataTable
+            End If
+
+            Call SetDropDownList(ddlCreditCardMerchant, dtMerchCCA, "DBA_NAME", "MERCHANT_ID", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlDebitCardMerchant, dtMerchDCA, "DBA_NAME", "MERCHANT_ID", "-- SELECT ITEM --", String.Empty)
+
+            If Not IsSourceSiteLocked OrElse (ddlCreditCardTerminalUse.SelectedIndex < 1 AndAlso ddlDebitCardTerminalUse.SelectedIndex < 1) Then
+                Dim TerminalCCA = From c In dtTerminal.AsEnumerable
+                            Where c.Field(Of String)("Ctype") = "CCA"
+                            Select c
+                If TerminalCCA.Any Then
+                    dtTerminalCCA = TerminalCCA.CopyToDataTable
+                End If
+
+                Dim TerminalDCA = From c In dtTerminal.AsEnumerable
+                                 Where c.Field(Of String)("Ctype") = "DCA"
+                                 Select c
+                If TerminalDCA.Any Then
+                    dtTerminalDCA = TerminalDCA.CopyToDataTable
+                End If
+
+                Call SetDropDownList(ddlCreditCardTerminalUse, dtTerminalCCA, "descrp", "terminal_id", "-- SELECT ITEM --", String.Empty)
+                Call SetDropDownList(ddlDebitCardTerminalUse, dtTerminalDCA, "descrp", "terminal_id", "-- SELECT ITEM --", String.Empty)
+            End If
+
+        End Set
+    End Property
+
+    Public WriteOnly Property dtBankList As DataTable Implements prePayment.IPaymentAckReceipt.dtBankList
+        Set(value As DataTable)
+            Call SetDropDownList(ddlCheckBankName, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlDebitCardBankName, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtBankNetwork As DataTable Implements prePayment.IPaymentAckReceipt.dtBankNetwork
+        Set(value As DataTable)
+            Call SetDropDownList(ddlDebitCardBankNetwork, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtAccountType As DataTable Implements prePayment.IPaymentAckReceipt.dtAccountType
+        Set(value As DataTable)
+            Call SetDropDownList(ddlDebitCardAccountType, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtPaymentType As DataTable Implements prePayment.IPaymentAckReceipt.dtPaymentType
+        Set(value As DataTable)
+            value.DefaultView.Sort = "DESCRP ASC"
+            value = value.DefaultView.ToTable
+            Call SetDropDownList(ddlPaymentType, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+            ddlPaymentType.Items.FindByValue("DCA").Enabled = False ' Disable "Debit Card Option"
+            ddlPaymentType.Items.FindByValue("CCA").Enabled = False ' Disable "Credit Card Option"
+            ddlPaymentType.Items.FindByValue("ECP").Enabled = False ' Disable "ECASH Option"
+        End Set
+    End Property
+
+    Public WriteOnly Property dtCancellationReason As DataTable Implements prePayment.IPaymentAckReceipt.dtCancellationReason
+        Set(value As DataTable)
+            value.DefaultView.Sort = "CODE ASC"
+            value = value.DefaultView.ToTable
+            Call SetDropDownList(ddlCancellationReason, value, "DESCRP", "DESCRP", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtECashPaymentChannel As DataTable Implements prePayment.IPaymentAckReceipt.dtECashPaymentChannel
+        Set(value As DataTable)
+            value.DefaultView.Sort = "DESCRP ASC"
+            value = value.DefaultView.ToTable
+            Call SetDropDownList(ddlECashPaymentChannel, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+#End Region
+#End Region
+
+#Region "Event"
+    Public Event ClearScreenMain(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenMain
+    Public Event ClearScreenInfo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenInfo
+    Public Event ClearScreenViewAR(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenViewAR
+    Public Event ClearScreenViewSI(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenViewSI
+    Public Event ClearScreenPaymentDetails(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenPaymentDetails
+    Public Event ClearScreenPaymentTypeDetails(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenPaymentTypeDetails
+    Public Event ClearScreenCashDetails(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenCheckDetails
+    Public Event ClearScreenCheckDetails(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenCashDetails
+    Public Event ClearScreenCreditCardDetails(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenCreditCardDetails
+    Public Event ClearScreenCreditCardNumber(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenCreditCardNumber
+    Public Event ClearScreenDebitCardDetails(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenDebitCardDetails
+    Public Event ClearScreenECashPaymentDetails(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ClearScreenECashPaymentDetails
+    ' -------------------------------------------------------------------------------
+    Public Event LoadSourceSite(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadSourceSite
+    Public Event LoadCurrency(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadCurrency
+    Public Event CheckSourceSite(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.CheckSourceSite
+    ' -------------------------------------------------------------------------------
+    Public Event ValidateCreditCardNo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.ValidateCreditCardNo
+    Public Event CreditCardFetchData(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.CreditCardFetchData
+    Public Event DebitCardFetchData(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.DebitCardFetchData
+    Public Event AddCashPayment(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.AddCashPayment
+    Public Event AddPaymentTypeDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.AddPaymentTypeDetails
+    Public Event DeletePaymentTypeDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.DeletePaymentTypeDetails
+    Public Event GetPaymentTypeDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.GetPaymentTypeDetails
+    Public Event CheckPrevPayType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.CheckPrevPayType
+    Public Event CheckAllowedPaytype(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.CheckAllowedPaytype
+    Public Event CheckGrossAmount(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.CheckGrossAmount
+    ' -------------------------------------------------------------------------------
+    Public Event LoadPaymentType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadPaymentType
+    Public Event LoadCancellationReason(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadCancellationReason
+    Public Event LoadAllowedPaymentType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadAllowedPaymentType
+    Public Event LoadMerchantId(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadMerchantId
+    Public Event LoadBankNetwork(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadBankNetwork
+    Public Event LoadAccountType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadAccountType
+    Public Event LoadBankList(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadBankList
+    Public Event LoadDefaultTerminal(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadDefaultTerminal
+    Public Event LoadECashPaymentChannel(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadECashPaymentChannel
+    ' -------------------------------------------------------------------------------
+    Public Event ConfirmCancel(sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ConfirmCancel
+    Public Event ConfirmSave(sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ConfirmSave
+    Public Event ConfirmPrint(sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.ConfirmPrint
+    Public Event ProcessAcKReceipt(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.ProcessAcKReceipt
+    Public Event LoadAckReceipt(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadAckReceipt
+    Public Event LoadSalesInvoice(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadSalesInvoice
+    Public Event LoadNewAckReceipt(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadNewAckReceipt
+    Public Event LoadViewAR(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadViewAR
+    Public Event LoadViewSI(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.LoadViewSI
+    Public Event GenerateReport(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.GenerateReport
+#End Region
+
+#End Region
+
+#Region "Event Handlers"
+
+#Region "Page"
+
+    Private Sub PaymentAckReceipt_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Init
+        pSystemMessage = New preSecurity.PSystemMessage(Me)
+        pConfirmationMessage = New preMessages.PConfirmationMessage(Me)
+        pPaymentAckReceipt = New prePayment.PPaymentAckReceipt(Me)
+    End Sub
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        Page.MaintainScrollPositionOnPostBack = True
+
+        If Not IsPostBack Then
+            Call AddAttributes()
+            Call LoadReference()
+            Call ClearFields()
+            Call ManageMain(eDocSaveState.Initial)
+        End If
+
+    End Sub
+
+#End Region
+
+#Region "Button"
+
+    Private Sub btnPaymentTypeAdd_Click(sender As Object, e As EventArgs) Handles btnPaymentTypeAdd.Click
+        Call ClearSession()
+        RaiseEvent AddPaymentTypeDetails(Me, EventArgs.Empty)
+        If IsPayTypeSuccessful Then
+            RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+            ManageCardPayment("ALL", True)
+        End If
+
+        upPaymentAckReceipt.Update()
+    End Sub
+
+    Private Sub btnPaymentTypeClear_Click(sender As Object, e As EventArgs) Handles btnPaymentTypeClear.Click
+        RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+        ManageCardPayment("ALL", True)
+    End Sub
+
+
+    Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
+        Call ClearSession()
+        Response.Redirect(ePage.PaymentAckReceipt, False)
+    End Sub
+
+    Private Sub btnMessageOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnMessageOk.Click
+        mpeMessage.Hide()
+        Select Case Session(eSession.Modal)
+            Case "mpeViewARs"
+                Call SetModalSession(mpeViewARs, True, btnLoadViewAR)
+        End Select
+
+        Call ClearSession()
+    End Sub
+
+    Private Sub btnLoadViewAR_Click(sender As Object, e As EventArgs) Handles btnLoadViewAR.Click
+        dtViewAR = Nothing
+        RaiseEvent LoadViewAR(Me, EventArgs.Empty)
+        Call SetModalSession(mpeViewARs, True, btnLoadViewAR)
+        upPaymentAckReceipt.Update()
+    End Sub
+
+    Private Sub btnViewARsClose_Click(sender As Object, e As EventArgs) Handles btnViewARsClose.Click
+        Call ClearSession()
+        Call SetModalSession(mpeViewARs, False, ibtnViewARs)
+        RaiseEvent ClearScreenViewAR(sender, e)
+    End Sub
+
+    Private Sub btnLoadViewSI_Click(sender As Object, e As EventArgs) Handles btnLoadViewSI.Click
+        dtViewSI = Nothing
+        RaiseEvent LoadViewSI(Me, EventArgs.Empty)
+        Call SetModalSession(mpeViewSIs, True, btnLoadViewSI)
+        upPaymentAckReceipt.Update()
+    End Sub
+
+    Private Sub btnViewSIsClose_Click(sender As Object, e As EventArgs) Handles btnViewSIsClose.Click
+        Call ClearSession()
+        Call SetModalSession(mpeViewSIs, False, ibtnSearchSalesInvoice)
+        RaiseEvent ClearScreenViewAR(sender, e)
+    End Sub
+
+    Private Sub btnAckReceiptAddNew_Click(sender As Object, e As EventArgs) Handles btnAckReceiptAddNew.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+        RaiseEvent LoadNewAckReceipt(Me, EventArgs.Empty)
+        Call SetDefaults()
+        If IsSuccessful Then
+            DocSaveState = eDocSaveState.AddNew
+            IsSourceSiteLocked = True
+            IsGrossAmountLocked = False
+        Else
+            DocSaveState = eDocSaveState.Initial
+        End If
+        upPaymentAckReceipt.Update()
+    End Sub
+
+    Private Sub btnAckReceiptSave_Click(sender As Object, e As EventArgs) Handles btnAckReceiptSave.Click
+        Select Case DocSaveState
+            Case eDocSaveState.ViewEdit
+                'ManageMain(DocSaveState)
+                DocSaveState = eReference.DocSaveState.Edit
+                IsSourceSiteLocked = True
+                IsGrossAmountLocked = True
+
+            Case eDocSaveState.AddNew, eDocSaveState.Edit
+                RaiseEvent ConfirmSave(Me, EventArgs.Empty)
+        End Select
+    End Sub
+
+    Private Sub btnConfirmNo_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnConfirmNo.Click
+        ConfirmClickState = True
+
+        Call ClearSession()
+        SetModalSession(mpeConfirm, False, btnConfirmYes)
+    End Sub
+
+    Private Sub btnConfirmYes_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnConfirmYes.Click
+        ConfirmClickState = True
+        mpeConfirm.Hide()
+
+        Call ClearSession()
+        Select Case ConfirmCaller
+            Case "CANCEL"
+                DocSaveState = eDocSaveState.Cancel
+                RaiseEvent ProcessAcKReceipt(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    ReceiptById = UserID
+                    RaiseEvent LoadAckReceipt(Me, EventArgs.Empty)
+                Else
+                    DocSaveState = eDocSaveState.ViewNoEdit
+                End If
+                Call SetModalSession(mpeConfirm, False, btnAckReceiptCancel)
+
+            Case "SAVE"
+                RaiseEvent ProcessAcKReceipt(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    ReceiptById = UserID
+                    RaiseEvent LoadAckReceipt(Me, EventArgs.Empty)
+                    DocSaveState = eDocSaveState.ViewEdit
+                End If
+            Case "PRINT"
+                DocSaveState = eDocSaveState.Print
+                RaiseEvent ProcessAcKReceipt(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    ReceiptById = UserID
+                    RaiseEvent LoadAckReceipt(Me, EventArgs.Empty)
+                Else
+                    DocSaveState = eDocSaveState.ViewNoEdit
+                End If
+
+        End Select
+        upPaymentAckReceipt.Update()
+    End Sub
+
+    Private Sub btnCancelYes_Click(sender As Object, e As EventArgs) Handles btnCancelYes.Click
+        ConfirmClickState = True
+        mpeConfirm.Hide()
+
+        Call ClearSession()
+        DocSaveState = eDocSaveState.Cancel
+        RaiseEvent ProcessAcKReceipt(Me, EventArgs.Empty)
+        If IsSuccessful Then
+            ReceiptById = UserID
+            RaiseEvent LoadAckReceipt(Me, EventArgs.Empty)
+        Else
+            DocSaveState = eDocSaveState.ViewNoEdit
+        End If
+        Call SetModalSession(mpeConfirm, False, btnAckReceiptCancel)
+
+        upPaymentAckReceipt.Update()
+    End Sub
+
+    Private Sub btnAckReceiptCancel_Click(sender As Object, e As EventArgs) Handles btnAckReceiptCancel.Click
+        RaiseEvent ConfirmCancel(Me, EventArgs.Empty)
+    End Sub
+
+#End Region
+
+#Region "CheckBox"
+
+#End Region
+
+#Region "DropDownList"
+
+    Private Sub ddlPaymentType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlPaymentType.SelectedIndexChanged
+        ManagePaymentType(PaymentType, True)
+        ManageCardPayment("ALL", True)
+        PrevPayType = ddlPaymentType.SelectedValue
+        If SourceSite <> String.Empty Then
+            RaiseEvent LoadMerchantId(Me, EventArgs.Empty)
+        End If
+    End Sub
+#End Region
+
+#Region "ImageButton"
+
+    Private Sub ibtnVerifyGrossAmount_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnVerifyGrossAmount.Click
+        IsGrossAmountLocked = True
+        If IsGrossAmountLocked Then
+            If Not PaymentTypeTag Then PaymentTypeTag = True
+        End If
+    End Sub
+
+    Private Sub ibtnSearchSalesInvoice_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchSalesInvoice.Click
+        ReferenceNo = InvoiceNumber
+        ReceiptByCode = UserID
+        SourceSite = SiteCode
+
+        'DocSaveState = eReference.DocSaveState.ViewNoEdit
+        RaiseEvent LoadSalesInvoice(Me, EventArgs.Empty)
+        If IsInvoiceNoExisting Then
+            ManageDetails("SEARCHREFNO", True)
+        End If
+        Call SetModalSession(mpeViewSIs, False, ibtnSearchSalesInvoice)
+        upPaymentAckReceipt.Update()
+    End Sub
+
+    Private Sub ibtnAddCash_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnAddCash.Click
+        RaiseEvent AddCashPayment(Me, EventArgs.Empty)
+        If IsPayTypeSuccessful Then
+            RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+            'FOCUS Me.Page.SetFocus(ddlOPRPaymentType)
+        End If
+        upPaymentAckReceipt.Update()
+    End Sub
+
+    Private Sub ibtnClearGrossAmount_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearGrossAmount.Click
+        GrossAmount = 0
+        IsGrossAmountLocked = False
+        'PaymentTypeTag = False
+    End Sub
+
+    Private Sub ibtnVerifyDiscount_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnVerifyDiscount.Click
+        If Discount < TotalSales Then
+            TotalSales = TotalSales - Discount
+            IsDiscountLocked = True
+        Else
+            lblMessage.Text = "Total sales should be greater than Discount Amount."
+            MessageType = eSystemMessage.Warning
+            mpeMessage.Show()
+        End If
+    End Sub
+
+    Private Sub ibtnVerifyWTax_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnVerifyWTax.Click
+        If WitholdingTax < TotalSales Then
+            TotalSales = TotalSales - WitholdingTax
+            NetOfWitholdingTax = GrossAmount - WitholdingTax
+            IsWTaxLocked = True
+        Else
+            lblMessage.Text = "Total sales should be greater than Withholding Tax Amount."
+            MessageType = eSystemMessage.Warning
+            mpeMessage.Show()
+        End If
+    End Sub
+
+    Private Sub ibtnVerifyComm_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnVerifyComm.Click
+        If CommissionAmount < TotalSales Then
+            TotalSales = TotalSales - CommissionAmount
+            IsCommLocked = True
+        Else
+            lblMessage.Text = "Total sales should be greater than Commision Amount."
+            MessageType = eSystemMessage.Warning
+            mpeMessage.Show()
+        End If
+    End Sub
+
+    Private Sub ibtnClearDiscount_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearDiscount.Click
+        TotalSales = TotalSales + Discount
+        Discount = 0
+        DiscountIdNo = String.Empty
+        IsDiscountLocked = False
+    End Sub
+
+    Private Sub ibtnClearWTax_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearWTax.Click
+        TotalSales = TotalSales + WitholdingTax
+        NetOfWitholdingTax = GrossAmount
+        WitholdingTax = 0
+        IsWTaxLocked = False
+    End Sub
+
+    Private Sub ibtnClearComm_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearComm.Click
+        TotalSales = TotalSales + CommissionAmount
+        CommissionAmount = 0
+        IsCommLocked = False
+    End Sub
+
+    Private Sub ibtnClearRefNo_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearRefNo.Click
+        Call ClearSession()
+        ManageDetails("SEARCHREFNO", False)
+        RaiseEvent ClearScreenInfo(Me, EventArgs.Empty)
+        upPaymentAckReceipt.Update()
+    End Sub
+
+    Private Sub ibtnClearSourceSite_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearSourceSite.Click
+        SourceSite = String.Empty
+        IsSourceSiteLocked = False
+        Call ibtnClearRefNo_Click(sender, e)
+    End Sub
+
+    Private Sub ibtnVerifySourceSite_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnVerifySourceSite.Click
+        IsSourceSiteLocked = True
+    End Sub
+
+
+#End Region
+
+#Region "GridView"
+    Private Sub gvwPaymentTypeDetails_RowDeleting(sender As Object, e As GridViewDeleteEventArgs) Handles gvwPaymentTypeDetails.RowDeleting
+
+        Dim index As Integer = Convert.ToInt32(e.RowIndex)
+        Dim radSelect As RadioButton
+
+        radSelect = DirectCast(gvwPaymentTypeDetails.Rows(index).FindControl("radSelectPayTypeDetails"), RadioButton)
+        radSelect.Checked = True
+        radSelectPayTypeDetails_CheckedChanged(radSelect, EventArgs.Empty)
+
+        'Do not show "change of payment" prompt
+        mpeMessage.Hide()
+        '--------------------------------------
+
+        Call ClearSession()
+        RaiseEvent DeletePaymentTypeDetails(Me, EventArgs.Empty)
+
+        If IsPayTypeSuccessful Then
+            RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+        End If
+
+        upPaymentAckReceipt.Update()
+    End Sub
+#End Region
+
+#Region "Radio Button"
+    Protected Sub radSelectViewAR_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.radSelectAR
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+        AckReceiptNumber = cDataType.fLong.IfNull(gvrSelect.Cells(1).Text.Trim)
+        ReceiptByCode = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(7).Text.Trim))
+        SourceSite = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(9).Text.Trim))
+        txtPaymentTypeTotalAmount.Text = PaymentTotalAmount
+        RaiseEvent LoadAckReceipt(Me, EventArgs.Empty)
+
+        If ReceiptByCode <> Master.UserCode Then
+            btnAckReceiptSave.Enabled = False
+            btnAckReceiptPrint.Enabled = False
+            btnAckReceiptCancel.Enabled = False
+        End If
+        'Manage controls
+
+        Call SetModalSession(mpeViewARs, False, ibtnViewARs)
+        upPaymentAckReceipt.Update()
+
+    End Sub
+
+    Protected Sub radSelectViewSI_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentAckReceipt.radSelectSI
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        RaiseEvent ClearScreenInfo(Me, EventArgs.Empty)
+
+        InvoiceNumber = cDataType.fLong.IfNull(gvrSelect.Cells(1).Text.Trim)
+        'ReceiptByCode = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(9).Text.Trim))
+        'SourceSite = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(10).Text.Trim))
+
+        'DocSaveState = eReference.DocSaveState.ViewNoEdit
+        RaiseEvent LoadSalesInvoice(Me, EventArgs.Empty)
+        If IsInvoiceNoExisting Then
+            RaiseEvent ClearScreenViewSI(Me, EventArgs.Empty)
+            ManageDetails("SEARCHREFNO", True)
+        Else
+            ManageDetails("SEARCHREFNO", False)
+        End If
+
+        Call SetModalSession(mpeViewSIs, False, ibtnSearchSalesInvoice)
+        upPaymentAckReceipt.Update()
+
+    End Sub
+
+    Protected Sub radSelectPayTypeDetails_CheckedChanged(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentAckReceipt.radSelectPayTypeDetails
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        Call DeselectGridView(gvwPaymentTypeDetails, radSelect)
+        RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+        PaymentType = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(2).Text.Trim))
+        PaymentTypeID = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(1).Text.Trim))
+        RaiseEvent GetPaymentTypeDetails(Me, EventArgs.Empty)
+
+    End Sub
+#End Region
+
+#End Region
+
+#Region "Custom Method"
+
+#Region "Sub"
+
+    Private Sub AddAttributes()
+        Call SetFocusBlur(txtARRemarks, eCSS.TextBoxInputTextArea2Focus, eCSS.TextBoxInputTextArea2)
+        ' -------------------------------------------------------------------------------
+        Call SetButtonPostBack(btnCancel)
+        'Call SetButtonPostBack(btnLoadViewAR)
+        'Call SetButtonPostBack(btnLoadViewSI)
+        'Call SetButtonPostBack(btnConfirmYes)
+        'Call SetButtonPostBack(btnCancelYes)
+        Call SetButtonPostBack(btnAckReceiptAddNew)
+        Call SetButtonPostBack(btnAckReceiptCancel)
+        ' -------------------------------------------------------------------------------        
+    End Sub
+
+    Private Sub ClearDropDownList(ByVal pDropDownList As DropDownList, ByVal pText As String, ByVal pValue As String)
+        With pDropDownList
+            .Items.Clear()
+            .Items.Insert(0, New ListItem(pText, pValue))
+        End With
+    End Sub
+
+    Private Sub ClearFields()
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub ClearSession()
+        Session(eSession.IsMessage) = Nothing
+        Session(eSession.Message) = Nothing
+        Session(eSession.MessageType) = Nothing
+        Session(eSession.Modal) = Nothing
+        Session(eSession.ReportParam) = Nothing
+    End Sub
+
+    Private Sub DeselectGridView(ByVal pGridview As GridView, ByVal pRadButtonID As RadioButton)
+        Dim radSelect As RadioButton
+
+        For Each dr As GridViewRow In pGridview.Rows
+            radSelect = DirectCast(dr.FindControl(pRadButtonID.ID), RadioButton)
+            If Not radSelect.UniqueID = pRadButtonID.UniqueID Then
+                radSelect.Checked = False
+            End If
+        Next
+    End Sub
+
+    Private Sub LoadReference()
+        RaiseEvent LoadSourceSite(Me, EventArgs.Empty)
+        RaiseEvent LoadCurrency(Me, EventArgs.Empty)
+        RaiseEvent LoadPaymentType(Me, EventArgs.Empty)
+        RaiseEvent LoadCancellationReason(Me, EventArgs.Empty)
+        RaiseEvent LoadBankNetwork(Me, EventArgs.Empty)
+        RaiseEvent LoadAccountType(Me, EventArgs.Empty)
+        RaiseEvent LoadBankList(Me, EventArgs.Empty)
+        RaiseEvent LoadECashPaymentChannel(Me, EventArgs.Empty)
+        Call LoadSwipeTimes()
+    End Sub
+
+    Private Sub SetButtonPostBack(ByVal pButton As Button)
+        pButton.Attributes.Add("OnClick", "if(this.value === 'Processing...') { return false; } else { this.value = 'Processing...'; this.disabled = true; " + Page.ClientScript.GetPostBackEventReference(pButton, Nothing) + ";}")
+    End Sub
+
+    Private Sub SetCurrency(ByVal pTextbox As TextBox, ByVal pDecimal As Integer)
+        pTextbox.Attributes.Add("onkeypress", "return blockNonNumbers(this, event, true, false);")
+        Select Case pDecimal
+            Case -1 ' unlimited decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,-1,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,-1,false); javascript:this.value=Comma(this.value);")
+            Case 0 ' no decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,0,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,0,false); javascript:this.value=Comma(this.value);")
+            Case 2 ' 2 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,2,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,2,false); javascript:this.value=Comma(this.value);")
+            Case 3 ' 3 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,3,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,3,false); javascript:this.value=Comma(this.value);")
+            Case 4 ' 4 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,4,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,4,false); javascript:this.value=Comma(this.value);")
+        End Select
+    End Sub
+
+    Private Sub SetDefaults()
+        'TODO: Put default values here!
+        SourceSite = SiteCode
+    End Sub
+
+
+    Private Sub SetReportSessionScript(ByVal pReport As String)
+        If Session("script") = String.Empty Or Session("script") Is Nothing Then
+            Session("script") = "window.open('" + pReport + "','','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+            'Session("script") = "window.open('" + pReport + "','_blank','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+        Else
+            Session("script") = Session("script") & "window.open('" + pReport + "','','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+            'Session("script") = Session("script") & "window.open('" + pReport + "','_blank','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+        End If
+    End Sub
+
+    Private Sub ManageMain(ByVal pAction As Integer)
+        Select Case pAction
+            Case eDocSaveState.Initial
+                ManageDetails("ENABLED", False)
+                PaymentTypeTag = False
+            Case eDocSaveState.ViewNoEdit, eDocSaveState.ViewEdit, eDocSaveState.Print, eDocSaveState.Cancel
+                ManageDetails("ENABLED", True)
+                ManageDetails("PARTICULARS", False)
+            Case eDocSaveState.AddNew
+                ManageDetails("ENABLED", True)
+                ManageDetails("PARTICULARS", True)
+                ManageDetails("SEARCHREFNO", True)
+            Case eDocSaveState.Edit
+                ManageDetails("ENABLED", True)
+                ManageDetails("SEARCHREFNO", False)
+                ManageDetails("PARTICULARS", True)
+        End Select
+    End Sub
+
+    Private Sub ManageDetails(ByVal pAction As String, Optional ByVal pEnabled As Boolean? = Nothing)
+
+        Select Case pAction
+            Case "ENABLED"
+                pnlPaymentDetails1.Enabled = pEnabled
+                accInvoiceInformation.Visible = pEnabled
+                accParticulars.Visible = pEnabled
+                accARParticulars.Visible = pEnabled
+                accVATComputation.Visible = pEnabled
+            Case "SEARCHREFNO"
+                txtInvoiceNumber.Enabled = Not pEnabled
+                ibtnSearchSalesInvoice.Visible = Not pEnabled
+                ibtnClearRefNo.Visible = pEnabled
+                'ddlPolicyType.Enabled = Not pEnabled
+            Case "SOURCESITE"
+                ddlSourceSite.Enabled = Not pEnabled
+                ibtnVerifySourceSite.Visible = Not pEnabled
+                ibtnClearSourceSite.Visible = pEnabled
+            Case "EDIT"
+                txtARRemarks.Enabled = pEnabled
+                txtAROtherInfo.Enabled = pEnabled
+                txtInvoiceNumber.Enabled = pEnabled
+                ibtnSearchSalesInvoice.Visible = pEnabled
+                ibtnClearSourceSite.Visible = pEnabled
+                ibtnClearRefNo.Visible = pEnabled
+                ibtnClearGrossAmount.Visible = pEnabled
+                ibtnClearComm.Visible = pEnabled
+                ibtnClearWTax.Visible = pEnabled
+                ibtnClearDiscount.Visible = pEnabled
+                'ddlPolicyType.Enabled = pEnabled
+                'accPaymentTypeDetails.Enabled = pEnabled
+            Case "GROSSAMOUNT"
+                txtGrossAmount.Enabled = Not pEnabled
+                ddlPayCurrency.Enabled = Not pEnabled
+                ibtnVerifyGrossAmount.Visible = Not pEnabled
+                ibtnClearGrossAmount.Visible = pEnabled
+            Case "VATAMOUNTS"
+                txtWitholdingTax.Enabled = Not pEnabled
+                txtDiscount.Enabled = Not pEnabled
+                txtDiscountIdNo.Enabled = Not pEnabled
+                txtCommissionAmount.Enabled = Not pEnabled
+                ibtnVerifyWTax.Visible = Not pEnabled
+                ibtnClearWTax.Visible = pEnabled
+                ibtnVerifyDiscount.Visible = Not pEnabled
+                ibtnClearDiscount.Visible = pEnabled
+                ibtnVerifyComm.Visible = Not pEnabled
+                ibtnClearComm.Visible = pEnabled
+                IsWTaxLocked = pEnabled
+                IsCommLocked = pEnabled
+                IsDiscountLocked = pEnabled
+            Case "PARTICULARS"
+                accARParticulars.Enabled = pEnabled
+            Case Else
+                ddlSourceSite.Enabled = pEnabled
+
+        End Select
+
+    End Sub
+
+    Private Sub ManagePaymentType(ByVal pAction As String, ByVal pEnabled As Boolean)
+        'Manage visibility 
+        CashPaymentTag = False
+        CheckPaymentTag = False
+        CreditCardPaymentTag = False
+        DebitCardPaymentTag = False
+        ECashPaymentTag = False
+
+        Select Case pAction
+            Case "ENABLED"
+                pnlPaymentTypeDetails.Enabled = pEnabled
+            Case eReference.PayTypeCSH
+                CashPaymentTag = True
+                If lstPaymentTypeDetails.Count = 0 Then CashAmount = GrossAmount
+                txtCashAmount.Enabled = True
+            Case eReference.PayTypeCHQ
+                CashPaymentTag = True
+                CheckPaymentTag = True
+            Case eReference.PayTypeCCA
+                CreditCardPaymentTag = True
+                If lstPaymentTypeDetails.Count = 0 Then CreditCardAmount = GrossAmount
+                txtCreditCardAmount.Enabled = True
+            Case eReference.PayTypeDCA
+                DebitCardPaymentTag = True
+                If lstPaymentTypeDetails.Count = 0 Then DebitCardAmount = GrossAmount
+                txtDebitCardAmount.Enabled = True
+            Case eReference.PayTypeECP
+                ECashPaymentTag = True
+                If lstPaymentTypeDetails.Count = 0 Then ECashPaymentAmount = GrossAmount
+                txtECashPaymentAmount.Enabled = True
+            Case Else 'Default State
+        End Select
+
+    End Sub
+
+    Private Sub ManageCardPayment(ByVal pAction As String, Optional ByVal pEnabled As Boolean? = True)
+        Select Case pAction
+            Case eReference.PayTypeCCA
+                pnlCreditCardDetails.Enabled = pEnabled
+            Case eReference.PayTypeDCA
+                pnlDebitCardDetails.Enabled = pEnabled
+            Case "ALL"
+                pnlCreditCardDetails.Enabled = pEnabled
+                pnlDebitCardDetails.Enabled = pEnabled
+        End Select
+    End Sub
+
+    Private Sub LoadSwipeTimes()
+        For i = 12 To 1 Step -1
+            ddlCreditSwipeHour.Items.Insert(0, New ListItem(i.ToString("00"), i.ToString("00")))
+            ddlDebitSwipeHour.Items.Insert(0, New ListItem(i.ToString("00"), i.ToString("00")))
+        Next
+
+        For i = 59 To 0 Step -1
+            ddlCreditSwipeMinute.Items.Insert(0, New ListItem(i.ToString("00"), i.ToString("00")))
+            ddlDebitSwipeMinute.Items.Insert(0, New ListItem(i.ToString("00"), i.ToString("00")))
+        Next
+
+        ddlCreditSwipeAmPm.Items.Insert(0, New ListItem("PM", "PM"))
+        ddlCreditSwipeAmPm.Items.Insert(0, New ListItem("AM", "AM"))
+        ddlDebitSwipeAmPm.Items.Insert(0, New ListItem("PM", "PM"))
+        ddlDebitSwipeAmPm.Items.Insert(0, New ListItem("AM", "AM"))
+
+    End Sub
+
+    Private Sub SetDropDownList(ByVal pDropDownList As DropDownList, ByVal pDataSource As DataTable, ByVal pDataTextField As String, _
+        ByVal pDataValueField As String, Optional ByVal pNewDataTextField As String = Nothing, Optional ByVal pNewDataValueField As String = Nothing)
+
+        With pDropDownList
+            .Items.Clear()
+            If Not IsNothing(pNewDataTextField) AndAlso Not IsNothing(pNewDataValueField) Then
+                If IsNothing(pNewDataTextField) Then pNewDataTextField = String.Empty
+                If IsNothing(pNewDataValueField) Then pNewDataValueField = String.Empty
+
+                .Items.Insert(0, New ListItem(pNewDataTextField, pNewDataValueField))
+            End If
+            .AppendDataBoundItems = True
+            If pDataSource.Rows.Count > 0 Then
+                .DataTextField = pDataTextField
+                .DataValueField = pDataValueField
+            End If
+            .DataSource = IIf(pDataSource.Rows.Count = 0, Nothing, pDataSource)
+            .DataBind()
+        End With
+
+    End Sub
+
+    Private Sub SetRadioButtonList(ByVal pRadioButtonList As RadioButtonList, ByVal pDataSource As DataTable, ByVal pDataTextField As String, _
+        ByVal pDataValueField As String)
+
+        With pRadioButtonList
+            .Items.Clear()
+            .AppendDataBoundItems = True
+            If pDataSource.Rows.Count > 0 Then
+                .DataTextField = pDataTextField
+                .DataValueField = pDataValueField
+            End If
+            .DataSource = IIf(pDataSource.Rows.Count = 0, Nothing, pDataSource)
+            .DataBind()
+            .SelectedIndex = 0
+        End With
+
+    End Sub
+
+    Private Sub SetDropDownListNewListItem(ByVal pDropDownList As DropDownList, ByVal pDataIndex As Integer, ByVal pDataTextField As String,
+                                           ByVal pDataValueField As String)
+        With pDropDownList
+            .Items.Insert(pDataIndex, New ListItem(pDataTextField, pDataValueField))
+            .AppendDataBoundItems = True
+            .DataBind()
+        End With
+    End Sub
+
+    Private Sub SetFocusBlur(ByVal pTextBox As TextBox, ByVal pFocus As String, ByVal pBlur As String, Optional ByVal pDecimal As Integer? = Nothing)
+
+        Dim mOnBlurValue As String = pTextBox.Attributes.Item("onblur")
+        Dim mOnFocusValue As String = pTextBox.Attributes.Item("onfocus")
+
+        mOnBlurValue &= "DoBlur(this, '" & pBlur & "');"
+        mOnFocusValue &= "DoFocus(this, '" & pFocus & "');"
+
+        If Not IsNothing(pDecimal) Then
+            mOnBlurValue &= String.Concat("extractNumber(this,", pDecimal, ",false); javascript:this.value=Comma(this.value);")
+        End If
+
+        pTextBox.Attributes.Add("onfocus", mOnFocusValue)
+        pTextBox.Attributes.Add("onblur", mOnBlurValue)
+
+    End Sub
+
+    Private Sub SetFocusEnterKey(ByVal pTextbox As TextBox, ByVal pSetFocusTextBox As Object)
+        pTextbox.Attributes.Add("onkeypress", "if (event.keyCode == 13){document.getElementById('" + pSetFocusTextBox.ClientID + "').focus()};")
+    End Sub
+
+    Private Sub SetModalSession(ByVal pModal As AjaxControlToolkit.ModalPopupExtender, ByVal pShow As Boolean, ByVal pSetFocus As Object)
+        Session(eSession.Modal) = IIf(pShow, pModal.ID, Nothing)
+        If pShow Then
+            pModal.Show()
+        Else
+            pModal.Hide()
+        End If
+        'FOCUS Me.Page.SetFocus(pSetFocus)
+    End Sub
+
+    Private Sub ShowMessageBox(ByVal pMessage As String, ByVal pMessageType As String)
+        Me.Message = pMessage
+        Me.MessageType = pMessageType
+        Me.IsMessage = True
+    End Sub
+
+#End Region
+
+#Region "Function"
+
+    Private Function ConvertToList(Of T As New)(ByVal pGridView As GridView) As List(Of T)
+        Dim lstLocal As List(Of T) = New List(Of T)
+
+        For Each dr As GridViewRow In pGridView.Rows
+            Dim objLocal As New T
+            Select Case pGridView.ID
+                Case gvwPaymentTypeDetails.ID
+                    With TryCast(objLocal, cPaymentType)
+                        .PaymentTypeID = cDataType.fString.IfNull(dr.Cells(1).Text)
+                        .PaymentType = cDataType.fString.IfNull(dr.Cells(2).Text)
+                        .CheckNumber = cDataType.fLong.IfNull(dr.Cells(3).Text)
+                        .TerminalUse = cDataType.fString.IfNull(dr.Cells(4).Text)
+                        .MerchantID = cDataType.fString.IfNull(dr.Cells(5).Text)
+                        .SwipeDate = cDataType.fDate.IfNull(dr.Cells(6).Text)
+                        .Network = cDataType.fString.IfNull(dr.Cells(7).Text)
+                        .Bank = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(8).Text))
+                        .Branch = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(9).Text))
+                        .CASA = cDataType.fString.IfNull(dr.Cells(10).Text)
+                        .AccountNumber = cDataType.fString.IfNull(dr.Cells(11).Text)
+                        .CardType = cDataType.fString.IfNull(dr.Cells(12).Text)
+                        .CardNumber = cDataType.fString.IfNull(dr.Cells(13).Text)
+                        .ApprovalCode = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(14).Text))
+                        .Remarks = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(15).Text))
+                        .Amount = cDataType.fDecimal.IfNull(dr.Cells(17).Text)
+                        .BatchNumber = cDataType.fLong.IfNull(dr.Cells(18).Text)
+                        .ReferenceID = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(19).Text))
+                        .PaymentChannel = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(20).Text))
+                        .ServiceFeeRate = cDataType.fDecimal.IfNull(Server.HtmlDecode(dr.Cells(21).Text))
+                    End With
+                Case gvwParticulars.ID
+                    With TryCast(objLocal, cSIDetails)
+                        .ReferenceNo = Me.ReferenceNo
+                        .Particulars = cDataType.fString.IfNull(dr.Cells(0).Text)
+                        .Quantity = cDataType.fLong.IfNull(dr.Cells(1).Text)
+                        .UnitPrice = cDataType.fDecimal.IfNull(dr.Cells(2).Text)
+                        .Amount = cDataType.fDecimal.IfNull(dr.Cells(3).Text)
+                    End With
+                Case Else
+
+            End Select
+            lstLocal.Add(objLocal)
+        Next
+
+        Return lstLocal
+
+    End Function
+#End Region
+
+#End Region
+
+    Protected Sub ibtnViewARs_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnViewARs.Click
+
+    End Sub
+
+    Protected Sub gvwViewAR_SelectedIndexChanged(sender As Object, e As EventArgs) Handles gvwViewAR.SelectedIndexChanged
+
+    End Sub
+
+    Protected Sub btnAckReceiptPrint_Click(sender As Object, e As EventArgs) Handles btnAckReceiptPrint.Click
+
+    End Sub
+End Class

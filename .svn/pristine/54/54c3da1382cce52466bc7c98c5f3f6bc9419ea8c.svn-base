@@ -1,0 +1,65 @@
+﻿#Region "Description"
+' PAGE NAME     : AGNMAS Interface 
+' CREATED BY    : MPRO
+' CREATED DATE  : 04/30/2013
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+
+#End Region
+
+Namespace Person
+
+    Public Interface IAgnMas
+
+#Region "Variables"
+
+#End Region
+
+#Region "Properties"
+        Property AgnPrs() As Long           ' Agents ID
+        Property AgnCon() As String         ' Agents Contract code
+        Property AgnBrn() As Long           ' Branch ID
+        Property AgnOvr() As Long           ' Person ID of Mgr earning overwrites
+        Property AgnLoc() As String         ' Agents location
+        Property AgnDat() As date       ' Effectivity date
+        Property AgnEnd() As date       ' Termination date
+        Property CatCod() As String         ' Category code
+        ' -------------------------------------------------------------------------------
+        Property IsRecordExist() As Boolean
+#End Region
+
+#Region "Single Point Functions"
+        Function GetAgencyFund(ByVal pAgtPrsPID As Long) As Long
+        Function GetAgentInfo(ByVal pAgnPrs As Long, ByVal pDate As Date, ByVal pCol As Integer) As String
+        Function GetAgentSalesForce(ByVal pAgentCode As Long, ByVal pDate As Date) As String
+        Function GetAgentTaxRate(ByVal pAcctgPd As Long, ByVal pAgentCode As Long) As Decimal
+        Function GetAgentCommRate(ByVal pAgentCode As Long, ByVal pDate As Date) As Decimal
+        Function GetAgentOR(ByVal pAgentCode As Long) As Boolean
+        ' -------------------------------------------------------------------------------
+        Sub GetAgnMas(ByVal pAgnPrs As Long)
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Transactions"
+        Function InsertAgnMas(ByVal pList As IList(Of Person.BAgnMas), ByRef pConn As Object, ByRef pTrans As Object) As String
+        ' -------------------------------------------------------------------------------
+        Function SearchAgnMas(ByVal pAgnPrs As Long, ByVal pAgnNme As String, ByVal pAgnEnd As Date) As DataTable
+        ' -------------------------------------------------------------------------------
+        Function UpdateAgnMas(ByVal pList As IList(Of Person.BAgnMas), ByRef pConn As Object, ByRef pTrans As Object) As String
+        ' -------------------------------------------------------------------------------
+        Function ValidateAgent(ByVal pAgnPrs As Long, ByVal pUwDate As date) As DataTable
+#End Region
+
+    End Interface
+
+End Namespace
+
+

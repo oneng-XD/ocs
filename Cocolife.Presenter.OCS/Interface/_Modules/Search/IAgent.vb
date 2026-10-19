@@ -1,0 +1,77 @@
+﻿#Region "Description"
+' PAGE NAME     : Search Agent Interface
+' CREATED BY    : MPRO
+' CREATED DATE  : 04/30/2013
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+
+#End Region
+
+Namespace Search
+
+    Public Interface IAgent
+      
+
+
+#Region "Variables"
+
+#End Region
+
+#Region "Properties"
+        Property IsAgentExist() As Boolean
+        ' ------------------------------------------------------------------------------- 
+        Property SearchAgentTag() As Integer
+        Property SearchAgentID() As Long
+        Property SearchAgentName() As String
+
+        ' ------------------------------------------------------------------------------- 
+        Property LoadDocDate() As Date
+        Property LoadAgentID() As Long
+        Property LoadAgentName() As String
+        Property LoadAgentFName() As String
+        Property LoadAgentLName() As String
+        Property LoadAgentMName() As String
+        Property LoadAgencyID() As Long
+        Property LoadAgencyName() As String
+        Property LoadAgencyFName() As String
+        Property LoadAgencyLName() As String
+        Property LoadAgencyMName() As String
+        ' ------------------------------------------------------------------------------- 
+        WriteOnly Property dtSearchAgent() As DataTable
+#End Region
+
+#Region "Events"
+        Event ClearScreenLoadAgent(ByVal sender As Object, ByVal e As EventArgs)
+        Event ClearScreenSearchAgent(ByVal sender As Object, ByVal e As EventArgs)
+        ' ------------------------------------------------------------------------------- 
+        Event LoadAgent(ByVal sender As Object, ByVal e As EventArgs)
+        Event LoadSearchAgent(ByVal sender As Object, ByVal e As EventArgs)
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Transactions"
+        Sub radSelectAgent(ByVal sender As Object, ByVal e As EventArgs)
+#End Region
+
+    End Interface
+
+
+    Public Interface IAgentPolicyContext
+        Property SearchAgentPolType As String
+    End Interface
+
+End Namespace
+
+

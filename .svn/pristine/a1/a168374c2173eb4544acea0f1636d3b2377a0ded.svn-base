@@ -1,0 +1,321 @@
+﻿#Region "Description"
+' PAGE NAME     :  
+' CREATED BY    : 
+' CREATED DATE  : 
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports System.Data.OracleClient
+Imports bllConn = Cocolife.BLL.Common.Database.BCollectionWeb
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports eDBAction = Cocolife.Utility.Common.Enums.eDBAction
+Imports dalConstant = Cocolife.DAL.OCS.DConstant
+#End Region
+
+Namespace Staging
+
+
+    Public Class DDebitCredit
+
+#Region "Variables"
+        Private mReference As Object = Nothing
+#End Region
+
+#Region "Properties"
+        Property Reference As Object
+            Get
+                Return mReference
+            End Get
+            Set(value As Object)
+                mReference = value
+            End Set
+        End Property
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Data Retrieval"
+     
+        Public Function SearchDebitCreditMemo(ByVal pTransID As Long) As DataTable
+
+            Dim oraCmd As New OracleCommand(dalConstant._spSSOGetDebitCreditMemo)
+            Dim oraDA As OracleDataAdapter = Nothing
+            Dim ds As New DataSet
+
+            Try
+
+                With oraCmd
+                    .CommandType = CommandType.StoredProcedure
+                    .Connection = bllConn.Instance.Connection
+                    If bllConn.Instance.Transaction IsNot Nothing Then .Transaction = bllConn.Instance.Transaction
+
+                    With .Parameters
+                        .Add(New OracleParameter("pTransID", OracleType.Number)).Value = pTransID
+                        .Add(New OracleParameter("rsOut", OracleType.Cursor)).Direction = ParameterDirection.Output
+                    End With
+
+                    oraDA = New OracleDataAdapter(oraCmd)
+                    oraDA.Fill(ds, "dtSearchDebitCreditMemo")
+                End With
+
+                Return ds.Tables("dtSearchDebitCreditMemo")
+
+            Catch ex As Exception
+                Throw
+            Finally
+                oraCmd.Dispose()
+            End Try
+
+        End Function
+        Public Function SearchTaxAmount(ByVal pBillNumber As String, ByVal pAmount As Decimal, ByVal pQuantity As Long) As DataTable
+
+            Dim oraCmd As New OracleCommand(dalConstant._spSSOGetDMCMTaxAmount)
+            Dim oraDA As OracleDataAdapter = Nothing
+            Dim ds As New DataSet
+
+            Try
+
+                With oraCmd
+                    .CommandType = CommandType.StoredProcedure
+                    .Connection = bllConn.Instance.Connection
+                    If bllConn.Instance.Transaction IsNot Nothing Then .Transaction = bllConn.Instance.Transaction
+
+                    With .Parameters
+                        .Add(New OracleParameter("pBillNumber", OracleType.VarChar)).Value = pBillNumber
+                        .Add(New OracleParameter("pAmount", OracleType.Number)).Value = pAmount
+                        .Add(New OracleParameter("pQuantity", OracleType.Number)).Value = pQuantity
+                        .Add(New OracleParameter("rsOut", OracleType.Cursor)).Direction = ParameterDirection.Output
+                    End With
+
+                    oraDA = New OracleDataAdapter(oraCmd)
+                    oraDA.Fill(ds, "dtSearchTaxAmount")
+                End With
+
+                Return ds.Tables("dtSearchTaxAmount")
+
+            Catch ex As Exception
+                Throw
+            Finally
+                oraCmd.Dispose()
+            End Try
+
+        End Function
+        Public Function GetDocList(ByVal pSiteCode As Long, ByVal pRoleCode As String, ByVal pParam As Long, ByVal pTransID As String, ByVal pType As Integer) As DataTable
+            Dim oraCmd As New OracleCommand(dalConstant._spSiteGetDMCMList)
+            Dim oraDA As OracleDataAdapter
+            Dim ds As New DataSet
+            Try
+                With oraCmd
+                    .CommandType = CommandType.StoredProcedure
+                    .Connection = bllConn.Instance.Connection
+                    If bllConn.Instance.Transaction IsNot Nothing Then .Transaction = bllConn.Instance.Transaction
+
+                    .Parameters.Add(New OracleParameter("pSiteCode", OracleType.Number)).Value = pSiteCode
+                    .Parameters.Add(New OracleParameter("pRoleCode", OracleType.VarChar)).Value = pRoleCode
+                    .Parameters.Add(New OracleParameter("pStartDate", OracleType.DateTime)).Value = Nothing
+                    .Parameters.Add(New OracleParameter("pEndDate", OracleType.DateTime)).Value = Nothing
+                    .Parameters.Add(New OracleParameter("pStringParam", OracleType.Number)).Value = pParam
+                    .Parameters.Add(New OracleParameter("pParamType", OracleType.Number)).Value = pType
+                    .Parameters.Add(New OracleParameter("pTransID", OracleType.VarChar)).Value = pTransID
+                    .Parameters.Add(New OracleParameter("rsOut", OracleType.Cursor)).Direction = ParameterDirection.Output
+
+                    oraDA = New OracleDataAdapter(oraCmd)
+                    oraDA.Fill(ds, "dtViewDMCM")
+
+                End With
+                Return ds.Tables("dtViewDMCM")
+
+            Catch ex As Exception
+                Throw
+            Finally
+                oraCmd.Dispose()
+            End Try
+        End Function
+
+        Public Function GetDocList(ByVal pSiteCode As Long, ByVal pRoleCode As String, ByVal pStartDate As Date?, ByVal pEndDate As Date?) As DataTable
+            Dim oraCmd As New OracleCommand(dalConstant._spSiteGetDMCMList)
+            Dim oraDA As OracleDataAdapter
+            Dim ds As New DataSet
+            Try
+                With oraCmd
+                    .CommandType = CommandType.StoredProcedure
+                    .Connection = bllConn.Instance.Connection
+                    If bllConn.Instance.Transaction IsNot Nothing Then .Transaction = bllConn.Instance.Transaction
+
+                    .Parameters.Add(New OracleParameter("pSiteCode", OracleType.Number)).Value = pSiteCode
+                    .Parameters.Add(New OracleParameter("pRoleCode", OracleType.VarChar)).Value = pRoleCode
+                    .Parameters.Add(New OracleParameter("pStartDate", OracleType.DateTime)).Value = pStartDate
+                    .Parameters.Add(New OracleParameter("pEndDate", OracleType.DateTime)).Value = pEndDate
+                    .Parameters.Add(New OracleParameter("pStringParam", OracleType.VarChar)).Value = Nothing
+                    .Parameters.Add(New OracleParameter("pParamType", OracleType.Number)).Value = 0
+                    .Parameters.Add(New OracleParameter("rsOut", OracleType.Cursor)).Direction = ParameterDirection.Output
+
+                    oraDA = New OracleDataAdapter(oraCmd)
+                    oraDA.Fill(ds, "dtViewDMCM")
+
+                End With
+                Return ds.Tables("dtViewDMCM")
+
+            Catch ex As Exception
+                Throw
+            Finally
+                oraCmd.Dispose()
+            End Try
+        End Function
+        Public Function GetDocList(ByVal pSiteCode As Long, ByVal pRoleCode As String, ByVal pType As Integer, ByVal pParam As Long, ByVal pStartDate As Date, ByVal pEndDate As Date) As DataTable
+            Dim oraCmd As New OracleCommand(dalConstant._spSiteGetDMCMList)
+            Dim oraDA As OracleDataAdapter
+            Dim ds As New DataSet
+            Try
+                With oraCmd
+                    .CommandType = CommandType.StoredProcedure
+                    .Connection = bllConn.Instance.Connection
+                    If bllConn.Instance.Transaction IsNot Nothing Then .Transaction = bllConn.Instance.Transaction
+
+                    .Parameters.Add(New OracleParameter("pSiteCode", OracleType.Number)).Value = pSiteCode
+                    .Parameters.Add(New OracleParameter("pRoleCode", OracleType.VarChar)).Value = pRoleCode
+                    .Parameters.Add(New OracleParameter("pStartDate", OracleType.DateTime)).Value = pStartDate
+                    .Parameters.Add(New OracleParameter("pEndDate", OracleType.DateTime)).Value = pEndDate
+                    .Parameters.Add(New OracleParameter("pStringParam", OracleType.VarChar)).Value = pParam
+                    .Parameters.Add(New OracleParameter("pParamType", OracleType.Number)).Value = pType
+                    .Parameters.Add(New OracleParameter("rsOut", OracleType.Cursor)).Direction = ParameterDirection.Output
+
+                    oraDA = New OracleDataAdapter(oraCmd)
+                    oraDA.Fill(ds, "dtViewDMCM")
+
+                End With
+                Return ds.Tables("dtViewDMCM")
+
+            Catch ex As Exception
+                Throw
+            Finally
+                oraCmd.Dispose()
+            End Try
+        End Function
+        Public Function GetApprover(ByVal pRoleCode As String) As DataTable
+            Dim oraCmd As New OracleCommand(dalConstant._spGetDMCMApprover)
+            Dim oraDA As OracleDataAdapter
+            Dim ds As New DataSet
+            Try
+                With oraCmd
+                    .CommandType = CommandType.StoredProcedure
+                    .Connection = bllConn.Instance.Connection
+                    If bllConn.Instance.Transaction IsNot Nothing Then .Transaction = bllConn.Instance.Transaction
+
+                    .Parameters.Add(New OracleParameter("pRoleCode", OracleType.VarChar)).Value = pRoleCode
+                    .Parameters.Add(New OracleParameter("rsOut", OracleType.Cursor)).Direction = ParameterDirection.Output
+
+                    oraDA = New OracleDataAdapter(oraCmd)
+                    oraDA.Fill(ds, "dtApprover")
+
+                End With
+                Return ds.Tables("dtApprover")
+
+            Catch ex As Exception
+                Throw
+            Finally
+                oraCmd.Dispose()
+            End Try
+        End Function
+
+#End Region
+
+#Region "Transactions"
+
+        Public Sub AlterDebitCreditMemo(ByVal pObject As Object, ByVal pAction As String, ByRef pOraConn As OracleConnection, ByRef pOraTrans As OracleTransaction)
+            Dim oraCmd As New OracleCommand(DConstant._spOCSProcessDMCM)
+            Dim oraDR As OracleDataReader = Nothing
+
+            Try
+
+                With oraCmd
+                    .CommandType = CommandType.StoredProcedure
+                    .Connection = pOraConn
+                    .Transaction = pOraTrans
+
+                    With .Parameters
+                        .Add(New OracleParameter("pPrintStatus", OracleType.VarChar)).Value = pAction                               ' 1
+                        .Add(New OracleParameter("pID", OracleType.Number)).Value = pObject.DebitCreditID
+                        .Add(New OracleParameter("pTransID", OracleType.VarChar)).Value = pObject.DMCMTransNo
+                        .Add(New OracleParameter("pDMCMNumber", OracleType.Number)).Value = pObject.DMCMNumber ' 2
+                        .Add(New OracleParameter("pMemoType", OracleType.VarChar)).Value = pObject.MemoType
+                        .Add(New OracleParameter("pSalesInvoiceNumber", OracleType.Number)).Value = pObject.SINumber           ' 21
+                        .Add(New OracleParameter("pDMCMDate", OracleType.DateTime)).Value = pObject.DMCMDate
+                        .Add(New OracleParameter("pRenewalDate", OracleType.DateTime)).Value = pObject.RenewalDate
+                        .Add(New OracleParameter("pEffectivityFrom", OracleType.DateTime)).Value = pObject.EffectivityDate
+                        .Add(New OracleParameter("pEffectivityTo", OracleType.DateTime)).Value = pObject.ExpiryDate
+                        .Add(New OracleParameter("pBillPeriodFrom", OracleType.DateTime)).Value = pObject.BillPeriodFrom
+                        .Add(New OracleParameter("pBillPeriodTo", OracleType.DateTime)).Value = pObject.BillPeriodTo
+                        .Add(New OracleParameter("pBillStatementDate", OracleType.DateTime)).Value = pObject.BillStatementDate
+                        .Add(New OracleParameter("pPostedBy", OracleType.VarChar)).Value = pObject.PostedBy
+                        .Add(New OracleParameter("pSiteCode", OracleType.Number)).Value = pObject.SiteCode
+                        .Add(New OracleParameter("pPayor", OracleType.VarChar)).Value = pObject.Payor
+                        .Add(New OracleParameter("pPayorAddr", OracleType.VarChar)).Value = pObject.Address
+                        .Add(New OracleParameter("pPayorTin", OracleType.VarChar)).Value = pObject.Tin
+                        .Add(New OracleParameter("pPolicyNo", OracleType.VarChar)).Value = pObject.PolicyNumber
+                        .Add(New OracleParameter("pSIDate", OracleType.DateTime)).Value = pObject.InvoiceDate
+                        .Add(New OracleParameter("pRemarks", OracleType.VarChar)).Value = pObject.Remarks
+                        .Add(New OracleParameter("pReason", OracleType.VarChar)).Value = pObject.Reason
+                        .Add(New OracleParameter("pMode", OracleType.VarChar)).Value = pObject.PaymentTerm
+                        .Add(New OracleParameter("pReferenceNo", OracleType.VarChar)).Value = pObject.ReferenceNo
+                        .Add(New OracleParameter("pBillStatNo", OracleType.VarChar)).Value = pObject.BillStatNo
+                        .Add(New OracleParameter("pSiteName", OracleType.VarChar)).Value = pObject.SiteName
+                        .Add(New OracleParameter("pSiteAddr", OracleType.VarChar)).Value = pObject.SiteAddr
+                        .Add(New OracleParameter("pSiteContact", OracleType.VarChar)).Value = pObject.SiteTelNo
+                        .Add(New OracleParameter("pSiteTin", OracleType.VarChar)).Value = pObject.SiteTin
+                        .Add(New OracleParameter("pPreparedBy", OracleType.VarChar)).Value = pObject.PreparedBy
+                        .Add(New OracleParameter("pBillingType", OracleType.VarChar)).Value = pObject.BillingType
+
+                        .Add(New OracleParameter("pParticulars", OracleType.VarChar)).Value = pObject.Particulars
+                        .Add(New OracleParameter("pQuantity", OracleType.Number)).Value = pObject.Quantity
+                        .Add(New OracleParameter("pUnitPrice", OracleType.Double)).Value = pObject.UnitPrice
+                        .Add(New OracleParameter("pVatableSales", OracleType.Double)).Value = pObject.VatSales
+                        .Add(New OracleParameter("pVatExemptSales", OracleType.Double)).Value = pObject.VatExemptSales
+                        .Add(New OracleParameter("pVatAmount", OracleType.Double)).Value = pObject.VatAmount
+                        .Add(New OracleParameter("pNonVatSales", OracleType.Double)).Value = pObject.NonVatSales
+                        .Add(New OracleParameter("pTotalSales", OracleType.Double)).Value = pObject.TotalSales
+                        .Add(New OracleParameter("pWTax", OracleType.Double)).Value = pObject.WTax
+                        .Add(New OracleParameter("pNetWTax", OracleType.Double)).Value = pObject.NetWTax
+                        .Add(New OracleParameter("pDiscount", OracleType.Double)).Value = pObject.Discount
+                        .Add(New OracleParameter("pDiscountID", OracleType.VarChar)).Value = pObject.DiscountID
+                        .Add(New OracleParameter("pRoleCode", OracleType.VarChar)).Value = pObject.RoleCode
+                        .Add(New OracleParameter("pApprover", OracleType.VarChar)).Value = pObject.Approver
+
+                        .Add(New OracleParameter("rsOut", OracleType.Cursor)).Direction = ParameterDirection.Output
+                        .Add(New OracleParameter("rsSendEmail", OracleType.Cursor)).Direction = ParameterDirection.Output ' 33
+                    End With
+
+                    oraDR = .ExecuteReader
+                    With oraDR
+                        Reference = 0
+                        While .Read
+                            If eDBAction.isSuccessful(.Item("message")) Then
+                                Reference = cDataType.fString.getReference(.Item("message"))
+                            Else
+                                Throw New Exception(.Item("message"))
+                            End If
+                        End While
+                    End With
+
+                End With
+
+            Catch ex As Exception
+                Throw
+            Finally
+                oraCmd.Dispose()
+                If Not IsNothing(oraDR) Then
+                    oraDR.Dispose()
+                End If
+            End Try
+
+        End Sub
+#End Region
+    End Class
+
+End Namespace

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+preCommon
+</name>
+</assembly>
+<members>
+<member name="P:Cocolife.Presenter.Common.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:Cocolife.Presenter.Common.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:Cocolife.Presenter.Common.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:Cocolife.Presenter.Common.Security.PLogIn.LogIn(System.Object,System.EventArgs)">
+	<summary>
+ Raise this event on "LogIn" object click
+ </summary>
+	<param name="sender"></param>
+	<param name="e"></param>
+	<remarks></remarks>
+</member><member name="M:Cocolife.Presenter.Common.Security.PLogIn.ValidateForgotPassword(System.Object,System.EventArgs)">
+	<summary>
+ Raise this event on "Forgot Password" object click
+ </summary>
+	<param name="sender"></param>
+	<param name="e"></param>
+	<remarks></remarks>
+</member>
+</members>
+</doc>

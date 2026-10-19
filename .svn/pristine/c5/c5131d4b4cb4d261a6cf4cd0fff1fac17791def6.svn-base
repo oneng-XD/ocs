@@ -1,0 +1,36 @@
+﻿#Region "Description"
+' PAGE NAME     : ACCESS ENUMS
+' CREATED BY    : EJ
+' CREATED DATE  : 01/19/2018
+' UPDATE LOGS [modified by | modified date | updates]
+' -------------------------------------------------------------------------------
+' 
+' -------------------------------------------------------------------------------
+#End Region
+
+#Region "Imports"
+
+#End Region
+
+Namespace Enums
+
+    Public Class eAccess
+        Public Const AccessMtnAPR As String = "MTN001---" ' Not yet implemented
+        Public Const AccessMtnORseries As String = "MTN002"
+        Public Const AccessMtnAgentORseries As String = "MTN003"
+        Public Const AccessMtnTransactionSetup As String = "MTN004"
+        Public Const AccessMtnSiteMerchantID As String = "MTN005"
+        Public Const AccessRptPosting As String = "RPT001"
+        Public Const AccessTrnPremium As String = "TRN001"
+        Public Const AccessTrnNonPremium As String = "TRN002"
+        Public Const AccessTrnBatchPremium As String = "TRN003"
+        Public Const AccessTrnCheckTagging As String = "TRN004"
+        Public Const AccessTrnSalesInvoice As String = "TRN005"
+        Public Const AccessAckReceipt As String = "TRN006"
+        Public Const AccessDebitCreditMemo As String = "TRN007" 'added by junie --DMCM
+        Public Const AccessDMCMApproval As String = "TRN008" 'added by junie --DMCM
+    End Class
+
+
+End Namespace
+

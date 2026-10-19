@@ -1,0 +1,1596 @@
+﻿#Region "Description"
+' PAGE NAME     : Payment : Debit Credit Memo
+' CREATED BY    : Junie
+' CREATED DATE  : 04/10/2025
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports preSecurity = Cocolife.Presenter.Common.Security
+Imports preMessages = Cocolife.Utility.OCS.Messages
+Imports prePayment = Cocolife.Presenter.OCS.Payment
+Imports preSearch = Cocolife.Presenter.OCS.Search
+Imports preReport = Cocolife.Presenter.OCS.Report
+Imports eSystemMessage = Cocolife.Utility.Common.Enums.eSystemMessage
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports eCSS = Cocolife.Utility.OCS.Enums.eCSS
+Imports ePage = Cocolife.Utility.OCS.Enums.ePage
+Imports eReference = Cocolife.Utility.OCS.Enums.eReference
+Imports eDocSaveState = Cocolife.Utility.OCS.Enums.eReference.DocSaveState
+Imports eSession = Cocolife.Utility.OCS.Enums.eSession
+Imports eReport = Cocolife.Utility.OCS.Enums.eReport
+Imports Cocolife.Utility.OCS.Classes
+Imports System.Linq
+Imports System.Reflection
+Imports CrystalDecisions.CrystalReports.Engine
+Imports CrystalDecisions.Shared
+Imports cCrystalConn = Cocolife.Utility.OCS.Classes.cCrystalConn
+Imports System.Globalization
+#End Region
+
+
+Partial Public Class PaymentDebitCreditMemo
+    Inherits System.Web.UI.Page
+
+#Region "Implements"
+    Implements preSecurity.ISystemMessage
+    Implements preMessages.IConfirmationMessage
+    Implements prePayment.IPaymentDebitCreditMemo
+    Implements preReport.IReport
+#End Region
+
+#Region "Variables"
+    Private pSystemMessage As preSecurity.PSystemMessage
+    Private pConfirmationMessage As preMessages.PConfirmationMessage
+    Private pPaymentDebitCreditMemo As prePayment.PPaymentDebitCreditMemo
+    'Private mIsPayTypeSuccessful As Boolean
+    Private mIsSuccessful As Boolean
+#End Region
+
+#Region "ISystemMessage"
+#Region "Property"
+    Public WriteOnly Property Message() As String Implements preSecurity.ISystemMessage.Message
+        Set(ByVal value As String)
+            lblMessage.Text = value
+        End Set
+    End Property
+
+    Public WriteOnly Property MessageType() As String Implements preSecurity.ISystemMessage.MessageType
+        Set(ByVal value As String)
+            imgMessage.ImageUrl = value
+        End Set
+    End Property
+
+    Public WriteOnly Property IsMessage() As Boolean Implements preSecurity.ISystemMessage.isMessage
+        Set(ByVal value As Boolean)
+            If value Then
+                mpeMessage.Show()
+            End If
+        End Set
+    End Property
+#End Region
+
+#Region "Event"
+
+#End Region
+
+#End Region
+
+#Region "IConfirmationMessage"
+#Region "Property"
+
+    Public Property ConfirmCaller() As String Implements preMessages.IConfirmationMessage.ConfirmCaller
+        Get
+            Return cDataType.fString.IfNull(hdnConfirmCaller.Value)
+        End Get
+        Set(value As String)
+            hdnConfirmCaller.Value = value
+        End Set
+    End Property
+
+    Public Property ConfirmClickState() As Boolean Implements preMessages.IConfirmationMessage.ClickedState
+        Get
+            Return cDataType.fBoolean.IfNull(hdnClickStateTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnClickStateTag.Value = value
+        End Set
+    End Property
+
+    Public Property UserResponse() As Boolean Implements preMessages.IConfirmationMessage.UserResponse
+        Get
+            Return cDataType.fBoolean.IfNull(hdnConfirmTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnConfirmTag.Value = value
+        End Set
+    End Property
+
+    Public WriteOnly Property ConfirmMessage() As String Implements preMessages.IConfirmationMessage.Message
+        Set(ByVal value As String)
+            lblConfirm.Text = value
+        End Set
+    End Property
+
+    Public WriteOnly Property IsConfirmMessage() As Boolean Implements preMessages.IConfirmationMessage.isMessage
+        Set(ByVal value As Boolean)
+            If value Then
+                mpeConfirm.Show()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+
+#End Region
+
+#End Region
+
+#Region "IPaymentDebitCreditMemo"
+#Region "Property"
+#Region "Invoice Details"
+    Public Property DocSaveState As Integer Implements prePayment.IPaymentDebitCreditMemo.DocSaveState 'HEREDMCM
+        Get
+            Return cDataType.fInteger.IfNull(hdnDocSaveState.Value)
+        End Get
+        Set(value As Integer)
+            hdnDocSaveState.Value = value
+
+            ManageMain(value)
+
+            Select Case value
+                Case eDocSaveState.Initial
+                    ibtnViewDMCMs.Visible = True
+                    btnDMCMAddNew.Enabled = True
+                    btnDMCMPreview.Enabled = False
+                    btnDMCMSend.Enabled = False
+                    btnDMCMSave.Text = "Save"
+                    btnDMCMPrint.Enabled = False
+                    btnDMCMCancel.Enabled = False
+                    RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+                    ManageDetails("EDITABLE", True)
+
+                Case eDocSaveState.ViewEdit
+                    ibtnViewDMCMs.Visible = True
+                    ibtnSearchSalesInvoice.Visible = False
+                    ibtnClearRefNo.Visible = False
+                    ManageDetails("UNITPRICE", False)
+                    ibtnClearUnitPrice.Visible = False
+
+                    btnDMCMAddNew.Enabled = False
+                    btnDMCMSave.Enabled = True
+                    btnDMCMSave.Text = "Modify"
+                    btnDMCMPrint.Enabled = False
+                    btnDMCMSend.Enabled = True
+                    If DMCMNumber > 0 OrElse Not (Status = "ACTIVE" OrElse Status = "REJECTED") Then
+                        btnDMCMCancel.Enabled = False
+                    Else
+                        btnDMCMCancel.Enabled = True
+                    End If
+                    If Status = "REJECTED" Then
+                        btnDMCMSend.Enabled = False
+                    End If
+
+                    txtInvoiceNumber.Enabled = False
+                    ibtnSearchSalesInvoice.Visible = False
+                    ibtnClearRefNo.Visible = False
+
+
+                    ManageDetails("SOURCESITE", True)
+
+                    ManageDetails("EDITABLE", False)
+
+                    'ManagePaymentType("ENABLED", False)
+                Case eDocSaveState.ViewNoEdit
+                    ibtnViewDMCMs.Visible = False
+                    ibtnClearUnitPrice.Visible = False
+                    btnDMCMAddNew.Enabled = True
+                    btnDMCMPreview.Enabled = False
+                    btnDMCMSend.Enabled = False
+                    btnDMCMSave.Enabled = False
+                    btnDMCMPrint.Enabled = False
+                    btnDMCMCancel.Enabled = False
+
+                    'If DMCMDate = Now.Date AndAlso Status = "APPROVED" Then
+                    '    btnDMCMCancel.Enabled = True
+                    'Else
+                    '    btnDMCMCancel.Enabled = False
+                    'End If
+
+
+
+
+                    If Status = "APPROVED" Then
+                        'btnDMCMPreview.Enabled = True
+                        btnDMCMPrint.Enabled = True
+                    End If
+
+                    ManageDetails("EDITABLE", False)
+                    ManageDetails("SEARCHREFNO", False)
+                    ibtnClearRefNo.Visible = False
+
+                Case eDocSaveState.Edit
+                    'ibtnViewARs.Visible = False
+                    btnDMCMAddNew.Enabled = False
+                    btnDMCMSave.Enabled = True
+                    btnDMCMSend.Enabled = False
+                    btnDMCMSave.Text = "Update"
+                    btnDMCMPrint.Enabled = False
+                    btnDMCMCancel.Enabled = False
+                    ibtnViewDMCMs.Visible = False
+
+                    ManageDetails("EDITABLE", True)
+                    ManageDetails("SEARCHREFNO", False)
+                    ManageDetails("UNITPRICE", False)
+                    ddlMemoType.Enabled = False
+                    ManageDetails("OTHER FIELD", False)
+                    'ManageDetails("EDIT", True)
+                    'ManageDetails("SEARCHREFNO", True)
+                    'ManagePaymentType("ENABLED", True)
+                    'ibtnClearRefNo.Visible = False
+                    'ibtnClearSourceSite.Visible = False
+                    'ManageDetails("SOURCESITE", True)
+                Case eDocSaveState.AddNew
+
+                    btnDMCMAddNew.Enabled = False
+                    btnDMCMSave.Enabled = True
+                    btnDMCMSave.Text = "Save"
+                    btnDMCMPrint.Enabled = False
+                    btnDMCMSend.Enabled = False
+                    btnDMCMCancel.Enabled = False
+                    ibtnClearUnitPrice.Visible = False
+                    IsUnitPriceLocked = False
+                    ibtnClearUnitPrice.Visible = False
+                    ManageDetails("VATAMOUNTS", True)
+
+                    'ManagePaymentType("ENABLED", True)
+                Case eDocSaveState.Cancel
+                    'ibtnViewARs.Visible = True
+                    'btnAckReceiptAddNew.Enabled = True
+                    btnDMCMSave.Enabled = False
+                    'btnAckReceiptSave.Text = "Save"
+                    btnDMCMPrint.Enabled = False
+                    btnDMCMCancel.Enabled = False
+                    ManageDetails("EDITABLE", False)
+                    ManageDetails("OTHER FIELD", False)
+                    'ibtnSearchSalesInvoice.Visible = False
+                    'ibtnClearRefNo.Visible = False
+                    'ibtnVerifyWTax.Visible = False
+                    'ibtnVerifyDiscount.Visible = False
+                    'ibtnVerifyComm.Visible = False
+                    'ibtnClearWTax.Visible = False
+                    'ibtnClearDiscount.Visible = False
+                    'ibtnClearComm.Visible = False
+                    'ManageDetails("EDIT", False)
+                    'ManagePaymentType("ENABLED", False)
+                Case eDocSaveState.Print
+                    ibtnViewDMCMs.Visible = False
+                    ibtnClearUnitPrice.Visible = False
+                    btnDMCMAddNew.Enabled = True
+                    btnDMCMPreview.Enabled = False
+                    btnDMCMSend.Enabled = False
+                    btnDMCMSave.Enabled = False
+                    btnDMCMPrint.Enabled = False
+                    btnDMCMCancel.Enabled = False
+
+                    If Status = "PRINTED" Then
+                        'btnDMCMPreview.Enabled = True
+                        btnDMCMPrint.Enabled = True
+                    End If
+
+                    'If DMCMDate = Now.Date AndAlso Status = "PRINTED" Then
+                    '    btnDMCMCancel.Enabled = True
+                    'Else
+                    '    btnDMCMCancel.Enabled = False
+                    'End If
+
+                    ManageDetails("EDITABLE", False)
+                    ManageDetails("SEARCHREFNO", False)
+                    ibtnClearRefNo.Visible = False
+
+                    'ibtnViewARs.Visible = True
+                    'btnAckReceiptAddNew.Enabled = True
+                    'btnAckReceiptSave.Enabled = False
+                    'btnAckReceiptSave.Text = "Modify"
+                    'btnAckReceiptPrint.Enabled = True
+                    'ibtnSearchSalesInvoice.Visible = False
+                    'ibtnClearSourceSite.Visible = False
+                    'ibtnClearRefNo.Visible = False
+                    'ibtnVerifyWTax.Visible = False
+                    'ibtnVerifyDiscount.Visible = False
+                    'ibtnVerifyComm.Visible = False
+                    'ibtnClearWTax.Visible = False
+                    'ibtnClearDiscount.Visible = False
+                    'ibtnClearComm.Visible = False
+                    'If ARDate = Now.Date AndAlso ARPrintStatus = "PRINTED" Then
+                    'btnAckReceiptCancel.Enabled = True
+                    'Else
+                    'btnAckReceiptCancel.Enabled = False
+                    'End If
+                    'ManageDetails("EDIT", False)
+                    'ManagePaymentType("ENABLED", False)
+            End Select
+        End Set
+    End Property
+    Public Property InvoiceNumber As Long Implements prePayment.IPaymentDebitCreditMemo.InvoiceNumber
+        Get
+            Return cDataType.fLong.IfNull(txtInvoiceNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtInvoiceNumber.Text = ""
+            Else
+                txtInvoiceNumber.Text = value
+            End If
+        End Set
+    End Property
+    Public Property ReferenceNo As String Implements prePayment.IPaymentDebitCreditMemo.ReferenceNo
+        Get
+            Return cDataType.fString.IfNull(hdnReferenceNo.Value)
+        End Get
+        Set(value As String)
+            hdnReferenceNo.Value = value
+        End Set
+    End Property
+    Public Property BillStatNo As String Implements prePayment.IPaymentDebitCreditMemo.BillStatNo
+        Get
+            Return cDataType.fString.IfNull(txtBillStatNo.Text)
+        End Get
+        Set(value As String)
+            txtBillStatNo.Text = value
+        End Set
+    End Property
+    Public Property PreparedBy As String Implements prePayment.IPaymentDebitCreditMemo.PreparedBy
+        Get
+            Return cDataType.fString.IfNull(txtPreparedBy.Text)
+        End Get
+        Set(value As String)
+            txtPreparedBy.Text = value
+        End Set
+    End Property
+    Public Property OfficeName As String Implements prePayment.IPaymentDebitCreditMemo.OfficeName
+        Get
+            Return cDataType.fString.IfNull(txtOfficeName.Text)
+        End Get
+        Set(value As String)
+            txtOfficeName.Text = value
+        End Set
+    End Property
+    Public Property OfficeContact As String Implements prePayment.IPaymentDebitCreditMemo.OfficeContact
+        Get
+            Return cDataType.fString.IfNull(txtOfficeContact.Text)
+        End Get
+        Set(value As String)
+            txtOfficeContact.Text = value
+        End Set
+    End Property
+    Public Property OfficeAddr As String Implements prePayment.IPaymentDebitCreditMemo.OfficeAddr
+        Get
+            Return cDataType.fString.IfNull(txtOfficeAddr.Text)
+        End Get
+        Set(value As String)
+            txtOfficeAddr.Text = value
+        End Set
+    End Property
+    Public Property OfficeTin As String Implements prePayment.IPaymentDebitCreditMemo.OfficeTin
+        Get
+            Return cDataType.fString.IfNull(txtOfficeTin.Text)
+        End Get
+        Set(value As String)
+            txtOfficeTin.Text = value
+        End Set
+    End Property
+    Public Property PayorName As String Implements prePayment.IPaymentDebitCreditMemo.PayorName
+        Get
+            Return cDataType.fString.IfNull(txtPayorName.Text)
+        End Get
+        Set(value As String)
+            txtPayorName.Text = value
+        End Set
+    End Property
+
+    Public Property PayorAddress As String Implements prePayment.IPaymentDebitCreditMemo.PayorAddress
+        Get
+            Return cDataType.fString.IfNull(txtPayorAddress.Text)
+        End Get
+        Set(value As String)
+            txtPayorAddress.Text = value
+        End Set
+    End Property
+
+    Public Property PayorTIN As String Implements prePayment.IPaymentDebitCreditMemo.PayorTIN
+        Get
+            Return cDataType.fString.IfNull(txtPayorTin.Text)
+        End Get
+        Set(value As String)
+            txtPayorTin.Text = value
+        End Set
+    End Property
+
+
+    Public Property PolicyNumber As String Implements prePayment.IPaymentDebitCreditMemo.PolicyNumber
+        Get
+            Return cDataType.fString.IfNull(txtPolicyNumber.Text)
+        End Get
+        Set(value As String)
+            txtPolicyNumber.Text = value
+        End Set
+    End Property
+    Public Property Mode As String Implements prePayment.IPaymentDebitCreditMemo.Mode
+        Get
+            Return cDataType.fString.IfNull(txtMode.Text)
+        End Get
+        Set(value As String)
+            txtMode.Text = value
+        End Set
+    End Property
+    Public Property InvoiceDate() As Date Implements prePayment.IPaymentDebitCreditMemo.InvoiceDate
+        Get
+            Return cDataType.fDate.IfNull(txtInvoiceDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtInvoiceDate.Text = ""
+            Else
+                txtInvoiceDate.Text = value
+            End If
+        End Set
+    End Property
+    Public Property DMCMDate() As Date Implements prePayment.IPaymentDebitCreditMemo.DMCMDate
+        Get
+            Return cDataType.fDate.IfNull(txtDMCMDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtDMCMDate.Text = ""
+            Else
+                txtDMCMDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property EffectivityFrom As Date Implements prePayment.IPaymentDebitCreditMemo.EffectivityFrom
+        Get
+            Return cDataType.fDate.IfNull(txtEffectivityFrom.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtEffectivityFrom.Text = cDataType.fDate.Current
+            Else
+                txtEffectivityFrom.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property EffectivityTo As Date Implements prePayment.IPaymentDebitCreditMemo.EffectivityTo
+        Get
+            Return cDataType.fDate.IfNull(txtEffectivityTo.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtEffectivityTo.Text = cDataType.fDate.Current
+            Else
+                txtEffectivityTo.Text = value
+            End If
+        End Set
+    End Property
+    Public Property RenewalDate As Date Implements prePayment.IPaymentDebitCreditMemo.RenewalDate
+        Get
+            Return cDataType.fDate.IfNull(txtRenewalDate.Text)
+        End Get
+        Set(value As Date)
+            txtRenewalDate.Text = value
+        End Set
+    End Property
+    Public Property BillStatementDate As Date Implements prePayment.IPaymentDebitCreditMemo.BillStatementDate
+        Get
+            Return cDataType.fDate.IfNull(txtBillStatementDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtBillStatementDate.Text = cDataType.fDate.Current
+            Else
+                txtBillStatementDate.Text = value
+            End If
+        End Set
+    End Property
+    Public Property BillPeriodFrom As Date Implements prePayment.IPaymentDebitCreditMemo.BillPeriodFrom
+        Get
+            Return cDataType.fDate.IfNull(txtBillPeriodFrom.Text)
+        End Get
+        Set(value As Date)
+            txtBillPeriodFrom.Text = value
+        End Set
+    End Property
+    Public Property BillPeriodTo As Date Implements prePayment.IPaymentDebitCreditMemo.BillPeriodTo
+        Get
+            Return cDataType.fDate.IfNull(txtBillPeriodTo.Text)
+        End Get
+        Set(value As Date)
+            txtBillPeriodTo.Text = value
+        End Set
+    End Property
+    Public Property ViewSINumber As Long Implements prePayment.IPaymentDebitCreditMemo.ViewSINumber
+        Get
+            Return cDataType.fLong.IfNull(txtViewSINumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtViewSINumber.Text = Nothing
+            Else
+                txtViewSINumber.Text = value
+            End If
+        End Set
+    End Property
+    Public Property ViewSIFrom As Date Implements prePayment.IPaymentDebitCreditMemo.ViewSIFrom
+        Get
+            Return cDataType.fDate.IfNull(txtViewSIFromDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtViewSIFromDate.Text = cDataType.fDate.Current.AddMonths(-1)
+            Else
+                txtViewSIFromDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewSITo As Date Implements prePayment.IPaymentDebitCreditMemo.ViewSITo
+        Get
+            Return cDataType.fDate.IfNull(txtViewSIToDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtViewSIToDate.Text = cDataType.fDate.Current
+            Else
+                txtViewSIToDate.Text = value
+            End If
+        End Set
+    End Property
+    Public Property ViewSIReferenceNumber As String Implements prePayment.IPaymentDebitCreditMemo.ViewSIReferenceNumber
+        Get
+            Return cDataType.fString.IfNull(txtViewSIReferenceNo.Text)
+        End Get
+        Set(value As String)
+            txtViewSIReferenceNo.Text = value
+        End Set
+    End Property
+
+    Public Property ViewDMCMFrom As Date Implements prePayment.IPaymentDebitCreditMemo.ViewDMCMFrom
+        Get
+            Return cDataType.fDate.IfNull(txtViewDMCMFromDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtViewDMCMFromDate.Text = cDataType.fDate.Current.AddDays(-3)
+            Else
+                txtViewDMCMFromDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewDMCMTo As Date Implements prePayment.IPaymentDebitCreditMemo.ViewDMCMTo
+        Get
+            Return cDataType.fDate.IfNull(txtViewDMCMToDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtViewDMCMToDate.Text = cDataType.fDate.Current
+            Else
+                txtViewDMCMToDate.Text = value
+            End If
+        End Set
+    End Property
+    Public Property ViewDMCMNumber As Long Implements prePayment.IPaymentDebitCreditMemo.ViewDMCMNumber
+        Get
+            Return cDataType.fLong.IfNull(txtViewDMCMNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtViewDMCMNumber.Text = Nothing
+            Else
+                txtViewDMCMNumber.Text = value
+            End If
+        End Set
+    End Property
+    Public Property SourceType As String Implements prePayment.IPaymentDebitCreditMemo.SourceType
+        Get
+            Return cDataType.fString.IfNull(ddlSourceType.Text)
+        End Get
+        Set(ByVal value As String)
+            Select Case UCase(Trim(value))
+                Case "HMO"
+                    ddlSourceType.SelectedValue = "HMO"
+
+                Case Else
+                    ddlSourceType.SelectedValue = "SSO"
+            End Select
+        End Set
+    End Property
+
+    Public Property ViewDMCMBySINo As Long Implements prePayment.IPaymentDebitCreditMemo.ViewDMCMBySINo
+        Get
+            Return cDataType.fLong.IfNull(txtViewDMCMBySINo.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtViewDMCMBySINo.Text = Nothing
+            Else
+                txtViewDMCMBySINo.Text = value
+            End If
+        End Set
+    End Property
+    Public Property ViewDMCMByTransID As String Implements prePayment.IPaymentDebitCreditMemo.ViewDMCMByTransID
+        Get
+            Return cDataType.fString.IfNull(txtViewDMCMTransID.Text)
+        End Get
+        Set(value As String)
+            If value = cDataType.fString.Empty Then
+                txtViewDMCMTransID.Text = Nothing
+            Else
+                txtViewDMCMTransID.Text = value
+            End If
+        End Set
+    End Property
+
+
+
+    Public ReadOnly Property SiteIpAddr As String Implements preReport.IReport.SiteIpAddr
+        Get
+            Return Master.SiteIpAddr
+        End Get
+    End Property
+
+    Public ReadOnly Property SiteCode As Long Implements prePayment.IPaymentDebitCreditMemo.SiteCode, preReport.IReport.SiteCode
+        Get
+            Return Master.SiteID
+        End Get
+    End Property
+    Public ReadOnly Property RoleCode As String Implements prePayment.IPaymentDebitCreditMemo.RoleCode
+        Get
+            Return Master.RoleCode
+        End Get
+    End Property
+
+    Public ReadOnly Property UserID As Long Implements prePayment.IPaymentDebitCreditMemo.UserID, preReport.IReport.UserId
+        Get
+            Return Master.UserPrsPID
+        End Get
+    End Property
+    Public Property IsTransIDExisting As Boolean Implements prePayment.IPaymentDebitCreditMemo.IsTransIDExisting
+        Get
+            Return cDataType.fBoolean.IfNull(hdnARNoExisting.Value)
+        End Get
+        Set(ByVal value As Boolean)
+            hdnARNoExisting.Value = value
+        End Set
+    End Property
+    Public Property IsInvoiceNoExisting As Boolean Implements prePayment.IPaymentDebitCreditMemo.IsInvoiceNoExisting
+        Get
+            Return cDataType.fBoolean.IfNull(hdnInvoiceNoExisting.Value)
+        End Get
+        Set(ByVal value As Boolean)
+            hdnInvoiceNoExisting.Value = value
+        End Set
+    End Property
+
+    Public Property IsSuccessful As Boolean Implements prePayment.IPaymentDebitCreditMemo.IsSuccessful, preReport.IReport.IsSuccessful
+        Get
+            Return mIsSuccessful
+        End Get
+        Set(value As Boolean)
+            mIsSuccessful = value
+        End Set
+    End Property
+
+
+
+
+    Public Property ReservedDMCMID As Long Implements prePayment.IPaymentDebitCreditMemo.ReservedDMCMID
+        Get
+            Return cDataType.fString.IfNull(hdnReservedDMCMID.Value)
+        End Get
+        Set(value As Long)
+            hdnReservedDMCMID.Value = value
+        End Set
+    End Property
+    Public Property PrintCounter As Long Implements prePayment.IPaymentDebitCreditMemo.PrintCounter
+        Get
+            Return cDataType.fString.IfNull(hdnPrintCounter.Value)
+        End Get
+        Set(value As Long)
+            hdnPrintCounter.Value = value
+        End Set
+    End Property
+
+    Public Property ReceiptByCode As String Implements prePayment.IPaymentDebitCreditMemo.ReceiptByCode
+        Get
+            Return cDataType.fString.IfNull(hdnReceiptByCode.Value)
+        End Get
+        Set(value As String)
+            hdnReceiptByCode.Value = value
+        End Set
+    End Property
+    Public Property DMCMNumber As Long Implements prePayment.IPaymentDebitCreditMemo.DMCMNumber
+        Get
+            Return cDataType.fLong.IfNull(txtDMCMNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtDMCMNumber.Text = 0
+            Else
+                txtDMCMNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property DMCMTransNo As String Implements prePayment.IPaymentDebitCreditMemo.DMCMTransNo
+        Get
+            Return cDataType.fString.IfNull(txtDMCMTransNo.Text)
+        End Get
+        Set(value As String)
+            If value = cDataType.fString.Empty Then
+                txtDMCMTransNo.Text = "AUTO"
+            Else
+                txtDMCMTransNo.Text = value
+            End If
+        End Set
+    End Property
+    Public Property MemoType As String Implements prePayment.IPaymentDebitCreditMemo.MemoType
+        Get
+            Return cDataType.fString.IfNull(ddlMemoType.Text)
+        End Get
+        Set(value As String)
+            If value = "CREDIT MEMO" Then
+                ddlMemoType.Text = value
+            Else
+                ddlMemoType.Text = "DEBIT MEMO"
+            End If
+        End Set
+    End Property
+
+    Public Property DebitCreditID As Long Implements prePayment.IPaymentDebitCreditMemo.DebitCreditID
+        Get
+            Return cDataType.fLong.IfNull(hdnDebitCreditID.Value)
+        End Get
+        Set(value As Long)
+            hdnDebitCreditID.Value = value
+        End Set
+    End Property
+    Public Property Remarks As String Implements prePayment.IPaymentDebitCreditMemo.Remarks
+        Get
+            Return cDataType.fString.IfNull(txtDMCMRemarks.Text)
+        End Get
+        Set(value As String)
+            txtDMCMRemarks.Text = value
+            If value = cDataType.fString.Empty Then
+                txtDMCMRemarks.Text = ""
+            Else
+                txtDMCMRemarks.Text = value
+            End If
+        End Set
+    End Property
+    Public Property Reason As String Implements prePayment.IPaymentDebitCreditMemo.Reason
+        Get
+            Return cDataType.fString.IfNull(txtDMCMReason.Text)
+        End Get
+        Set(value As String)
+            txtDMCMReason.Text = value
+            If value = cDataType.fString.Empty Then
+                txtDMCMReason.Text = ""
+            Else
+                txtDMCMReason.Text = value
+            End If
+        End Set
+    End Property
+    Public Property IsPreview As Boolean Implements preReport.IReport.IsPreview
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsPreviewTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnIsPreviewTag.Value = value
+        End Set
+    End Property
+    Public Property Status() As String Implements prePayment.IPaymentDebitCreditMemo.Status
+        Get
+            Return cDataType.fString.IfNull(txtDMCMStatus.Text)
+        End Get
+        Set(value As String)
+            txtDMCMStatus.Text = value
+        End Set
+    End Property
+
+    Public Property BillingType As String Implements prePayment.IPaymentDebitCreditMemo.BillingType
+        Get
+            Return cDataType.fString.IfNull(ddlBillingType.Text)
+        End Get
+        Set(value As String)
+            ddlBillingType.Text = value
+        End Set
+    End Property
+    Public Property Approver As String Implements prePayment.IPaymentDebitCreditMemo.Approver
+        Get
+            Return cDataType.fString.IfNull(ddlApprover.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlApprover.SelectedValue = value
+        End Set
+    End Property
+    'taxes and amount 
+    Public Property IsUnitPriceLocked As Boolean Implements prePayment.IPaymentDebitCreditMemo.IsUnitPriceLocked
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsUnitPriceLocked.Value)
+        End Get
+        Set(value As Boolean)
+            If value Then
+                If DocSaveState = eReference.DocSaveState.AddNew Or DocSaveState = eReference.DocSaveState.Edit Then
+                    RaiseEvent CheckUnitPrice(Me, EventArgs.Empty)
+                    value = IsSuccessful
+                    UnitPrice = FormatNumber(UnitPrice, 2, TriState.True, TriState.True, TriState.True)
+                    If VATAmount = 0 Then
+                        ManageDetails("TAXES", False)
+                    Else
+                        ManageDetails("TAXES", True)
+                    End If
+
+                Else
+                    value = True
+                    'if true dito computation
+                End If
+            Else
+                TotalAmount = 0
+                VATable = 0
+                VATExempt = 0
+                VATAmount = 0
+                NonVAT = 0
+                TotalSales = 0
+                WitholdingTax = 0
+                NetOfWitholdingTax = 0
+                Discount = 0
+                DiscountID = ""
+            End If
+            hdnIsUnitPriceLocked.Value = value
+            ManageDetails("UNITPRICE", IsUnitPriceLocked)
+        End Set
+    End Property
+    Public Property UnitPrice As Decimal Implements prePayment.IPaymentDebitCreditMemo.UnitPrice
+        Get
+            Return cDataType.fDecimal.IfNull(txtUnitPrice.Text)
+        End Get
+        Set(value As Decimal)
+            txtUnitPrice.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            'If TotalSales = 0 Then
+            'TotalSales = GrossAmount
+            'End If
+        End Set
+    End Property
+
+    Public Property VATable As Decimal Implements prePayment.IPaymentDebitCreditMemo.VATable
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATable.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATable.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property VATExempt As Decimal Implements prePayment.IPaymentDebitCreditMemo.VATExempt
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATExempt.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATExempt.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property VATAmount As Decimal Implements prePayment.IPaymentDebitCreditMemo.VATAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property NonVAT As Decimal Implements prePayment.IPaymentDebitCreditMemo.NonVAT
+        Get
+            Return cDataType.fDecimal.IfNull(txtNonVAT.Text)
+        End Get
+        Set(value As Decimal)
+            txtNonVAT.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property TotalSales As Decimal Implements prePayment.IPaymentDebitCreditMemo.TotalSales
+        Get
+            Return cDataType.fDecimal.IfNull(txtTotalSales.Text)
+        End Get
+        Set(value As Decimal)
+            txtTotalSales.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property WitholdingTax As Decimal Implements prePayment.IPaymentDebitCreditMemo.WitholdingTax
+        Get
+            Return cDataType.fDecimal.IfNull(txtWitholdingTax.Text)
+        End Get
+        Set(value As Decimal)
+            txtWitholdingTax.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property NetOfWitholdingTax As Decimal Implements prePayment.IPaymentDebitCreditMemo.NetOfWitholdingTax
+        Get
+            Return cDataType.fDecimal.IfNull(txtNetOfWitholdingTax.Text)
+        End Get
+        Set(value As Decimal)
+            txtNetOfWitholdingTax.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property Discount As Decimal Implements prePayment.IPaymentDebitCreditMemo.Discount
+        Get
+            Return cDataType.fDecimal.IfNull(txtDiscount.Text)
+        End Get
+        Set(value As Decimal)
+            txtDiscount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+    Public Property DiscountID As String Implements prePayment.IPaymentDebitCreditMemo.DiscountID
+        Get
+            Return cDataType.fString.IfNull(txtDiscountIdNo.Text)
+        End Get
+        Set(value As String)
+            txtDiscountIdNo.Text = value
+        End Set
+    End Property
+    Public Property TotalAmount As Decimal Implements prePayment.IPaymentDebitCreditMemo.TotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtTotalAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtTotalAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+    Public Property Quantity As Long Implements prePayment.IPaymentDebitCreditMemo.Quantity
+        Get
+            Return cDataType.fLong.IfNull(txtQuantity.Text)
+        End Get
+        Set(value As Long)
+            txtQuantity.Text = value
+        End Set
+    End Property
+    Public Property Particulars As String Implements prePayment.IPaymentDebitCreditMemo.Particulars
+        Get
+            Return cDataType.fString.IfNull(txtParticulars.Text)
+        End Get
+        Set(value As String)
+            txtParticulars.Text = value
+        End Set
+    End Property
+    Public Property SISourceType As String Implements prePayment.IPaymentDebitCreditMemo.SISourcetype
+        Get
+            Return cDataType.fString.IfNull(hdnSISourceType.Value)
+        End Get
+        Set(value As String)
+            hdnSISourceType.Value = value
+        End Set
+    End Property
+
+#End Region 'Invoice Details
+
+#Region "DataTable"
+    Public WriteOnly Property dtViewDMCM As DataTable Implements prePayment.IPaymentDebitCreditMemo.dtViewDMCM
+        Set(value As DataTable)
+            gvwViewDMCM.DataSource = value
+            gvwViewDMCM.DataBind()
+        End Set
+    End Property
+
+
+    Public WriteOnly Property dtViewSI As DataTable Implements prePayment.IPaymentDebitCreditMemo.dtViewSI
+        Set(value As DataTable)
+            gvwViewSI.DataSource = value
+            gvwViewSI.DataBind()
+        End Set
+    End Property
+    Public WriteOnly Property dtBillingType As DataTable Implements prePayment.IPaymentDebitCreditMemo.dtBillingType
+        Set(value As DataTable)
+            value.DefaultView.Sort = "CODE ASC"
+            value = value.DefaultView.ToTable
+            Call SetDropDownList(ddlBillingType, value, "DESCRP", "DESCRP", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtApprover As DataTable Implements prePayment.IPaymentDebitCreditMemo.dtApprover
+        Set(value As DataTable)
+            Call SetDropDownList(ddlApprover, value, "USER_NAME", "SECPID", "-- SELECT APPROVER --", String.Empty)
+        End Set
+    End Property
+
+#End Region
+
+#End Region 'Property
+
+#Region "Event"
+    Public Event ClearScreenMain(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.ClearScreenMain
+    Public Event LoadSourceSite(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.LoadSourceSite
+    Public Event LoadCurrency(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.LoadCurrency
+    Public Event CheckSourceSite(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.CheckSourceSite
+    Public Event LoadViewSI(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.LoadViewSI
+    Public Event LoadDMCM(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.LoadDMCM
+    Public Event ClearScreenSIInfo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.ClearScreenSIInfo
+
+    Public Event LoadSalesInvoice(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.LoadSalesInvoice
+    Public Event LoadDebitCreditMemo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.LoadDebitCreditMemo
+    Public Event LoadViewDMCM(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.LoadViewDMCM
+    Public Event ConfirmSave(sender As Object, e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.ConfirmSave
+    Public Event ConfirmCancel(sender As Object, e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.ConfirmCancel
+    Public Event ConfirmSend(sender As Object, e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.ConfirmSend
+    Public Event LoadBillingType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.LoadBillingType
+    Public Event LoadApprover(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.LoadApprover
+    Public Event GenerateReport(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.GenerateReport
+    Public Event CheckUnitPrice(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.CheckUnitPrice
+    Public Event ClearScreenViewSI(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.ClearScreenViewSI
+
+
+
+    Public Event ProcessDebitCreditMemo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.ProcessDebitCreditMemo
+
+    'Public Event CheckGrossAmount(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.CheckGrossAmount
+
+
+    'Public Event LoadNewDMCM(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.LoadNewDMCM
+#End Region 'Event
+
+#End Region 'IPaymentDebitCreditMemo
+
+#Region "IReport"
+#Region "Properties"
+    Public Property ReportType() As eReport Implements preReport.IReport.ReportType
+        Get
+            Return cDataType.fString.IfNull(hdnReportType.Value)
+        End Get
+        Set(value As eReport)
+            hdnReportType.Value = value
+        End Set
+    End Property
+
+    Public Property RptParamString() As String Implements preReport.IReport.RptParamString
+        Get
+            Return Session(eSession.ReportParam)
+        End Get
+        Set(ByVal value As String)
+            Session(eSession.ReportParam) = value
+        End Set
+    End Property
+#End Region
+#Region "Event"
+
+    Public Event ClearScreenReport(sender As Object, e As EventArgs) Implements preReport.IReport.ClearScreenReport
+
+#End Region
+
+#End Region
+#Region "Event Handlers"
+
+
+#Region "Page"
+    Private Sub PaymentDebitCreditMemo_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Init
+        pSystemMessage = New preSecurity.PSystemMessage(Me)
+        pConfirmationMessage = New preMessages.PConfirmationMessage(Me)
+        pPaymentDebitCreditMemo = New prePayment.PPaymentDebitCreditMemo(Me)
+    End Sub
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        Page.MaintainScrollPositionOnPostBack = True
+
+        If Not IsPostBack Then
+            Call AddAttributes()
+            Call LoadReference()
+            Call ClearFields()
+            Call ManageMain(eDocSaveState.Initial)
+        End If
+    End Sub
+#End Region 'Page
+
+
+#Region "Button"
+    Protected Sub btnDMCMAddNew_Click(sender As Object, e As EventArgs) Handles btnDMCMAddNew.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+        'RaiseEvent LoadNewDMCM(Me, EventArgs.Empty)
+        Call SetDefaults()
+        DocSaveState = eDocSaveState.AddNew
+        'IsUnitPriceLocked = False
+
+        'upPaymentAckReceipt.Update()
+    End Sub
+    Private Sub btnConfirmYes_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnConfirmYes.Click
+        ConfirmClickState = True
+        mpeConfirm.Hide()
+
+        Call ClearSession()
+        Select Case ConfirmCaller
+            Case "CANCEL"
+                DocSaveState = eDocSaveState.Cancel
+                RaiseEvent ProcessDebitCreditMemo(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    'ReceiptById = UserID
+                    RaiseEvent LoadDebitCreditMemo(Me, EventArgs.Empty)
+                Else
+                    DocSaveState = eDocSaveState.ViewNoEdit
+                End If
+                Call SetModalSession(mpeConfirm, False, btnDMCMCancel)
+            Case "SAVE"
+                RaiseEvent ProcessDebitCreditMemo(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    'ReceiptById = UserID
+                    RaiseEvent LoadDebitCreditMemo(Me, EventArgs.Empty)
+                    DocSaveState = eDocSaveState.ViewEdit
+                End If
+            Case "SEND"
+                RaiseEvent ProcessDebitCreditMemo(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    'ReceiptById = UserID
+                    RaiseEvent LoadDebitCreditMemo(Me, EventArgs.Empty)
+                    DocSaveState = eDocSaveState.ViewNoEdit
+                End If
+            Case "PRINT"
+                'DocSaveState = eDocSaveState.Print
+                'RaiseEvent ProcessAcKReceipt(Me, EventArgs.Empty)
+                'If IsSuccessful Then
+                'ReceiptById = UserID
+                'RaiseEvent LoadAckReceipt(Me, EventArgs.Empty)
+                'Else
+                'DocSaveState = eDocSaveState.ViewNoEdit
+                'End If
+
+        End Select
+        upPaymentDebitCreditMemo.Update()
+    End Sub
+#End Region 'Button
+
+#Region "ImageButton"
+    Private Sub ibtnVerifyUnitPrice_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnVerifyUnitPrice.Click
+        IsUnitPriceLocked = True
+        ManageDetails("UNITPRICE", False)
+        'If IsUnitPriceLocked Then
+        'If Not PaymentTypeTag Then PaymentTypeTag = True
+        'End If
+    End Sub
+#End Region 'Image Button
+
+#Region "Radio Button"
+    Protected Sub radSelectViewDMCM_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.radSelectDMCM
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+        DebitCreditID = cDataType.fLong.IfNull(gvrSelect.Cells(1).Text.Trim)
+        'ReceiptByCode = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(7).Text.Trim))
+        'SourceSite = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(9).Text.Trim))
+        'txtPaymentTypeTotalAmount.Text = PaymentTotalAmount
+        RaiseEvent LoadDebitCreditMemo(Me, EventArgs.Empty)
+
+        'If ReceiptByCode <> Master.UserCode Then
+        'btnDMCMSave.Enabled = False
+        'btnDMCMPrint.Enabled = False
+        'btnDMCMCancel.Enabled = False
+        'End If
+        'Manage controls
+
+        Call SetModalSession(mpeViewDMCMs, False, ibtnViewDMCMs)
+        upPaymentDebitCreditMemo.Update()
+
+    End Sub
+
+    Protected Sub radSelectViewSI_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentDebitCreditMemo.radSelectSI
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        RaiseEvent ClearScreenSIInfo(Me, EventArgs.Empty)
+
+        InvoiceNumber = cDataType.fLong.IfNull(gvrSelect.Cells(1).Text.Trim)
+        'ReceiptByCode = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(9).Text.Trim))
+        'SourceSite = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(10).Text.Trim))
+
+        'DocSaveState = eReference.DocSaveState.ViewNoEdit
+        RaiseEvent LoadSalesInvoice(Me, EventArgs.Empty)
+        If IsInvoiceNoExisting Then
+            RaiseEvent ClearScreenViewSI(Me, EventArgs.Empty)
+            ManageDetails("SEARCHREFNO", False)
+            ManageDetails("UNITPRICE", True)
+            ibtnClearUnitPrice.Visible = False
+        Else
+            ManageDetails("SEARCHREFNO", True)
+            ManageDetails("UNITPRICE", False)
+            ibtnClearUnitPrice.Visible = True
+        End If
+
+        Call SetModalSession(mpeViewSIs, False, ibtnSearchSalesInvoice)
+        upPaymentDebitCreditMemo.Update()
+
+    End Sub
+
+
+#End Region
+
+#End Region 'Event Handlers
+
+#Region "Custom Method"
+#Region "Sub"
+    Private Sub AddAttributes()
+        Call SetFocusBlur(txtDMCMRemarks, eCSS.TextBoxInputTextArea2Focus, eCSS.TextBoxInputTextArea2)
+        ' -------------------------------------------------------------------------------
+        Call SetButtonPostBack(btnCancel)
+        'Call SetButtonPostBack(btnLoadViewAR)
+        'Call SetButtonPostBack(btnLoadViewSI)
+        'Call SetButtonPostBack(btnConfirmYes)
+        'Call SetButtonPostBack(btnCancelYes)
+        Call SetButtonPostBack(btnDMCMAddNew)
+        Call SetButtonPostBack(btnDMCMCancel)
+        ' -------------------------------------------------------------------------------        
+    End Sub
+
+
+    Private Sub SetFocusBlur(ByVal pTextBox As TextBox, ByVal pFocus As String, ByVal pBlur As String, Optional ByVal pDecimal As Integer? = Nothing)
+
+        Dim mOnBlurValue As String = pTextBox.Attributes.Item("onblur")
+        Dim mOnFocusValue As String = pTextBox.Attributes.Item("onfocus")
+
+        mOnBlurValue &= "DoBlur(this, '" & pBlur & "');"
+        mOnFocusValue &= "DoFocus(this, '" & pFocus & "');"
+
+        If Not IsNothing(pDecimal) Then
+            mOnBlurValue &= String.Concat("extractNumber(this,", pDecimal, ",false); javascript:this.value=Comma(this.value);")
+        End If
+
+        pTextBox.Attributes.Add("onfocus", mOnFocusValue)
+        pTextBox.Attributes.Add("onblur", mOnBlurValue)
+
+    End Sub
+    Private Sub ManageDetails(ByVal pAction As String, Optional ByVal pEnabled As Boolean? = Nothing)
+
+        Select Case pAction
+            Case "ENABLED"
+                pnlPaymentDetails1.Enabled = pEnabled
+                accInvoiceInformation.Visible = pEnabled
+                accParticulars.Visible = pEnabled
+                accVATComputation.Visible = pEnabled
+            Case "SEARCHREFNO"
+                txtInvoiceNumber.Enabled = pEnabled
+                ibtnSearchSalesInvoice.Visible = pEnabled
+                ibtnClearRefNo.Visible = Not pEnabled
+                'ibtnClearRefNo.Visible = pEnabled
+                'ibtnVerifyUnitPrice.Visible = False
+                'ibtnClearUnitPrice.Visible = False
+                'ddlPolicyType.Enabled = Not pEnabled
+            Case "UNITPRICE"
+                txtUnitPrice.Enabled = pEnabled
+                ibtnVerifyUnitPrice.Visible = pEnabled
+                ibtnClearUnitPrice.Visible = Not pEnabled
+            Case "SOURCESITE"
+                'txtUnitPrice.Enabled = Not pEnabled
+                'ibtnVerifyUnitPrice.Visible = Not pEnabled
+                'ibtnClearUnitPrice.Visible = pEnabled
+            Case "TAXES"
+                txtVATable.Enabled = pEnabled
+                txtVATExempt.Enabled = pEnabled
+                txtVATAmount.Enabled = pEnabled
+                txtNonVAT.Enabled = pEnabled
+                txtTotalSales.Enabled = pEnabled
+                txtWitholdingTax.Enabled = pEnabled
+                txtNetOfWitholdingTax.Enabled = pEnabled
+                txtDiscount.Enabled = pEnabled
+                txtDiscountIdNo.Enabled = pEnabled
+            Case "EDITABLE"
+                txtEffectivityFrom.Enabled = pEnabled
+                txtEffectivityTo.Enabled = pEnabled
+                txtRenewalDate.Enabled = pEnabled
+                txtBillPeriodFrom.Enabled = pEnabled
+                txtBillPeriodTo.Enabled = pEnabled
+                txtBillStatementDate.Enabled = pEnabled
+                ddlBillingType.Enabled = pEnabled
+                txtDMCMRemarks.Enabled = pEnabled
+                txtUnitPrice.Enabled = pEnabled
+                txtDMCMRemarks.Enabled = pEnabled
+                ddlMemoType.Enabled = pEnabled
+                txtPreparedBy.Enabled = pEnabled
+                ddlApprover.Enabled = pEnabled
+
+            Case "CUSTOM_EDIT"
+                txtDMCMTransNo.Enabled = pEnabled
+                txtInvoiceNumber.Enabled = pEnabled
+                ibtnSearchSalesInvoice.Visible = pEnabled
+                ddlMemoType.Enabled = pEnabled
+
+            Case "OTHER FIELD"
+                ibtnClearUnitPrice.Visible = pEnabled
+                txtInvoiceNumber.Enabled = pEnabled
+                ibtnSearchSalesInvoice.Visible = pEnabled
+
+            Case "EDIT"
+                'txtARRemarks.Enabled = pEnabled
+                'txtAROtherInfo.Enabled = pEnabled
+                'txtInvoiceNumber.Enabled = pEnabled
+                'ibtnSearchSalesInvoice.Visible = pEnabled
+                'ibtnClearSourceSite.Visible = pEnabled
+                'ibtnClearRefNo.Visible = pEnabled
+                'ibtnClearGrossAmount.Visible = pEnabled
+                'ibtnClearComm.Visible = pEnabled
+                'ibtnClearWTax.Visible = pEnabled
+                'ibtnClearDiscount.Visible = pEnabled
+                'ddlPolicyType.Enabled = pEnabled
+                'accPaymentTypeDetails.Enabled = pEnabled
+           
+            Case "VATAMOUNTS"
+                'txtWitholdingTax.Enabled = Not pEnabled
+                'txtDiscount.Enabled = Not pEnabled
+                'txtDiscountIdNo.Enabled = Not pEnabled
+                'txtCommissionAmount.Enabled = Not pEnabled
+                'ibtnVerifyWTax.Visible = Not pEnabled
+                'ibtnClearWTax.Visible = pEnabled
+                'ibtnVerifyDiscount.Visible = Not pEnabled
+                'ibtnClearDiscount.Visible = pEnabled
+                'ibtnVerifyComm.Visible = Not pEnabled
+                'ibtnClearComm.Visible = pEnabled
+                'IsWTaxLocked = pEnabled
+                'IsCommLocked = pEnabled
+                'IsDiscountLocked = pEnabled
+            Case "PARTICULARS"
+                'accARParticulars.Enabled = pEnabled
+            Case Else
+                'ddlSourceSite.Enabled = pEnabled
+
+        End Select
+
+    End Sub
+
+    Private Sub SetReportSessionScript(ByVal pReport As String)
+        If Session("script") = String.Empty Or Session("script") Is Nothing Then
+            Session("script") = "window.open('" + pReport + "','','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+            'Session("script") = "window.open('" + pReport + "','_blank','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+        Else
+            Session("script") = Session("script") & "window.open('" + pReport + "','','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+            'Session("script") = Session("script") & "window.open('" + pReport + "','_blank','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+        End If
+    End Sub
+    Private Sub ManageMain(ByVal pAction As Integer)
+        Select Case pAction
+            Case eDocSaveState.Initial
+                ManageDetails("ENABLED", False)
+                ManageDetails("UNITPRICE", False)
+                ManageDetails("TAXES", False)
+                'PaymentTypeTag = False
+            Case eDocSaveState.ViewNoEdit, eDocSaveState.ViewEdit, eDocSaveState.Print, eDocSaveState.Cancel
+                ManageDetails("ENABLED", True)
+                ManageDetails("PARTICULARS", False)
+                ManageDetails("SEARCHREFNO", True)
+                ManageDetails("TAXES", False)
+
+            Case eDocSaveState.AddNew
+                ManageDetails("ENABLED", True)
+                ManageDetails("EDITABLE", True)
+                ManageDetails("PARTICULARS", True)
+                ManageDetails("SEARCHREFNO", True)
+                ManageDetails("TAXES", False)
+
+            Case eDocSaveState.Edit
+                ManageDetails("ENABLED", True)
+                ManageDetails("SEARCHREFNO", False)
+                ManageDetails("PARTICULARS", True)
+                ManageDetails("TAXES", False)
+
+        End Select
+    End Sub
+    Private Sub LoadReference()
+        RaiseEvent LoadSourceSite(Me, EventArgs.Empty)
+        RaiseEvent LoadCurrency(Me, EventArgs.Empty)
+        RaiseEvent LoadBillingType(Me, EventArgs.Empty)
+        RaiseEvent LoadApprover(Me, EventArgs.Empty)
+        'RaiseEvent LoadPaymentType(Me, EventArgs.Empty)
+        'RaiseEvent LoadCancellationReason(Me, EventArgs.Empty)
+        'RaiseEvent LoadBankNetwork(Me, EventArgs.Empty)
+        'RaiseEvent LoadAccountType(Me, EventArgs.Empty)
+        'RaiseEvent LoadBankList(Me, EventArgs.Empty)
+        'RaiseEvent LoadECashPaymentChannel(Me, EventArgs.Empty)
+        'Call LoadSwipeTimes()
+    End Sub
+    Private Sub SetButtonPostBack(ByVal pButton As Button)
+        pButton.Attributes.Add("OnClick", "if(this.value === 'Processing...') { return false; } else { this.value = 'Processing...'; this.disabled = true; " + Page.ClientScript.GetPostBackEventReference(pButton, Nothing) + ";}")
+    End Sub
+
+    Private Sub ClearFields()
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub ClearSession()
+        Session(eSession.IsMessage) = Nothing
+        Session(eSession.Message) = Nothing
+        Session(eSession.MessageType) = Nothing
+        Session(eSession.Modal) = Nothing
+        Session(eSession.ReportParam) = Nothing
+    End Sub
+    Private Sub SetModalSession(ByVal pModal As AjaxControlToolkit.ModalPopupExtender, ByVal pShow As Boolean, ByVal pSetFocus As Object)
+        Session(eSession.Modal) = IIf(pShow, pModal.ID, Nothing)
+        If pShow Then
+            pModal.Show()
+        Else
+            pModal.Hide()
+        End If
+        'FOCUS Me.Page.SetFocus(pSetFocus)
+    End Sub
+
+    Private Sub SetDefaults()
+        'TODO: Put default values here!
+        'SourceSite = SiteCode
+    End Sub
+
+    Private Sub SetDropDownList(ByVal pDropDownList As DropDownList, ByVal pDataSource As DataTable, ByVal pDataTextField As String, _
+       ByVal pDataValueField As String, Optional ByVal pNewDataTextField As String = Nothing, Optional ByVal pNewDataValueField As String = Nothing)
+
+        With pDropDownList
+            .Items.Clear()
+            If Not IsNothing(pNewDataTextField) AndAlso Not IsNothing(pNewDataValueField) Then
+                If IsNothing(pNewDataTextField) Then pNewDataTextField = String.Empty
+                If IsNothing(pNewDataValueField) Then pNewDataValueField = String.Empty
+
+                .Items.Insert(0, New ListItem(pNewDataTextField, pNewDataValueField))
+            End If
+            .AppendDataBoundItems = True
+            If pDataSource.Rows.Count > 0 Then
+                .DataTextField = pDataTextField
+                .DataValueField = pDataValueField
+            End If
+            .DataSource = IIf(pDataSource.Rows.Count = 0, Nothing, pDataSource)
+            .DataBind()
+        End With
+
+    End Sub
+#End Region 'Sub
+#End Region 'Custom Method
+
+
+    Protected Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
+        Call ClearSession()
+        Response.Redirect(ePage.PaymentDebitCreditMemo, False)
+    End Sub
+
+    Protected Sub btnLoadViewSI_Click(sender As Object, e As EventArgs) Handles btnLoadViewSI.Click
+        dtViewSI = Nothing
+        RaiseEvent LoadViewSI(Me, EventArgs.Empty)
+        Call SetModalSession(mpeViewSIs, True, btnLoadViewSI)
+        upPaymentDebitCreditMemo.Update()
+    End Sub
+
+    Protected Sub ibtnSearchSalesInvoice_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchSalesInvoice.Click
+        'ReferenceNo = InvoiceNumber
+        'ReceiptByCode = UserID
+        'SourceSite = SiteCode
+
+        RaiseEvent LoadSalesInvoice(Me, EventArgs.Empty)
+        If IsInvoiceNoExisting Then
+            ManageDetails("SEARCHREFNO", False)
+            ManageDetails("UNITPRICE", True)
+        Else
+            ManageDetails("UNITPRICE", False)
+        End If
+        Call SetModalSession(mpeViewSIs, False, ibtnSearchSalesInvoice)
+        upPaymentDebitCreditMemo.Update()
+    End Sub
+
+    Protected Sub ibtnViewDMCMs_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnViewDMCMs.Click
+     
+    End Sub
+
+    Protected Sub btnLoadViewDMCM_Click(sender As Object, e As EventArgs) Handles btnLoadViewDMCM.Click
+        dtViewDMCM = Nothing
+        RaiseEvent LoadViewDMCM(Me, EventArgs.Empty)
+        Call SetModalSession(mpeViewDMCMs, True, btnLoadViewDMCM)
+        upPaymentDebitCreditMemo.Update()
+    End Sub
+
+    Protected Sub btnDMCMSave_Click(sender As Object, e As EventArgs) Handles btnDMCMSave.Click
+        Select Case DocSaveState
+            Case eDocSaveState.ViewEdit
+                ManageMain(DocSaveState)
+                DocSaveState = eReference.DocSaveState.Edit
+
+                'IsSourceSiteLocked = True
+                'IsGrossAmountLocked = True
+            Case eDocSaveState.AddNew, eDocSaveState.Edit
+
+                RaiseEvent ConfirmSave(Me, EventArgs.Empty)
+        End Select
+    End Sub
+
+    Protected Sub btnDMCMCancel_Click(sender As Object, e As EventArgs) Handles btnDMCMCancel.Click
+        RaiseEvent ConfirmCancel(Me, EventArgs.Empty)
+    End Sub
+
+    
+
+    Protected Sub btnDMCMSend_Click(sender As Object, e As EventArgs) Handles btnDMCMSend.Click
+        Select Case DocSaveState
+            Case eDocSaveState.ViewEdit
+                ManageMain(DocSaveState)
+                RaiseEvent ConfirmSend(Me, EventArgs.Empty)
+        End Select
+
+    End Sub
+
+    Protected Sub ibtnClearRefNo_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearRefNo.Click
+        Call ClearSession()
+        ManageDetails("SEARCHREFNO", True)
+        IsUnitPriceLocked = False
+        ManageDetails("UNITPRICE", False)
+        ibtnClearUnitPrice.Visible = False
+
+
+        RaiseEvent ClearScreenSIInfo(Me, EventArgs.Empty)
+        upPaymentDebitCreditMemo.Update()
+    End Sub
+
+    Protected Sub btnDMCMPreview_Click(sender As Object, e As EventArgs) Handles btnDMCMPreview.Click
+        Call ClearSession()
+        IsPreview = True
+        ReportType = eReport.ReceiptDMCMPreview
+        RaiseEvent GenerateReport(Me, EventArgs.Empty)
+        If IsSuccessful Then
+            SetReportSessionScript(ePage.RptReceiptDMCMPreview)
+            ScriptManager.RegisterStartupScript(sender, GetType(String), "OPEN_WINDOW", Session("script"), True)
+            Session("script") = String.Empty
+            RaiseEvent ProcessDebitCreditMemo(Me, EventArgs.Empty)
+        End If
+    End Sub
+
+    Protected Sub btnDMCMPrint_Click(sender As Object, e As EventArgs) Handles btnDMCMPrint.Click
+        Select Case DocSaveState
+            Case eDocSaveState.ViewNoEdit, eDocSaveState.Print
+                ManageMain(DocSaveState)
+                DocSaveState = eReference.DocSaveState.Print
+                Call ClearSession()
+                IsPreview = False
+                ReportType = eReport.ReceiptDMCM
+                RaiseEvent GenerateReport(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    SetReportSessionScript(ePage.RptReceiptDMCM)
+                    ScriptManager.RegisterStartupScript(sender, GetType(String), "OPEN_WINDOW", Session("script"), True)
+                    Session("script") = String.Empty
+                End If
+        End Select
+
+
+
+      
+
+    End Sub
+
+    Protected Sub ibtnClearUnitPrice_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearUnitPrice.Click
+        ManageDetails("TAXES", False)
+        UnitPrice = 0
+        IsUnitPriceLocked = False
+        'hdnIsUnitPriceLocked.Value = False
+        ManageDetails("UNITPRICE", True)
+
+
+    End Sub
+
+    Protected Sub txtBillStatNo_TextChanged(sender As Object, e As EventArgs) Handles txtBillStatNo.TextChanged
+
+    End Sub
+
+    Protected Sub gvwViewDMCM_SelectedIndexChanged(sender As Object, e As EventArgs) Handles gvwViewDMCM.SelectedIndexChanged
+
+    End Sub
+End Class

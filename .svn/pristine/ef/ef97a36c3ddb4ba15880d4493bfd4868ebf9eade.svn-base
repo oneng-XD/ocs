@@ -1,0 +1,415 @@
+﻿#Region "Description"
+' PAGE NAME     : Payment Check Tagging
+' CREATED BY    : EJ 
+' CREATED DATE  : 10/24/2018
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports eSystemMessage = Cocolife.Utility.Common.Enums.eSystemMessage
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports preSecurity = Cocolife.Presenter.Common.Security
+Imports preMessages = Cocolife.Utility.OCS.Messages
+Imports bllReference = Cocolife.BLL.OCS.Reference
+Imports bllPayment = Cocolife.BLL.OCS.Payment
+Imports bllWorking = Cocolife.BLL.OCS.Working
+Imports eReference = Cocolife.Utility.OCS.Enums.eReference
+Imports eReport = Cocolife.Utility.OCS.Enums.eReport
+Imports Cocolife.Utility.OCS.Classes
+#End Region
+
+Namespace Payment
+
+    Public Class PPaymentCheckTagging
+
+#Region "Implements"
+
+#End Region
+
+#Region "Variables"
+        Private vwSysMsg As preSecurity.ISystemMessage
+        Private vwConfirmation As preMessages.IConfirmationMessage
+        Private vwPaymentCheckTagging As Payment.IPaymentCheckTagging
+#End Region
+
+#Region "Properties"
+
+#End Region
+
+#Region "Constructor"
+
+        Sub New()
+
+        End Sub
+
+        Sub New(ByVal pView As Payment.IPaymentCheckTagging)
+
+            vwSysMsg = pView
+            vwConfirmation = pView
+            vwPaymentCheckTagging = pView
+
+            With vwPaymentCheckTagging
+                AddHandler .ClearScreenMain, AddressOf ClearScreenMain
+                AddHandler .ClearScreenTagging, AddressOf ClearScreenTagging
+                AddHandler .ClearScreenSearch, AddressOf ClearScreenSearch
+                ' ---------------------------------------------------------------------
+                AddHandler .LoadTransactionType, AddressOf LoadTransactionType
+                AddHandler .LoadStatus, AddressOf LoadStatus
+                AddHandler .LoadForDeposit, AddressOf LoadForDeposit
+                AddHandler .LoadForClearing, AddressOf LoadForClearing
+                AddHandler .LoadForReDeposit, AddressOf LoadForRedeposit
+                AddHandler .ConfirmSave, AddressOf ConfirmSave
+                ' ---------------------------------------------------------------------
+                AddHandler .ProcessTagging, AddressOf ProcessTagging
+            End With
+
+        End Sub
+
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Validations"
+        Private Function isValidSearch() As Boolean
+            Try
+                With vwPaymentCheckTagging
+                    If .SearchFromDate <> cDataType.fDate.Empty _
+                    Or .SearchToDate <> cDataType.fDate.Empty Then
+                        If .SearchFromDate > .SearchToDate Then
+                            Call SetMessage("Search Date From exceeds Date To.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        Select Case .SearchFromDate
+                            Case cDataType.fDate.Empty
+                                Call SetMessage("Please enter Date From.", eSystemMessage.Warning, True)
+                                Return False
+                            Case cDataType.fDate.Invalid
+                                Call SetMessage("Invalid Date From.", eSystemMessage.Warning, True)
+                                Return False
+                            Case Is < cDataType.fDate.Minimum
+                                Call SetMessage("Search Date From precedes minimum date.", eSystemMessage.Warning, True)
+                                Return False
+                            Case Is > cDataType.fDate.Current
+                                Call SetMessage("Search Date From exceeds current date.", eSystemMessage.Warning, True)
+                                Return False
+                        End Select
+
+                        Select Case .SearchToDate
+                            Case cDataType.fDate.Empty
+                                Call SetMessage("Please enter Date To.", eSystemMessage.Warning, True)
+                                Return False
+                            Case cDataType.fDate.Invalid
+                                Call SetMessage("Invalid Date To.", eSystemMessage.Warning, True)
+                                Return False
+                            Case Is < cDataType.fDate.Minimum
+                                Call SetMessage("Search Date To precedes minimum date.", eSystemMessage.Warning, True)
+                                Return False
+                            Case Is > cDataType.fDate.Current
+                                Call SetMessage("Search Date To exceeds current date.", eSystemMessage.Warning, True)
+                                Return False
+                        End Select
+                    End If
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidSearch : ", ex.Message))
+            End Try
+        End Function
+
+        Private Function IsValidTagging() As Boolean
+            Try
+                With vwPaymentCheckTagging
+                    If .TaggingCheckList.AsEnumerable.Count = 0 Then
+                        Call SetMessage("Please mark at least one check.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    Select Case .TaggingType
+                        Case 1, 3
+                            Select Case .TaggingDepositDate
+                                Case cDataType.fDate.Empty
+                                    Call SetMessage("Please enter deposit date.", eSystemMessage.Warning, True)
+                                    Return False
+                                Case cDataType.fDate.Invalid
+                                    Call SetMessage("Invalid deposit date.", eSystemMessage.Warning, True)
+                                    Return False
+                                Case Is < cDataType.fDate.Minimum
+                                    Call SetMessage("Deposit date precedes minimum date.", eSystemMessage.Warning, True)
+                                    Return False
+                                Case Is > cDataType.fDate.Current
+                                    Call SetMessage("Deposit date exceeds current date.", eSystemMessage.Warning, True)
+                                    Return False
+                            End Select
+                        Case 2
+                            Select Case .TaggingClearingDate
+                                Case cDataType.fDate.Empty
+                                    Call SetMessage("Please enter clearing date.", eSystemMessage.Warning, True)
+                                    Return False
+                                Case cDataType.fDate.Invalid
+                                    Call SetMessage("Invalid clearing date.", eSystemMessage.Warning, True)
+                                    Return False
+                                Case Is < cDataType.fDate.Minimum
+                                    Call SetMessage("Clearing date precedes minimum date.", eSystemMessage.Warning, True)
+                                    Return False
+                                Case Is > cDataType.fDate.Current
+                                    Call SetMessage("Clearing date exceeds current date.", eSystemMessage.Warning, True)
+                                    Return False
+                            End Select
+
+                            If .TaggingClearingStatusId <= 1 Then
+                                Call SetMessage("Please select clearing status.", eSystemMessage.Warning, True)
+                                Return False
+                            End If
+                    End Select
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidTagging : ", ex.Message))
+            End Try
+        End Function
+
+        Private Function IsValidForProcessing(ByVal pDocNumber As Long) As Boolean
+            Try
+                With vwPaymentCheckTagging
+                    Dim objBll As New BLL.OCS.Reference.BOprDetails
+
+                    If Not objBll.IsOprProcessed(pDocNumber) Then
+                        Return True
+                    Else
+                        Call SetMessage(String.Concat("Check Clearing .<br /><br />", "Update not allowed!<br />Payment was already processed, please reverse via Debit/Credit Memo.<br /><br />"), eSystemMessage.Information, True)
+                        Return False
+                    End If
+                End With
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidForProcessing : ", ex.Message))
+            End Try
+        End Function
+#End Region
+
+#Region "Transactions"
+
+        Private Sub ClearScreenMain(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Call ClearScreenTagging(sender, e)
+                Call ClearScreenCheckDetails(sender, e)
+                vwPaymentCheckTagging.dtCheckList = New DataTable
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenMain.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ClearScreenCheckDetails(ByVal sender As Object, ByVal ee As EventArgs)
+            Try
+                With vwPaymentCheckTagging
+                    .CheckAmount = cDataType.fDecimal.Empty
+                    .CheckBankBranch = cDataType.fString.Empty
+                    .CheckBankName = cDataType.fString.Empty
+                    .CheckNumber = cDataType.fLong.Empty
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenCheckDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ClearScreenTagging(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                With vwPaymentCheckTagging
+                    .TaggingEditId = cDataType.fLong.Empty
+                    .TaggingDepositDate = cDataType.fDate.Empty
+                    .TaggingClearingDate = cDataType.fDate.Empty
+                    .TaggingClearingStatusId = cDataType.fInteger.Empty
+                    '.TaggingRemarks = cDataType.fString.Empty
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenTagging.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ClearScreenSearch(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                With vwPaymentCheckTagging
+                    .SearchFromDate = cDataType.fDate.Empty
+                    .SearchToDate = cDataType.fDate.Empty
+                    .SearchReceiptNumber = cDataType.fLong.Empty
+                    .SearchCheckNumber = cDataType.fLong.Empty
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenSearch.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        ' -------------------------------------------------------------------------------
+        Private Sub LoadTransactionType(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim objBLL As New bllReference.BParamRef
+                vwPaymentCheckTagging.dtTransactionType = objBLL.GetRefTRNTYP_TAGGING
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadTransactionType.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub LoadStatus(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Dim objBLL As New bllReference.BParamRef
+                vwPaymentCheckTagging.dtStatus = objBLL.GetRefTAGGING_STATUS
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadStatus.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub LoadForDeposit(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Dim objBLL As New bllWorking.BSiteOPRChkPy
+                Dim dtLocal As New DataTable
+                With vwPaymentCheckTagging
+                    .IsSuccessful = False
+
+                    If isValidSearch() Then
+                        dtLocal = objBLL.GetForDeposit(.SiteCode, .SearchReceiptNumber, .SearchCheckNumber, .SearchFromDate, .SearchToDate)
+                        .dtCheckList = dtLocal
+
+                        .IsSuccessful = True
+                    End If
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadForDeposit.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub LoadForClearing(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Dim objBLL As New bllWorking.BSiteOPRChkPy
+                Dim dtLocal As New DataTable
+                With vwPaymentCheckTagging
+                    .IsSuccessful = False
+
+                    If isValidSearch() Then
+                        dtLocal = objBLL.GetForClearing(.SiteCode, .SearchReceiptNumber, .SearchCheckNumber, .SearchFromDate, .SearchToDate)
+                        .dtCheckList = dtLocal
+
+                        .IsSuccessful = True
+                    End If
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadForClearing.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub LoadForReDeposit(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Dim objBLL As New bllWorking.BSiteOPRChkPy
+                Dim dtLocal As New DataTable
+                With vwPaymentCheckTagging
+                    .IsSuccessful = False
+
+                    If isValidSearch() Then
+                        dtLocal = objBLL.GetForReDeposit(.SiteCode, .SearchReceiptNumber, .SearchCheckNumber, .SearchFromDate, .SearchToDate)
+                        .dtCheckList = dtLocal
+
+                        .IsSuccessful = True
+                    End If
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadForReDeposit.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ConfirmSave(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                With vwConfirmation
+                    .ConfirmCaller = "SAVE"
+                    If IsValidTagging() Then
+                        .Message = String.Concat("Are you sure you want to save?")
+                        .isMessage = True
+                    End If
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ConfirmSave.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ProcessTagging(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Dim objBll As New bllPayment.BPaymentCheckTagging
+                Dim lstCheckTagging As New List(Of Object)
+
+                With vwPaymentCheckTagging
+                    .IsSuccessful = False
+
+                    If IsValidTagging() Then
+
+                        For Each item As cCheckTagging In .TaggingCheckList
+                            Select Case .TaggingType
+                                Case 1
+                                    If item.TaggingRemarks.ToString.ToUpper.IndexOf("REDEPOSIT") = -1 Then
+                                        lstCheckTagging.Add(New bllWorking.BSiteOPRChkPy(item.TaggingEditId, item.ReceiptNo, item.CheckNumber, item.CheckBankName, item.CheckBankBranch, item.CheckAmount, item.CheckLineNumber, item.CheckOTCFlag, .TaggingDepositDate, .TaggingClearingDate, 1, item.TaggingRemarks, item.StatusId, item.PostBy, item.PostDate, item.LastUpdateBy, item.LastUpdate))
+                                    ElseIf .TaggingDepositDate >= item.TaggingDepositDate Then
+                                        lstCheckTagging.Add(New bllWorking.BSiteOPRChkPy(item.TaggingEditId, item.ReceiptNo, item.CheckNumber, item.CheckBankName, item.CheckBankBranch, item.CheckAmount, item.CheckLineNumber, item.CheckOTCFlag, .TaggingDepositDate, .TaggingClearingDate, 1, item.TaggingRemarks, item.StatusId, item.PostBy, item.PostDate, item.LastUpdateBy, item.LastUpdate))
+                                    Else
+                                        Call SetMessage("Some checks were not tagged<br /><br />Redeposit Date preceeds deposit date.<br /><br />", eSystemMessage.Information, True)
+                                    End If
+                                Case 2
+                                    If .TaggingClearingDate >= item.TaggingDepositDate Then
+                                        If IsValidForProcessing(item.ReceiptNo) Then
+                                            lstCheckTagging.Add(New bllWorking.BSiteOPRChkPy(item.TaggingEditId, item.ReceiptNo, item.CheckNumber, item.CheckBankName, item.CheckBankBranch, item.CheckAmount, item.CheckLineNumber, item.CheckOTCFlag, item.TaggingDepositDate, .TaggingClearingDate, .TaggingClearingStatusId, item.TaggingRemarks, item.StatusId, item.PostBy, item.PostDate, item.LastUpdateBy, item.LastUpdate))
+                                        End If
+                                    Else
+                                        Call SetMessage("Some checks were not tagged<br /><br />Clearing Date preceeds deposit date.<br /><br />", eSystemMessage.Information, True)
+                                    End If
+                                Case 3
+                                    If .TaggingDepositDate < item.TaggingDepositDate Then
+                                        Call SetMessage("Some checks were not tagged<br /><br />Redeposit Date preceeds deposit date.<br /><br />", eSystemMessage.Information, True)
+                                    ElseIf item.TaggingRemarks.ToString.ToUpper.IndexOf("REDEPOSIT") <> -1 Then
+                                        Call SetMessage("Some checks were not tagged<br /><br />Check cannot be redeposited more than once.<br /><br />", eSystemMessage.Information, True)
+                                    Else
+                                        lstCheckTagging.Add(New bllWorking.BSiteOPRChkPy(item.TaggingEditId, item.ReceiptNo, item.CheckNumber, item.CheckBankName, item.CheckBankBranch, item.CheckAmount, item.CheckLineNumber, item.CheckOTCFlag, .TaggingDepositDate, cDataType.fDate.Empty, eReference.Status.Active, String.Concat("REDEPOSIT: ", item.TaggingClearingStatus), item.StatusId, item.PostBy, item.PostDate, item.LastUpdateBy, item.LastUpdate))
+                                    End If
+                            End Select
+                        Next
+
+                        objBll.SiteOprCheck = lstCheckTagging
+                        objBll.TagCheck()
+
+                        .IsSuccessful = objBll.IsSuccessful
+
+                    End If
+                End With
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ProcessTagging.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub SetMessage(ByVal pMessage As String, ByVal pMessageType As String, ByVal pIsMessage As Boolean)
+
+            Try
+                With vwSysMsg
+                    .Message = pMessage
+                    .MessageType = pMessageType
+                    .isMessage = pIsMessage
+                End With
+            Catch ex As Exception
+                Throw
+            End Try
+
+        End Sub
+
+#End Region
+
+    End Class
+
+End Namespace
+

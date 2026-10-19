@@ -1,0 +1,341 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1F5FEDDA-CCAD-42D2-B189-6B5F4ECB96A2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Cocolife.BLL.OCS</RootNamespace>
+    <AssemblyName>bllOCS</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionStrict>Off</OptionStrict>
+    <OptionInfer>On</OptionInfer>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>bllOCS.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>bllOCS.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="bllCommon, Version=5.4.0.302, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\OUTRE-PROD\COM_NET35\_Published\bllCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="dalCommon, Version=4.1.59.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\OUTRE-PROD\COM_NET35\_Published\dalCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.0.5022.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\Microsoft.Office.Interop.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Vbe.Interop, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\Microsoft.Vbe.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\office.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="utiCommon, Version=6.1.209.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\OUTRE-PROD\COM_NET35\_Published\utiCommon.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Business\Maintenance\BSiteOprSeries.vb" />
+    <Compile Include="Business\Person\BAgnMas.vb" />
+    <Compile Include="Business\Person\BPrsMas.vb" />
+    <Compile Include="Business\Person\BSecRef.vb" />
+    <Compile Include="Business\Reference\BBankDetails.vb" />
+    <Compile Include="Business\Reference\BColumbary.vb" />
+    <Compile Include="Business\Reference\BDebitCreditMemo.vb" />
+    <Compile Include="Business\Reference\BMerchantSite.vb" />
+    <Compile Include="Business\Reference\BNGIBillingDetails.vb" />
+    <Compile Include="Business\Reference\BOrDetails.vb" />
+    <Compile Include="Business\Reference\BTrnRef.vb" />
+    <Compile Include="Business\Reference\BGpaDetails.vb" />
+    <Compile Include="Business\Reference\BPrsRef.vb" />
+    <Compile Include="Business\Reference\BSiteDetails.vb" />
+    <Compile Include="Business\Reference\BOprDetails.vb" />
+    <Compile Include="Business\Reference\BHMOPayslip.vb" />
+    <Compile Include="Business\Reference\BSalesInvoice.vb" />
+    <Compile Include="Business\Staging\BAckReceipt.vb" />
+    <Compile Include="Business\Search\BSearch.vb" />
+    <Compile Include="Business\Reference\BFrqPay.vb" />
+    <Compile Include="Business\Reference\BParamRef.vb" />
+    <Compile Include="Business\Reference\BMetPay.vb" />
+    <Compile Include="Business\Reference\BCurRef.vb" />
+    <Compile Include="Business\Staging\BDebitCredit.vb" />
+    <Compile Include="Business\Staging\BNewgenLifePayment.vb" />
+    <Compile Include="Business\Staging\BStgOPRAPRPy.vb" />
+    <Compile Include="Business\Staging\BStgOPRChkPy.vb" />
+    <Compile Include="Business\Staging\BStgOPRCred.vb" />
+    <Compile Include="Business\Staging\BStgOPRDebit.vb" />
+    <Compile Include="Business\Staging\BStgOPRDtl.vb" />
+    <Compile Include="Business\Staging\BStgOPRHeader.vb" />
+    <Compile Include="Business\Staging\BStgOPRInfo.vb" />
+    <Compile Include="Business\Staging\BStgOPRVAT.vb" />
+    <Compile Include="Business\Staging\BStgORAPRPay.vb" />
+    <Compile Include="Business\Staging\BStgORChkPay.vb" />
+    <Compile Include="Business\Staging\BStgORDtl.vb" />
+    <Compile Include="Business\Staging\BStgORHeader.vb" />
+    <Compile Include="Business\Staging\BStgORPart.vb" />
+    <Compile Include="Business\Staging\BStgORVAT.vb" />
+    <Compile Include="Business\Staging\BStgPAMaster.vb" />
+    <Compile Include="Business\Staging\BStgTmpTrn.vb" />
+    <Compile Include="Business\Staging\BARPayDetails.vb" />
+    <Compile Include="Business\Working\BSiteOPRAPRPy.vb" />
+    <Compile Include="Business\Working\BSiteOPRChkPy.vb" />
+    <Compile Include="Business\Working\BSiteOPRCred.vb" />
+    <Compile Include="Business\Working\BSiteOPRDebit.vb" />
+    <Compile Include="Business\Working\BSiteOPRDtl.vb" />
+    <Compile Include="Business\Working\BSiteOPRHeader.vb" />
+    <Compile Include="Business\Working\BSiteOPRInfo.vb" />
+    <Compile Include="Business\Working\BSiteOPRVAT.vb" />
+    <Compile Include="Business\Working\BSiteORAPRPay.vb" />
+    <Compile Include="Business\Working\BSiteORChkPay.vb" />
+    <Compile Include="Business\Working\BSiteORColDtl.vb" />
+    <Compile Include="Business\Working\BSiteORDtl.vb" />
+    <Compile Include="Business\Working\BSiteORHeader.vb" />
+    <Compile Include="Business\Working\BSiteORPart.vb" />
+    <Compile Include="Business\Working\BSiteORVAT.vb" />
+    <Compile Include="Business\Working\BGpaProcess.vb" />
+    <Compile Include="Business\Working\BSiteTmpTrn.vb" />
+    <Compile Include="Business\Working\BReceiptCounter.vb" />
+    <Compile Include="Business\Working\BSiteBatchDtl.vb" />
+    <Compile Include="Business\Working\BSiteBatch.vb" />
+    <Compile Include="Business\Working\BPrintReceipt.vb" />
+    <Compile Include="Business\Working\BSiteOPRECash.vb" />
+    <Compile Include="Business\_Modules\BPaymentDebitCreditMemo.vb" />
+    <Compile Include="Business\_Modules\BPaymentDMCMApproval.vb" />
+    <Compile Include="Business\_Modules\BPaymentNonPremiumRelated.vb" />
+    <Compile Include="Business\_Modules\BPaymentPremiumRelated.vb" />
+    <Compile Include="Business\_Modules\BDailyCollectionReport.vb" />
+    <Compile Include="Business\_Modules\BPaymentBatchPremiumRelated.vb" />
+    <Compile Include="Business\_Modules\BMaintOfficialReceipt.vb" />
+    <Compile Include="Business\_Modules\BMaintAgentsORSeries.vb" />
+    <Compile Include="Business\_Modules\BPaymentCheckTagging.vb" />
+    <Compile Include="Business\_Modules\BPaymentSalesInvoice.vb" />
+    <Compile Include="Business\_Modules\BPaymentAckReceipt.vb" />
+    <Compile Include="Interface\Maintenance\ISiteOprSeries.vb" />
+    <Compile Include="Interface\Person\IAgnMas.vb" />
+    <Compile Include="Interface\Person\IPrsMas.vb" />
+    <Compile Include="Interface\Person\ISecRef.vb" />
+    <Compile Include="Interface\Reference\IDebitCreditMemo.vb" />
+    <Compile Include="Interface\Staging\IARPayDetails.vb" />
+    <Compile Include="Interface\Staging\IAckReceipt.vb" />
+    <Compile Include="Interface\Reference\ISalesInvoice.vb" />
+    <Compile Include="Interface\Reference\IHMOPayslip.vb" />
+    <Compile Include="Interface\Reference\IBankDetails.vb" />
+    <Compile Include="Interface\Reference\IColumbary.vb" />
+    <Compile Include="Interface\Reference\IMerchantSite.vb" />
+    <Compile Include="Interface\Reference\IFrqPay.vb" />
+    <Compile Include="Interface\Reference\IMetPay.vb" />
+    <Compile Include="Interface\Reference\ICurRef.vb" />
+    <Compile Include="Interface\Reference\INGIBillingDetails.vb" />
+    <Compile Include="Interface\Reference\IOrDetails.vb" />
+    <Compile Include="Interface\Reference\IParamRef.vb" />
+    <Compile Include="Interface\Reference\ITrnRef.vb" />
+    <Compile Include="Interface\Reference\IGpaDetails.vb" />
+    <Compile Include="Interface\Reference\IPrsRef.vb" />
+    <Compile Include="Interface\Reference\ISiteDetails.vb" />
+    <Compile Include="Interface\Reference\IOprDetails.vb" />
+    <Compile Include="Interface\Search\ISearch.vb" />
+    <Compile Include="Interface\Staging\IDebitCredit.vb" />
+    <Compile Include="Interface\Staging\INewgenLifePayment.vb" />
+    <Compile Include="Interface\Staging\IStgOPRAPRPy.vb" />
+    <Compile Include="Interface\Staging\IStgOPRChkPy.vb" />
+    <Compile Include="Interface\Staging\IStgOPRCred.vb" />
+    <Compile Include="Interface\Staging\IStgOPRDebit.vb" />
+    <Compile Include="Interface\Staging\IStgOPRDtl.vb" />
+    <Compile Include="Interface\Staging\IStgOPRHeader.vb" />
+    <Compile Include="Interface\Staging\IStgOPRInfo.vb" />
+    <Compile Include="Interface\Staging\IStgOPRVAT.vb" />
+    <Compile Include="Interface\Staging\IStgORAPRPay.vb" />
+    <Compile Include="Interface\Staging\IStgORChkPay.vb" />
+    <Compile Include="Interface\Staging\IStgORDtl.vb" />
+    <Compile Include="Interface\Staging\IStgORHeader.vb" />
+    <Compile Include="Interface\Staging\IStgORPart.vb" />
+    <Compile Include="Interface\Staging\IStgORVAT.vb" />
+    <Compile Include="Interface\Staging\IGpaProcess.vb" />
+    <Compile Include="Interface\Staging\IStgTmpTrn.vb" />
+    <Compile Include="Interface\Working\ISiteOPRECash.vb" />
+    <Compile Include="Interface\Working\IPrintReceipt.vb" />
+    <Compile Include="Interface\Working\ISiteBatch.vb" />
+    <Compile Include="Interface\Working\ISiteBatchDtl.vb" />
+    <Compile Include="Interface\Working\IReceiptCounter.vb" />
+    <Compile Include="Interface\Working\ISiteOPRAPRPy.vb" />
+    <Compile Include="Interface\Working\ISiteOPRChkPy.vb" />
+    <Compile Include="Interface\Working\ISiteOPRCred.vb" />
+    <Compile Include="Interface\Working\ISiteOPRDebit.vb" />
+    <Compile Include="Interface\Working\ISiteOPRDtl.vb" />
+    <Compile Include="Interface\Working\ISiteOPRHeader.vb" />
+    <Compile Include="Interface\Working\ISiteOPRInfo.vb" />
+    <Compile Include="Interface\Working\ISiteOPRVAT.vb" />
+    <Compile Include="Interface\Working\ISiteORAPRPay.vb" />
+    <Compile Include="Interface\Working\ISiteORChkPay.vb" />
+    <Compile Include="Interface\Working\ISiteORColDtl.vb" />
+    <Compile Include="Interface\Working\ISiteORDtl.vb" />
+    <Compile Include="Interface\Working\ISiteORHeader.vb" />
+    <Compile Include="Interface\Working\ISiteORPart.vb" />
+    <Compile Include="Interface\Working\ISiteORVAT.vb" />
+    <Compile Include="Interface\Working\ISitePAMaster.vb" />
+    <Compile Include="Interface\Working\ISiteTmpTrn.vb" />
+    <Compile Include="Interface\_Modules\IPaymentAckReceipt.vb" />
+    <Compile Include="Interface\_Modules\IPaymentDebitCreditMemo.vb" />
+    <Compile Include="Interface\_Modules\IPaymentDMCMApproval.vb" />
+    <Compile Include="Interface\_Modules\IPaymentSalesInvoice.vb" />
+    <Compile Include="Interface\_Modules\IPaymentCheckTagging.vb" />
+    <Compile Include="Interface\_Modules\IMaintAgentsORSeries.vb" />
+    <Compile Include="Interface\_Modules\IMaintTransactionsSetup.vb" />
+    <Compile Include="Interface\_Modules\IMaintOfficialReceipt.vb" />
+    <Compile Include="Interface\_Modules\IPaymentBatchPremiumRelated.vb" />
+    <Compile Include="Interface\_Modules\IDailyCollectionReport.vb" />
+    <Compile Include="Interface\_Modules\IPaymentNonPremiumRelated.vb" />
+    <Compile Include="Interface\_Modules\IPaymentPremiumRelated.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cocolife.DAL.OCS\Cocolife.DAL.OCS.vbproj">
+      <Project>{30A29717-6B09-44CA-AA48-FB8D5D884B2B}</Project>
+      <Name>Cocolife.DAL.OCS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cocolife.Utility.OCS\Cocolife.Utility.OCS.vbproj">
+      <Project>{12B69A23-3DCE-4418-9E03-F6D9F7E523DA}</Project>
+      <Name>Cocolife.Utility.OCS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

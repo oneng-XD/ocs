@@ -1,0 +1,365 @@
+﻿<%@ Master Language="VB" AutoEventWireup="false" CodeBehind="OCS.master.vb" Inherits="Cocolife.UI.OCS.OCS" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head runat="server">
+    <title>Online Collection System</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- ICON -->
+    <link rel="shortcut icon" type="image/x-icon" href="Images/CocoIcon.ico" />
+    <link rel="icon" type="image/x-icon" href="Images/CocoIcon.ico" />       
+    <!-- CSS -->
+    <link href="CSS/OCSStyle.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/MenuStyle.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/AJAXStyle.css" rel="stylesheet" type="text/css" />    
+    <!-- JS -->
+    <script src="JS/CommonScripts.js" type="text/javascript"></script>
+    <script src="JS/jquery-3.2.1.min.js" type="text/javascript"></script>
+    <%--<script src="JS/Placeholders.js" type="text/javascript"></script>--%>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+
+</head>
+<body>
+    <form id="frmMaster" runat="server">
+            
+        <script type="text/javascript" language="javascript">
+            
+            var ModalProgress = '<%= mpeProgress.ClientID %>';
+            
+            Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(beginReq);
+            Sys.WebForms.PageRequestManager.getInstance().add_endRequest(endReq);
+            
+            confirmBackspaceNavigations()
+            
+            function beginReq(sender, args) {
+                var postBackElementID = args.get_postBackElement().id; 
+                /*$find(ModalProgress).show();*/
+            }
+            
+            function endReq(sender, args) {
+                $find(ModalProgress).hide();
+            }
+
+            function blinker() {
+                $('.blinking').fadeOut(1000);
+                $('.blinking').fadeIn(0);
+            }
+
+            setInterval(blinker, 1000);
+            
+        </script>
+
+        <asp:UpdatePanel ID="upMaster" runat="server" RenderMode="Inline" UpdateMode="Conditional">
+            <ContentTemplate>
+                
+                <asp:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server"
+                    EnablePageMethods="true"
+                    EnableViewState="true">
+                </asp:ToolkitScriptManager>
+                
+                <div id="master">
+
+                    <!-- HEADER -->
+                    <div id="master-header">
+                        <table width="100%" style="height: 100%" cellpadding="0" cellspacing="0">
+                            <tr><td colspan="100%" style="height: 40px;"></td></tr>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td colspan="2" align="right" valign="top" style="height: 20px;">
+                                    <asp:LinkButton ID="lnkHomeHeader" runat="server" ToolTip="Home" CausesValidation="false" CssClass="lnkHeader">Home</asp:LinkButton>&nbsp;&nbsp;|&nbsp;                                
+                                    <asp:LinkButton ID="lnkToDosHeader" runat="server" ToolTip="To Do's" CausesValidation="false" CssClass="lnkHeader">To Do's</asp:LinkButton>&nbsp;&nbsp;|&nbsp;
+                                    <asp:LinkButton ID="lnkContactUsHeader" runat="server" ToolTip="Contact Us" CausesValidation="false" CssClass="lnkHeader">Contact Us</asp:LinkButton>&nbsp;&nbsp;|&nbsp;    
+                                    <%--<asp:LinkButton ID="lnkMyAccountHeader" runat="server" ToolTip="My Account" CausesValidation="false" CssClass="lnkHeader">My Account</asp:LinkButton>&nbsp;&nbsp;|&nbsp;--%>
+                                    <asp:LinkButton ID="lnkLogoutHeader" runat="server" ToolTip="Logout" CausesValidation="false" CssClass="lnkHeader">Logout</asp:LinkButton>&nbsp;              
+                                    [&nbsp;<asp:Label ID="lblUserHeader" runat="server" CssClass="lblUserHeader"></asp:Label>&nbsp;@&nbsp;<asp:Label ID="lblSiteHeader" runat="server" CssClass="lblUserHeader"></asp:Label>&nbsp;]
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="master-header-td1" style="height: 20px;"></td>
+                                <td class="master-header-td2"></td>
+                                <td class="master-header-td3"></td>
+                                <td class="master-header-td4"></td>
+                                <td class="master-header-td5"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td style="width: 860px; height: 35px;" align="left">
+                                    <!-- MENU -->
+                                    <div id="menu">
+                                        <span class="preload1"></span>
+                                        <span class="preload2"></span>
+                                        <ul id="nav">
+                                            <li id="menuTransactions" class="top" runat="server"><a href="#" id="Transactions" class="top_link"><span class="down">Transactions</span></a>
+                                                <ul class="sub">
+                                                    <li id="sub1Payments" runat="server"><a href="#" class="fly">Payments</a>
+                                                        <ul>
+                                                            <li id="sub2PremiumPayments" runat="server" visible="false"><a href="PaymentPremiumRelated.aspx">Premium Related</a></li>
+                                                            <li id="sub2NonPremiumPayments" runat="server" visible="false"><a href="PaymentNonPremiumRelated.aspx">Non-Premium Related</a></li>
+                                                            <li id="sub2SalesInvoice" runat="server" visible="false"><a href="PaymentSalesInvoice.aspx">Sales Invoice</a></li>
+                                                            <li id="sub2AckReceipts" runat="server" visible="false"><a href="PaymentAckReceipt.aspx">Acknowledgement Receipt</a></li>
+                                                            <li id="sub2DebitCreditMemo" runat="server" visible="false"><a href="PaymentDebitCreditMemo.aspx">Debit Credit Memo</a></li>
+                                                            <li id="sub2DMCMApproval" runat="server" visible="false"><a href="PaymentDMCMApproval.aspx">DMCM Approval</a></li>
+                                                            <li id="sub2BatchPremiumPayments" runat="server" visible="false"><a href="PaymentBatchPremiumRelated.aspx">Batch Premium Related</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li id="sub1CheckTagging" runat="server" visible="false"><a href="PaymentCheckTagging.aspx">Check Tagging</a></li>
+                                                    <li id="sub1AgentOrIssuance" runat="server" visible="false"><a href="AgentOrIssuance.aspx">Agent's OR Issuance</a></li>
+                                                </ul>
+                                            </li>
+                                            <%--<li id="menuInquiry" class="top" runat="server"><a href="#" id="Inquiry" class="top_link"><span class="down">Inquiry</span></a>
+                                                <ul class="sub">
+                                                    <li id="sub1PostedPremiumInquiry" runat="server"><a href="#" id="PostedPremiumRelated">Posted Premium Related</a></li>
+                                                    <li id="sub1PostedNonPremiumInquiry" runat="server"><a href="PostedPaymentNonPremium.aspx" id="PostedNonPremiumRelated">Posted Non-Premium Related</a></li>                                                                                        
+                                                </ul>
+                                            </li>--%>
+                                            <li id="menuReports" class="top" runat="server"><a href="#" id="Reports" class="top_link"><span class="down">Reports</span></a>
+                                                <ul class="sub">
+                                                    <li id="sub1DailyCollectionReport" runat="server"><a href="DailyCollectionReport.aspx">Daily Collection Report</a></li>                                          
+                                                </ul>
+                                            </li>
+                                            <li id="menuMaintenance" class="top" runat="server"><a href="#" id="Maintenance" class="top_link"><span class="down">Maintenance</span></a>
+                                                <ul class="sub">
+                                                    <li id="sub1MaintenanceAgentORSeries" runat="server" visible="false"><a href="MaintAgentsORSeries.aspx">Assign Agent OR Series</a></li>
+                                                    <li id="sub1MaintenanceAPR" runat="server" visible="false"><a href="#">Assign Agent Provisionary Receipt</a></li>
+                                                    <li id="sub1MaintenanceControlFileSetting" runat="server" visible="false"><a href="#">Control File Settings</a></li>
+                                                    <li id="sub1MaintenanceORSeries" runat="server" visible="false"><a href="MaintOfficialReceipt.aspx">Assign Invoice Series</a></li>
+                                                    <li id="sub1MaintenanceSiteMerchantID" runat="server" visible="false"><a href="MaintSiteMerchantID.aspx">Site Merchant ID Setup</a></li>
+                                                    <li id="sub1MaintenanceTransactionSetup" runat="server" visible="false"><a href="#">Transaction Setup</a></li>
+                                                    <li id="mnuChangePassword" runat="server" visible="true">
+                                                        <asp:LinkButton ID="lnkChangePassword" runat="server" ToolTip="Change Password" CausesValidation="false">Change Password</asp:LinkButton>
+                                                    </li>
+                                                    <li id="mnuUserProfile" runat="server" visible="false"><a href="UserProfile.aspx" id="UserProfile">User Profile</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td colspan="2"></td>
+                            </tr>
+                            <!--tr><td colspan="100%" style="height: 10px;"></td></tr-->
+                        </table>
+                    </div>
+
+                    <!-- BODY -->
+                    <div id="master-body">
+                        <table width="100%" style="height: 100%" cellpadding="0" cellspacing="0">
+                            <tr><td colspan="100%" style="height: 10px;"></td></tr>
+                            <%--<tr>
+                                <td></td>
+                                <td class="blinking" style="font-size: 20pt; text-align: center; color: red; vertical-align: middle;animation: blink .75s linear infinite;">
+                                    TEST ONLY!!!
+                                </td>
+                                <td></td>
+                            </tr>--%>
+                            <tr>
+                                <td></td>
+                                <td align="right">
+                                    <asp:Label ID="lblToday" runat="server" Text="" CssClass="lblNormal10Red"></asp:Label>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="master-body-td1" style="width: 40px;"></td>
+                                <td class="master-body-td2" style="width: 900px;" align="left" valign="top">
+                                    <!-- CONTENT -->
+                                    <asp:ContentPlaceHolder ID="ContentPlaceHolder2" runat="server">
+                                            
+                                    </asp:ContentPlaceHolder>
+                                </td>
+                                <td class="master-body-td3"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div id="master-footer">
+                        <table width="100%" style="height: 100%" cellpadding="0" cellspacing="0">
+                            <tr><td colspan="4" style="height: 10px;"></td></tr>
+                            <tr>
+                                <td class="master-footer-td1" style="height: 20px;"></td>
+                                <td class="master-footer-td2">
+                                    <asp:LinkButton ID="lnkHomeFooter" runat="server" ToolTip="Home" CausesValidation="false" CssClass="lnkFooter">Home</asp:LinkButton>&nbsp;&nbsp;|&nbsp;                                
+                                    <asp:LinkButton ID="lnkToDosFooter" runat="server" ToolTip="To Do's" CausesValidation="false" CssClass="lnkFooter">To Do's</asp:LinkButton>&nbsp;&nbsp;|&nbsp;
+                                    <asp:LinkButton ID="lnkContactUsFooter" runat="server" ToolTip="Contact Us" CausesValidation="false" CssClass="lnkFooter">Contact Us</asp:LinkButton>&nbsp;&nbsp;|&nbsp;                                
+                                    <%--<asp:LinkButton ID="lnkMyAccountFooter" runat="server" ToolTip="My Account" CausesValidation="false" CssClass="lnkFooter">My Account</asp:LinkButton>&nbsp;&nbsp;|&nbsp;--%>
+                                    <asp:LinkButton ID="lnkLogoutFooter" runat="server" ToolTip="Logout" CausesValidation="false" CssClass="lnkFooter">Logout</asp:LinkButton>&nbsp;
+                                    [&nbsp;<asp:Label ID="lblUserFooter" runat="server" CssClass="lblUserFooter"></asp:Label>&nbsp;@&nbsp;<asp:Label ID="lblSiteFooter" runat="server" CssClass="lblUserFooter"></asp:Label>&nbsp;]
+                                </td>
+                                <td class="master-footer-td3">
+                                    <asp:Label ID="lblLastUpdated" runat="server" CssClass="lblBold10777777"></asp:Label>
+                                </td>
+                                <td class="master-footer-td4"></td>
+                            </tr>
+                            <tr><td colspan="4" style="height: 50px;"></td></tr>
+                            <tr>
+                                <asp:Panel ID="pnlHiddenFields" runat="server" CssClass="panel-hidden">
+                                    <!-- SITE DETAILS -->
+                                    <asp:HiddenField ID="hdnSiteCode" runat="server" />
+                                    <asp:HiddenField ID="hdnSiteName" runat="server" />
+                                    <asp:HiddenField ID="hdnSiteAddr" runat="server" />
+                                    <asp:HiddenField ID="hdnSiteTel" runat="server" />
+                                    <asp:HiddenField ID="hdnSiteEmail" runat="server" />
+                                    <asp:HiddenField ID="hdnSiteTin" runat="server" />
+                                    <asp:HiddenField ID="hdnSitePrefix" runat="server" />
+                                    <asp:HiddenField ID="hdnSiteUserId" runat="server" />
+                                    <asp:HiddenField ID="hdnSiteIpAddr" runat="server" />
+					            </asp:Panel>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- TO DO's -->
+                    <input id="dummyToDos" type="button" style="display: none" runat="server" />
+                    <asp:Panel ID="pnlToDos" runat="server" CssClass="panel-modal-370" DefaultButton="btnToDosClose" Style="">
+                        <asp:UpdatePanel ID="upToDos" runat="server" RenderMode="Inline" UpdateMode="Conditional">
+                            <ContentTemplate>
+                                <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td class="mhToDos"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="height: 5px;"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="panel-modal-370-left"></div>
+                                            <div class="panel-modal-370-main">
+                                                <table width="100%" cellpadding="0" cellspacing="0">
+                                                    <tr>
+                                                        <td style="width: 23%;" class="lblBold11">Check Tagging</td>
+                                                        <td style="width: 27%;">
+                                                            
+                                                        </td>
+                                                        <td style="width: 23%;"></td>
+                                                        <td style="width: 27%;"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4">
+                                                            <div class="gvwSearch">
+                                                                <asp:GridView ID="gvwTagging" runat="server"
+                                                                    CssClass="gvwStylePlain"
+                                                                    RowStyle-CssClass="gvwRow"
+                                                                    AlternatingRowStyle-CssClass="gvwAlternationRow"
+                                                                    EditRowStyle-CssClass="gvwEditRow"
+                                                                    SelectedRowStyle-CssClass="gvwSelectedRow"
+                                                                    EmptyDataRowStyle-CssClass="gvwEmptyRow"
+                                                                    EmptyDataText="No Record(s) Found."
+                                                                    FooterStyle-CssClass="gvwFooter"
+                                                                    PagerStyle-CssClass="gvwPager"
+                                                                    AutoGenerateColumns="false"
+                                                                    GridLines="None"
+                                                                    Width="100%" >
+                                                                    <Columns>
+                                                                        <asp:BoundField HeaderText="Id" DataField="id" HeaderStyle-CssClass="gvwHidden" FooterStyle-CssClass="gvwHidden" ItemStyle-CssClass="gvwHidden" />
+                                                                        <asp:BoundField HeaderText="Receipt Number" DataField="opr_nmbr" ItemStyle-HorizontalAlign="Right" />
+                                                                        <asp:BoundField HeaderText="Receipt Date" DataField="oprdate" DataFormatString="{0:MM/dd/yyyy}" />
+                                                                        <asp:BoundField HeaderText="Check Number" DataField="chk_nmbr" ItemStyle-HorizontalAlign="Right"/>
+                                                                        <asp:TemplateField HeaderText="Status" HeaderStyle-Width="10px" ItemStyle-Width="10px" ItemStyle-HorizontalAlign="Center">
+                                                                            <ItemTemplate>
+                                                                                <asp:Label ID="lblStatus" runat="server" Text='<%# IIf(CDate(Eval("deposit_date")) = #1/1/1900#, "FOR DEPOSIT", "FOR CLEARING")%>'/>
+                                                                            </ItemTemplate>
+                                                                        </asp:TemplateField>
+                                                                    </Columns>
+                                                                </asp:GridView>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4" style="text-align: center;">
+                                                            <asp:Button ID="btnToDosClose" runat="server" Text="Close"
+                                                                CssClass="btnShort"
+                                                                CausesValidation="false" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="100%" style="height: 10px;"></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="panel-modal-370-right"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="height: 5px;"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="mfSeparator"></td>
+                                    </tr>
+                                </table>
+                            </ContentTemplate>
+                            <Triggers>
+                            </Triggers>
+                        </asp:UpdatePanel>
+                    </asp:Panel>
+                    <asp:ModalPopupExtender ID="mpeToDos" runat="server"
+                        TargetControlID="dummyToDos" 
+                        PopupControlID="pnlToDos" 
+                        BackgroundCssClass="modal" 
+                        Enabled="true">
+                    </asp:ModalPopupExtender>
+                    
+                    <!-- CONTACT US -->
+                    <input id="dummyContactUs" type="button" style="display: none" runat="server" />
+                    
+                    <!-- MY ACCOUNT -->
+                    <input id="dummyMyAccount" type="button" style="display: none" runat="server" />
+
+                    <!-- MESSAGE BOX --> 
+                    <input id="dummyMessage" type="button" style="display: none" runat="server" />
+                    <asp:Panel ID="pnlMessage" runat="server" CssClass="panel-messagebox" DefaultButton="btnMessageOk" style="display: none">
+                        <div>
+                            <div class="panel-messagebox-td1"><asp:Image ID="imgMessage" runat="server" ImageUrl="Images/icons/critical.png" CssClass="image-messagebox" /></div>
+                            <div class="panel-messagebox-td2"></div>
+                            <div class="panel-messagebox-td3"><asp:Label ID="lblMessage" runat="server" CssClass="label-messagebox" Text="Error!"></asp:Label></div>
+                        </div>
+                        <div class="panel-messagebox-button"><asp:Button ID="btnMessageOk" runat="server" Text="Ok" CssClass="btnShort" CausesValidation="false" /></div>
+                    </asp:Panel>
+                    <asp:ModalPopupExtender ID="mpeMessage" runat="server"
+                        TargetControlID="dummyMessage"
+                        PopupControlID="pnlMessage"
+                        BackgroundCssClass="modal"
+                        Enabled="true">
+                    </asp:ModalPopupExtender>
+                    
+                    <!-- PROGRESS -->
+                    <asp:Panel ID="pnlProgress" runat="server" CssClass="panel-progress" style="display: none">
+                        <div class="panel-progress-image"><asp:Image ID="imgProcessing" runat="server" ImageUrl="~/images/loading.gif" /></div>
+                        <div class="panel-progress-label">Processing...</div>
+                    </asp:Panel>
+                    <asp:ModalPopupExtender ID="mpeProgress" runat="server"
+                        TargetControlID="pnlProgress"
+                        PopupControlID="pnlProgress"
+                        BackgroundCssClass="modal">
+                    </asp:ModalPopupExtender>
+                    
+                </div>
+                
+            </ContentTemplate>
+            <Triggers>
+                <asp:AsyncPostBackTrigger ControlID="btnMessageOk" EventName="Click" />
+                <asp:AsyncPostBackTrigger ControlID="lnkContactUsFooter" EventName="Click" />
+                <asp:AsyncPostBackTrigger ControlID="lnkContactUsHeader" EventName="Click" />
+                <asp:AsyncPostBackTrigger ControlID="lnkHomeFooter" EventName="Click" />
+                <asp:AsyncPostBackTrigger ControlID="lnkHomeHeader" EventName="Click" />
+                <asp:AsyncPostBackTrigger ControlID="lnkLogoutFooter" EventName="Click" /> 
+                <asp:AsyncPostBackTrigger ControlID="lnkLogoutHeader" EventName="Click" />
+                <asp:AsyncPostBackTrigger ControlID="lnkToDosFooter" EventName="Click" />
+                <asp:AsyncPostBackTrigger ControlID="lnkToDosHeader" EventName="Click" />
+            </Triggers>
+        </asp:UpdatePanel>
+    
+    <div>
+        <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+        
+        </asp:ContentPlaceHolder>
+    </div>
+
+
+    </form>
+</body>
+</html>

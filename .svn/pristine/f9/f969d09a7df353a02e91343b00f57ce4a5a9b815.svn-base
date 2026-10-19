@@ -1,0 +1,85 @@
+﻿#Region "Description"
+' PAGE NAME     : HMO PAYSLIP Interface 
+' CREATED BY    : EJ
+' CREATED DATE  : 10/01/2018
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+
+#End Region
+
+Namespace Reference
+
+    Public Interface IHMOPayslip
+
+#Region "Variables"
+
+#End Region
+
+#Region "Properties"
+        Property CollHdrId() As Long
+        Property HeaderId() As Long
+        Property RemitCode() As String
+        Property RemitAmount() As Decimal
+        Property PayorTypeId() As Integer
+        Property PayorId() As String
+        Property PayorCode() As String
+        Property AprNumber() As String
+        Property AprDate() As Date
+        Property CheckNumber() As String
+        Property PaymentForm() As String
+        Property StatusId() As Integer
+        Property PostBy() As String
+        Property PostDate() As Date
+        Property LastUpdate() As Date
+        Property LastUpdateBy() As String
+        Property Companyname() As String
+        Property PayorName() As String
+        Property GrossPayment() As Decimal
+        Property TotDeductibles() As Decimal
+        Property NetPayment() As Decimal
+        Property Particulars() As String
+        Property ChargeTo() As String
+        Property PaymentMode() As String
+        Property UserName() As String
+        Property Ewt() As Decimal
+        Property PolicyNumber() As String
+        Property PayslipCode() As String
+        Property OrNumber() As String
+        Property PaymentType() As Integer
+        Property CheckDate() As Date
+        Property IssuingBank() As String
+        Property IssuingBranch() As String
+        Property Income() As Decimal
+        Property VatableAmt() As Decimal
+        Property VatExempt() As Decimal
+        Property VatAmount() As Decimal
+        Property IssuedBy() As String
+
+        Property PayorTin() As String
+        Property PayorAddress() As String
+        '------------------------------------
+        Property IsRecordExist() As Boolean
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Transactions"
+        Sub SearchPayslipCode(ByVal pPayslipCode As String)
+#End Region
+
+    End Interface
+
+End Namespace
+
+

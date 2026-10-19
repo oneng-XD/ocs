@@ -1,0 +1,398 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit http://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <LastUsedBuildConfiguration>Release</LastUsedBuildConfiguration>
+    <LastUsedPlatform>Any CPU</LastUsedPlatform>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="bin/AjaxControlToolkit.dll">
+      <publishTime>04/03/2025 11:43:58</publishTime>
+    </File>
+    <File Include="bin/bllCommon.dll">
+      <publishTime>04/03/2025 11:44:01</publishTime>
+    </File>
+    <File Include="bin/bllOCS.dll">
+      <publishTime>06/11/2025 07:29:07</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.CrystalReports.Engine.dll">
+      <publishTime>12/12/2013 04:59:48</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.ReportSource.dll">
+      <publishTime>12/12/2013 04:59:50</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.Shared.dll">
+      <publishTime>12/12/2013 04:59:50</publishTime>
+    </File>
+    <File Include="bin/CrystalDecisions.Web.dll">
+      <publishTime>12/12/2013 04:59:50</publishTime>
+    </File>
+    <File Include="bin/dalCommon.dll">
+      <publishTime>04/03/2025 11:44:01</publishTime>
+    </File>
+    <File Include="bin/dalOCS.dll">
+      <publishTime>06/11/2025 07:29:07</publishTime>
+    </File>
+    <File Include="bin/OCS.UI.dll">
+      <publishTime>06/11/2025 07:29:09</publishTime>
+    </File>
+    <File Include="bin/OCS.UI.xml">
+      <publishTime>06/11/2025 07:29:09</publishTime>
+    </File>
+    <File Include="bin/preCommon.dll">
+      <publishTime>04/03/2025 11:44:01</publishTime>
+    </File>
+    <File Include="bin/preOCS.dll">
+      <publishTime>06/11/2025 07:29:08</publishTime>
+    </File>
+    <File Include="bin/utiCommon.dll">
+      <publishTime>04/03/2025 11:44:01</publishTime>
+    </File>
+    <File Include="bin/utiOCS.dll">
+      <publishTime>06/11/2025 07:29:06</publishTime>
+    </File>
+    <File Include="ChangePassword.aspx">
+      <publishTime>04/03/2025 11:43:52</publishTime>
+    </File>
+    <File Include="CSS/AJAXStyle.css">
+      <publishTime>04/03/2025 11:43:50</publishTime>
+    </File>
+    <File Include="CSS/MenuStyle.css">
+      <publishTime>04/03/2025 11:43:50</publishTime>
+    </File>
+    <File Include="CSS/OCSStyle.css">
+      <publishTime>05/05/2025 01:49:07</publishTime>
+    </File>
+    <File Include="DailyCollectionReport.aspx">
+      <publishTime>04/03/2025 11:43:59</publishTime>
+    </File>
+    <File Include="Home.aspx">
+      <publishTime>04/03/2025 11:43:50</publishTime>
+    </File>
+    <File Include="Images/accBlueOff.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/accBlueOn.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/accGrayOff.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/accGrayOn.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/accGreenOff.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/accGreenOn.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/accOrangeOff.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/accOrangeOn.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/body.jpg">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/BodyMain.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/cfSeparator.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chHome.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chMaintenanceAgentsORSeries.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chMaintenanceChangePassword.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chMaintenanceOPRSeries.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chPaymentAckReceipt.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chPaymentBatchPremiumRelated.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chPaymentCheckTagging.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chPaymentDebitCreditMemo.png">
+      <publishTime>04/03/2025 14:17:38</publishTime>
+    </File>
+    <File Include="Images/chPaymentDMCMApproval.png">
+      <publishTime>04/30/2025 23:09:51</publishTime>
+    </File>
+    <File Include="Images/chPaymentNonPremiumRelated.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chPaymentPremiumRelated.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chPaymentSalesInvoice.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/chReportsDailyCollectionReport.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/CocoIcon.ico">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/FooterMain.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/HeaderMain.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/accept.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/add.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/add_person.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/calculator.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/CocoIcon.ico">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/copy.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/critical.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/delete.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/delete_person.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/eraser.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/info.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/information.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/list.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/print.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/question.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/refresh.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/search.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/view.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/icons/warning.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/loading.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/Login.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/arrow.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/arrow_over.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/Copy of three_0.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/Copy of three_0a.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/Copy of three_1.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/Copy of three_1a.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/Copy of three_2.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/Copy of three_2a.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/three_0.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/three_0a.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/three_1.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/three_1a.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/three_2.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/menu/three_2a.gif">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/mfSeparator.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/mhSearchAgent.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/mhSearchInsured.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/mhSearchPayor.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/mhSearchPolicy.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/mhSearchPromoOff.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/mhSearchSalesOff.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/mhToDos.jpg">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/mhViewDocs.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="Images/mhViewOPRs.png">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="JS/CommonScripts.js">
+      <publishTime>04/03/2025 11:43:59</publishTime>
+    </File>
+    <File Include="JS/jquery-3.2.1.min.js">
+      <publishTime>04/03/2025 11:43:59</publishTime>
+    </File>
+    <File Include="JS/Placeholders.js">
+      <publishTime>04/03/2025 11:43:59</publishTime>
+    </File>
+    <File Include="Login.aspx">
+      <publishTime>04/03/2025 11:43:52</publishTime>
+    </File>
+    <File Include="MaintAgentsORSeries.aspx">
+      <publishTime>04/08/2025 13:35:50</publishTime>
+    </File>
+    <File Include="MaintOfficialReceipt.aspx">
+      <publishTime>04/03/2025 11:43:59</publishTime>
+    </File>
+    <File Include="MaintSiteMerchantID.aspx">
+      <publishTime>04/03/2025 11:43:55</publishTime>
+    </File>
+    <File Include="OCS.Master">
+      <publishTime>04/30/2025 21:30:35</publishTime>
+    </File>
+    <File Include="PaymentAckReceipt.aspx">
+      <publishTime>05/19/2025 16:11:12</publishTime>
+    </File>
+    <File Include="PaymentBatchPremiumRelated.aspx">
+      <publishTime>04/03/2025 11:43:52</publishTime>
+    </File>
+    <File Include="PaymentCheckTagging.aspx">
+      <publishTime>04/03/2025 11:43:58</publishTime>
+    </File>
+    <File Include="PaymentDebitCreditMemo.aspx">
+      <publishTime>06/05/2025 04:31:03</publishTime>
+    </File>
+    <File Include="PaymentDMCMApproval.aspx">
+      <publishTime>06/04/2025 12:34:31</publishTime>
+    </File>
+    <File Include="PaymentNonPremiumRelated.aspx">
+      <publishTime>04/03/2025 11:43:59</publishTime>
+    </File>
+    <File Include="PaymentPremiumRelated.aspx">
+      <publishTime>05/13/2025 14:02:00</publishTime>
+    </File>
+    <File Include="PaymentSalesInvoice.aspx">
+      <publishTime>04/19/2025 00:44:40</publishTime>
+    </File>
+    <File Include="Reports/DetailNonPremium.rpt">
+      <publishTime>04/03/2025 11:43:52</publishTime>
+    </File>
+    <File Include="Reports/DetailPremium.rpt">
+      <publishTime>04/03/2025 11:43:52</publishTime>
+    </File>
+    <File Include="Reports/Receipt.rpt">
+      <publishTime>05/26/2025 08:54:19</publishTime>
+    </File>
+    <File Include="Reports/ReceiptAppno.rpt">
+      <publishTime>04/03/2025 11:43:52</publishTime>
+    </File>
+    <File Include="Reports/ReceiptDMCM.rpt">
+      <publishTime>06/10/2025 18:14:05</publishTime>
+    </File>
+    <File Include="Reports/ReceiptOR.rpt">
+      <publishTime>05/21/2025 13:23:20</publishTime>
+    </File>
+    <File Include="Reports/SummaryNonPremium.rpt">
+      <publishTime>04/03/2025 11:43:52</publishTime>
+    </File>
+    <File Include="Reports/SummaryPremium.rpt">
+      <publishTime>04/03/2025 11:43:52</publishTime>
+    </File>
+    <File Include="RptDetailNonPrem.aspx">
+      <publishTime>04/03/2025 11:43:50</publishTime>
+    </File>
+    <File Include="RptDetailPrem.aspx">
+      <publishTime>04/03/2025 11:43:58</publishTime>
+    </File>
+    <File Include="RptORReceipt.aspx">
+      <publishTime>04/03/2025 11:43:58</publishTime>
+    </File>
+    <File Include="RptReceipt.aspx">
+      <publishTime>05/26/2025 10:56:56</publishTime>
+    </File>
+    <File Include="RptReceiptAppno.aspx">
+      <publishTime>04/03/2025 11:43:50</publishTime>
+    </File>
+    <File Include="RptReceiptBatch.aspx">
+      <publishTime>04/03/2025 11:43:59</publishTime>
+    </File>
+    <File Include="RptReceiptDMCM.aspx">
+      <publishTime>05/22/2025 21:38:24</publishTime>
+    </File>
+    <File Include="RptReceiptDMCMPreview.aspx">
+      <publishTime>05/06/2025 16:17:15</publishTime>
+    </File>
+    <File Include="RptSummaryNonPrem.aspx">
+      <publishTime>04/03/2025 11:43:58</publishTime>
+    </File>
+    <File Include="RptSummaryPrem.aspx">
+      <publishTime>04/03/2025 11:43:59</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>04/03/2025 11:43:52</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

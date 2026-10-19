@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{30A29717-6B09-44CA-AA48-FB8D5D884B2B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Cocolife.DAL.OCS</RootNamespace>
+    <AssemblyName>dalOCS</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionStrict>Off</OptionStrict>
+    <OptionInfer>On</OptionInfer>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>dalOCS.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>dalOCS.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="bllCommon, Version=5.4.0.302, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\OUTRE-PROD\COM_NET35\_Published\bllCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="dalCommon, Version=4.1.59.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\OUTRE-PROD\COM_NET35\_Published\dalCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.0.5022.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\Microsoft.Office.Interop.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Vbe.Interop, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\Microsoft.Vbe.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Users\ej\Desktop\Common v1\office.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="utiCommon, Version=6.1.209.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\OUTRE-PROD\COM_NET35\_Published\utiCommon.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Maintenance\DAgtOrReg.vb" />
+    <Compile Include="Maintenance\DSiteOprSeries.vb" />
+    <Compile Include="Person\DAgnMas.vb" />
+    <Compile Include="Person\DPrsMas.vb" />
+    <Compile Include="Person\DSecRef.vb" />
+    <Compile Include="Staging\DARPayDetails.vb" />
+    <Compile Include="Staging\DAckReceipt.vb" />
+    <Compile Include="Reference\DSalesInvoice.vb" />
+    <Compile Include="Reference\DHMOPayslip.vb" />
+    <Compile Include="Reference\DBankDetails.vb" />
+    <Compile Include="Reference\DColumbary.vb" />
+    <Compile Include="Reference\DMetPay.vb" />
+    <Compile Include="Reference\DMerchantSite.vb" />
+    <Compile Include="Reference\DNGIBillingDetails.vb" />
+    <Compile Include="Reference\DOrDetails.vb" />
+    <Compile Include="Reference\DPrsRef.vb" />
+    <Compile Include="Reference\DSiteDetails.vb" />
+    <Compile Include="Reference\DOprDetails.vb" />
+    <Compile Include="Reference\DGpaDetails.vb" />
+    <Compile Include="Search\DSearch.vb" />
+    <Compile Include="DConstant.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Reference\DCurRef.vb" />
+    <Compile Include="Reference\DTrnRef.vb" />
+    <Compile Include="Reference\DParamRef.vb" />
+    <Compile Include="Reference\DFrqPay.vb" />
+    <Compile Include="Staging\DDebitCredit.vb" />
+    <Compile Include="Staging\DNewgenLifePayment.vb" />
+    <Compile Include="Staging\DStgOPRAPRPy.vb" />
+    <Compile Include="Staging\DStgOPRChkPy.vb" />
+    <Compile Include="Staging\DStgOPRCred.vb" />
+    <Compile Include="Staging\DStgOPRDebit.vb" />
+    <Compile Include="Staging\DStgOPRDtl.vb" />
+    <Compile Include="Staging\DStgOPRHeader.vb" />
+    <Compile Include="Staging\DStgOPRInfo.vb" />
+    <Compile Include="Staging\DStgOPRVAT.vb" />
+    <Compile Include="Staging\DStgORAPRPay.vb" />
+    <Compile Include="Staging\DStgORChkPay.vb" />
+    <Compile Include="Staging\DStgORDtl.vb" />
+    <Compile Include="Staging\DStgORHeader.vb" />
+    <Compile Include="Staging\DStgORPart.vb" />
+    <Compile Include="Staging\DStgORVAT.vb" />
+    <Compile Include="Staging\DStgPAMaster.vb" />
+    <Compile Include="Staging\DStgTmpTrn.vb" />
+    <Compile Include="Working\DSiteOPRECash.vb" />
+    <Compile Include="Working\DPrintReceipt.vb" />
+    <Compile Include="Working\DSiteBatchDtl.vb" />
+    <Compile Include="Working\DSiteBatch.vb" />
+    <Compile Include="Working\DReceiptNumber.vb" />
+    <Compile Include="Working\DSiteOPRAPRPy.vb" />
+    <Compile Include="Working\DSiteOPRChkPy.vb" />
+    <Compile Include="Working\DSiteOPRCred.vb" />
+    <Compile Include="Working\DSiteOPRDebit.vb" />
+    <Compile Include="Working\DSiteOPRDtl.vb" />
+    <Compile Include="Working\DSiteOPRHeader.vb" />
+    <Compile Include="Working\DSiteOPRInfo.vb" />
+    <Compile Include="Working\DSiteOPRVAT.vb" />
+    <Compile Include="Working\DSiteORAPRPay.vb" />
+    <Compile Include="Working\DSiteORChkPay.vb" />
+    <Compile Include="Working\DSiteORColDtl.vb" />
+    <Compile Include="Working\DSiteORDtl.vb" />
+    <Compile Include="Working\DSiteORHeader.vb" />
+    <Compile Include="Working\DSiteORInfo.vb" />
+    <Compile Include="Working\DSiteORPart.vb" />
+    <Compile Include="Working\DSiteORVAT.vb" />
+    <Compile Include="Working\DSitePAMaster.vb" />
+    <Compile Include="Working\DSiteTmpTrn.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cocolife.Utility.OCS\Cocolife.Utility.OCS.vbproj">
+      <Project>{12B69A23-3DCE-4418-9E03-F6D9F7E523DA}</Project>
+      <Name>Cocolife.Utility.OCS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

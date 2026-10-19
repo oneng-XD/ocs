@@ -1,0 +1,2014 @@
+﻿#Region "Description"
+' PAGE NAME     : Payment Premium Related Presenter
+' CREATED BY    : MPRO 
+' CREATED DATE  : 11/13/2024
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports eSystemMessage = Cocolife.Utility.Common.Enums.eSystemMessage
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports cValidation = Cocolife.Utility.OCS.Common.uValidation
+Imports preSecurity = Cocolife.Presenter.Common.Security
+Imports preMessages = Cocolife.Utility.OCS.Messages
+Imports preReport = Cocolife.Presenter.OCS.Report
+Imports bllReference = Cocolife.BLL.OCS.Reference
+Imports bllPerson = Cocolife.BLL.OCS.Person
+Imports bllSearch = Cocolife.BLL.OCS.Search
+Imports bllWorking = Cocolife.BLL.OCS.Working
+Imports bllPayment = Cocolife.BLL.OCS.Payment
+Imports bllStaging = Cocolife.BLL.OCS.Staging
+Imports preSearch = Cocolife.Presenter.OCS.Search
+Imports eReference = Cocolife.Utility.OCS.Enums.eReference
+Imports eReport = Cocolife.Utility.OCS.Enums.eReport
+Imports Cocolife.Utility.OCS.Classes
+Imports System.Configuration
+#End Region
+
+Namespace Payment
+
+    Public Class PPaymentAckReceipt
+
+#Region "Implements"
+
+#End Region
+
+#Region "Variables"
+        Private vwSysMsg As preSecurity.ISystemMessage
+        Private vwPaymentAckReceipt As Payment.IPaymentAckReceipt
+        Private vwConfirmMsg As preMessages.IConfirmationMessage
+        Private vwReport As preReport.IReport
+
+        Private objPaymentAckReceipt As bllPayment.BPaymentAckReceipt
+#End Region
+
+#Region "Properties"
+
+#End Region
+
+#Region "Constructor"
+
+        Sub New()
+
+        End Sub
+
+        Sub New(ByVal pView As Payment.IPaymentAckReceipt)
+
+            vwSysMsg = pView
+            vwPaymentAckReceipt = pView
+            vwConfirmMsg = pView
+
+            With vwPaymentAckReceipt
+                ' -------------------------------------------------------------------------------
+                AddHandler .ClearScreenMain, AddressOf ClearScreenMain
+                AddHandler .ClearScreenInfo, AddressOf ClearScreenInfo
+                AddHandler .ClearScreenViewAR, AddressOf ClearScreenViewAR
+                AddHandler .ClearScreenViewSI, AddressOf ClearScreenViewSI
+                AddHandler .ClearScreenPaymentDetails, AddressOf ClearScreenPaymentDetails
+                AddHandler .ClearScreenPaymentTypeDetails, AddressOf ClearScreenPaymentTypeDetails
+                AddHandler .ClearScreenCashDetails, AddressOf ClearScreenCashDetails
+                AddHandler .ClearScreenCheckDetails, AddressOf ClearScreenCheckDetails
+                AddHandler .ClearScreenCreditCardDetails, AddressOf ClearScreenCreditCardDetails
+                AddHandler .ClearScreenCreditCardNumber, AddressOf ClearScreenCreditCardNumber
+                AddHandler .ClearScreenDebitCardDetails, AddressOf ClearScreenDebitCardDetails
+                AddHandler .ClearScreenECashPaymentDetails, AddressOf ClearScreenECashPaymentDetails
+               
+                ' -------------------------------------------------------------------------------
+                AddHandler .ValidateCreditCardNo, AddressOf ValidateCreditCardNo
+                AddHandler .CreditCardFetchData, AddressOf CreditCardFetchData
+                AddHandler .DebitCardFetchData, AddressOf DebitCardFetchData
+                AddHandler .AddCashPayment, AddressOf AddCashPayment
+                AddHandler .AddPaymentTypeDetails, AddressOf AddPaymentTypeDetails
+                AddHandler .DeletePaymentTypeDetails, AddressOf DeletePaymentTypeDetails
+                AddHandler .GetPaymentTypeDetails, AddressOf GetPaymentTypeDetails
+                'AddHandler .CheckPrevPayType, AddressOf CheckPrevPaytype
+                'AddHandler .CheckAllowedPaytype, AddressOf CheckAllowedPaytype
+                AddHandler .CheckGrossAmount, AddressOf CheckGrossAmount
+                ' -------------------------------------------------------------------------------
+                AddHandler .LoadPaymentType, AddressOf LoadPaymentType
+                AddHandler .LoadCancellationReason, AddressOf LoadCancellationReason
+                'AddHandler .LoadAllowedPaymentType, AddressOf LoadAllowedPaymentType
+                AddHandler .LoadMerchantId, AddressOf LoadMerchantId
+                AddHandler .LoadBankNetwork, AddressOf LoadBankNetwork
+                AddHandler .LoadAccountType, AddressOf LoadAccountType
+                AddHandler .LoadBankList, AddressOf LoadBankList
+                AddHandler .LoadDefaultTerminal, AddressOf LoadDefaultTerminal
+                AddHandler .LoadECashPaymentChannel, AddressOf LoadECashPaymentChannel
+                ' -------------------------------------------------------------------------------
+                AddHandler .LoadSourceSite, AddressOf LoadSourceSite
+                AddHandler .LoadCurrency, AddressOf LoadCurrency
+                ' -------------------------------------------------------------------------------
+                AddHandler .CheckSourceSite, AddressOf CheckSourceSite
+                AddHandler .ConfirmCancel, AddressOf ConfirmCancel
+                AddHandler .ConfirmSave, AddressOf ConfirmSave
+                AddHandler .ConfirmPrint, AddressOf ConfirmPrint
+                AddHandler .ProcessAcKReceipt, AddressOf ProcessAckReceipt
+                AddHandler .LoadAckReceipt, AddressOf LoadAckReceipt
+                AddHandler .LoadSalesInvoice, AddressOf LoadSalesInvoice
+                AddHandler .LoadNewAckReceipt, AddressOf LoadNewAckReceipt
+                AddHandler .LoadViewAR, AddressOf LoadViewAR
+                AddHandler .LoadViewSI, AddressOf LoadViewSI
+                ' -------------------------------------------------------------------------------
+                'AddHandler .GenerateReport, AddressOf GenerateReport
+            End With
+
+        End Sub
+
+#End Region
+
+#Region "Single Point Functions"
+        Private Function GetItemValue(ByVal pItem As String, ByVal pSplit As String, ByVal pArray As Integer) As String
+
+            Dim arrItem() As String
+
+            Try
+                arrItem = pItem.Split(pSplit)
+                Return arrItem(pArray)
+            Catch ex As Exception
+                Throw New Exception(String.Concat("GetItemValue : ", ex.Message))
+                'Throw
+            End Try
+
+        End Function
+
+        Private Function CheckIfExisting(ByVal pAction As String, ByVal pCode As String, ByVal pReference As String, ByVal pAmount As Decimal) As Boolean
+
+            Dim intRecCnt As Integer = 0
+
+            Try
+                With vwPaymentAckReceipt
+                    Select Case pAction
+                        Case "PAYTYPE"
+                            For Each item As cPaymentType In .lstPaymentTypeDetails
+                                Select Case pCode
+                                    Case eReference.PayTypeCCA, eReference.PayTypeDCA
+                                        'If Not .GpaPaymentTag Then
+                                        '    intRecCnt += 1
+                                        'End If
+                                End Select
+
+                                If item.PaymentType = pCode _
+                                And (String.Concat(item.ReferenceNumber, "|", IIf(item.PaymentType = eReference.PayTypeCHQ, item.Bank, item.ApprovalCode)) = pReference) Then
+                                    intRecCnt += 1
+                                End If
+                            Next
+                    End Select
+
+                    If intRecCnt >= 1 Then Return True
+                End With
+                Return False
+            Catch ex As Exception
+                Throw New Exception(String.Concat("CheckIfExisting : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error CheckIfExisting.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Function
+
+        Private Function GetServiceFeeRate(ByVal pPaymentChannel As String) As Decimal
+            Try
+                Dim objBLL As New bllReference.BParamRef
+                Dim dtParam As DataTable
+                Dim mReturn As Decimal
+
+                dtParam = objBLL.GetRefECASH
+
+                Dim dtFiltered = From c In dtParam.AsEnumerable
+                 Where c.Item("code") = pPaymentChannel _
+                 And cDataType.fDate.IfNull(c.Item("sdate")) <= Date.Now.Date _
+                 And IIf(IsDBNull(c.Item("edate")), Date.Now.Date, c.Item("edate")) <= Date.Now.Date
+                 Select c
+
+                If dtFiltered.Any() Then
+                    dtParam = dtFiltered.CopyToDataTable()
+                    mReturn = dtParam.Rows(0).Item("numcode")
+                Else
+                    mReturn = 0
+                End If
+
+                Return mReturn
+            Catch ex As Exception
+                Throw New Exception(String.Concat("GetServiceFeeRate : ", ex.Message))
+            End Try
+        End Function
+
+        Private Function GetIdFromList(ByVal pList As Object, ByVal pCounter As Integer) As Long
+            If pList.Count > pCounter Then
+                Return pList(pCounter)
+            Else
+                Return 0
+            End If
+        End Function
+
+        Public Shared Function ConvertToDataTable(Of T)(ByVal list As IList(Of T)) As DataTable
+
+            Dim table As New DataTable()
+            Dim fields() = list.First.GetType.GetProperties
+
+            For Each field In fields
+                table.Columns.Add(field.Name, field.PropertyType)
+            Next
+            For Each item In list
+                Dim row As DataRow = table.NewRow()
+                For Each field In fields
+                    Dim p = item.GetType.GetProperty(field.Name)
+                    row(field.Name) = p.GetValue(item, Nothing)
+                Next
+                table.Rows.Add(row)
+            Next
+            Return table
+        End Function
+#End Region
+
+#Region "Validations"
+        Private Function IsValidPaymentAckReceipt() As Boolean
+            Try
+                If vwPaymentAckReceipt.DocSaveState = eReference.DocSaveState.Cancel Then
+                    If vwPaymentAckReceipt.CancellationReason = cDataType.fString.Empty Then
+                        Call SetMessage("You must Select a Cancellation Reason.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+                End If
+
+                If IsValidTotals() AndAlso
+                    IsValidPaymentDetails() AndAlso
+                    IsValidInvoiceNumber() AndAlso
+                    IsValidARParticulars() Then
+                    Return True
+                Else
+                    Return False
+                End If
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidPaymentAckReceipt : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidPaymentPremiumRelated.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+            With vwPaymentAckReceipt
+                If .DocSaveState = eReference.DocSaveState.Cancel AndAlso .ARPrintStatus <> "PRINTED" Then
+                    Return False
+                End If
+            End With
+
+            Return True
+
+        End Function
+
+        Private Function IsValidTotals() As Boolean
+            Try
+                With vwPaymentAckReceipt
+                    If .GrossAmount = .PaymentTotalAmount + .WitholdingTax + .Discount Then
+                        Return True
+                    Else
+                        Call SetMessage(String.Concat("Ack. Receipt.<br /><br />", "Payment totals are not balanced with the Gross Amount!<br /><br />"), eSystemMessage.Information, True)
+                        Return False
+                    End If
+
+                End With
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidTotals : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidTotals.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Function
+
+        Private Function IsValidInvoiceNumber() As Boolean
+
+            Try
+
+                With vwPaymentAckReceipt
+
+                    If .InvoiceNumber = cDataType.fLong.Empty Then
+                        Call SetMessage("Input Invoice No.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidInvoiceNumber : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidGpaCardID.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Function
+
+        Private Function IsValidARParticulars() As Boolean
+            Try
+                With vwPaymentAckReceipt
+                    If Trim(.Particulars) = "" Then
+                        Call SetMessage("Please input AR Particularst", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If .Particulars.Length > 2000 Then
+                        Call SetMessage("Acknowledgement Receipt Particulars exceeds 2000 character limit", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    ' Check line limit
+                    Dim lines As String() = .Particulars.Split(New String() {Environment.NewLine, vbCrLf, vbLf}, StringSplitOptions.None)
+                    If lines.Length > 5 Then
+                        Call SetMessage("Acknowledgement Receipt Particulars exceeds the 5-line limit.", eSystemMessage.Warning, True)
+                        Exit Function
+                    End If
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidARParticulars.", ex.Message))
+            End Try
+        End Function
+
+        Private Function IsValidAckReceiptNumber() As Boolean
+
+            Try
+
+                With vwPaymentAckReceipt
+
+                    If .AckReceiptNumber = cDataType.fLong.Empty Then
+                        Call SetMessage("Input Ack Receipt No.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidAckReceiptNumber : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidGpaCardID.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Function
+
+        Private Function IsValidPaymentDetails() As Boolean
+            Try
+
+                With vwPaymentAckReceipt
+                    'If .ARDate = cDataType.fDate.Empty Then
+                    '    Call SetMessage("Error in generating OPR Date.", eSystemMessage.Warning, True)
+                    '    Return False
+                    'End If
+
+                    If .SourceSite = cDataType.fString.Empty Then
+                        Call SetMessage("Please select a Source Site.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If Not .IsSourceSiteLocked Then
+                        Call SetMessage("Please verify Source Site.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If Not .IsGrossAmountLocked Then
+                        Call SetMessage("Please verify Gross Amount.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If Not .IsWTaxLocked Then
+                        Call SetMessage("Please verify Witolding Tax Amount.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If Not .IsDiscountLocked Then
+                        Call SetMessage("Please verify Discount Amount.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If Not .IsCommLocked Then
+                        Call SetMessage("Please verify Commission Amount.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If .GrossAmount = cDataType.fDecimal.Empty Then
+                        Call SetMessage("Please enter gross amount.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If .GrossAmount <> .WitholdingTax + .CommissionAmount + .Discount + .TotalSales Then
+                        Call SetMessage("Please review payment totals.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If .TotalSales + .CommissionAmount <> .PaymentTotalAmount Then
+                        Call SetMessage("Please review payment totals.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If .CommissionAmount > .CashTotalAmount Then
+                        Call SetMessage("Commission amount cannot be greater than Cash Collection.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If .lstPaymentTypeDetails.Count = 0 Then
+                        Call SetMessage("Include Payment Details.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If .PayCurrency = cDataType.fString.Empty Then
+                        Call SetMessage("Please select currency of payment.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidPaymentDetails : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidPaymentDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Function
+
+        Private Function IsValidLoadViewAR() As Boolean
+
+            Try
+
+                With vwPaymentAckReceipt
+                    If .ViewARFrom > .ViewARTo Then
+                        Call SetMessage("View Date From exceeds Date To.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    Select Case .ViewARFrom
+                        Case cDataType.fDate.Empty
+                            Call SetMessage("Please enter Date From.", eSystemMessage.Warning, True)
+                            Return False
+                        Case cDataType.fDate.Invalid
+                            Call SetMessage("Invalid Date From.", eSystemMessage.Warning, True)
+                            Return False
+                        Case Is < cDataType.fDate.Minimum
+                            Call SetMessage("View Date From precedes minimum date.", eSystemMessage.Warning, True)
+                            Return False
+                        Case Is > cDataType.fDate.Current
+                            Call SetMessage("View Date From exceeds current date.", eSystemMessage.Warning, True)
+                            Return False
+                    End Select
+
+                    Select Case .ViewARTo
+                        Case cDataType.fDate.Empty
+                            Call SetMessage("Please enter Date To.", eSystemMessage.Warning, True)
+                            Return False
+                        Case cDataType.fDate.Invalid
+                            Call SetMessage("Invalid Date To.", eSystemMessage.Warning, True)
+                            Return False
+                        Case Is < cDataType.fDate.Minimum
+                            Call SetMessage("View Date To precedes minimum date.", eSystemMessage.Warning, True)
+                            Return False
+                        Case Is > cDataType.fDate.Current
+                            Call SetMessage("View Date To exceeds current date.", eSystemMessage.Warning, True)
+                            Return False
+                    End Select
+
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidLoadViewAR : ", ex.Message))
+            End Try
+
+        End Function
+
+        Private Function IsValidLoadViewSI() As Boolean
+
+            Try
+
+                With vwPaymentAckReceipt
+                    If .ViewSIFrom > .ViewSITo Then
+                        Call SetMessage("View Date From exceeds Date To.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    Select Case .ViewSIFrom
+                        Case cDataType.fDate.Empty
+                            Call SetMessage("Please enter Date From.", eSystemMessage.Warning, True)
+                            Return False
+                        Case cDataType.fDate.Invalid
+                            Call SetMessage("Invalid Date From.", eSystemMessage.Warning, True)
+                            Return False
+                        Case Is < cDataType.fDate.Minimum
+                            Call SetMessage("View Date From precedes minimum date.", eSystemMessage.Warning, True)
+                            Return False
+                        Case Is > cDataType.fDate.Current
+                            Call SetMessage("View Date From exceeds current date.", eSystemMessage.Warning, True)
+                            Return False
+                    End Select
+
+                    Select Case .ViewSITo
+                        Case cDataType.fDate.Empty
+                            Call SetMessage("Please enter Date To.", eSystemMessage.Warning, True)
+                            Return False
+                        Case cDataType.fDate.Invalid
+                            Call SetMessage("Invalid Date To.", eSystemMessage.Warning, True)
+                            Return False
+                        Case Is < cDataType.fDate.Minimum
+                            Call SetMessage("View Date To precedes minimum date.", eSystemMessage.Warning, True)
+                            Return False
+                        Case Is > cDataType.fDate.Current
+                            Call SetMessage("View Date To exceeds current date.", eSystemMessage.Warning, True)
+                            Return False
+                    End Select
+
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidLoadViewSI : ", ex.Message))
+            End Try
+
+        End Function
+
+        Private Function IsValidCashDetails() As Boolean
+            Try
+                With vwPaymentAckReceipt
+                    If .CashPaymentTag = True Then
+                        If .CashAmount = cDataType.fDecimal.Empty Then
+                            Call SetMessage("Please enter valid cash amount.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+                    Else
+                        Call SetMessage("Incorrect Payment Type tagging!", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidCashDetails : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidCashDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Function
+
+        Private Function IsValidCheckDetails() As Boolean
+
+            Try
+
+                With vwPaymentAckReceipt
+
+                    If .CheckPaymentTag = True Then
+
+                        If .CheckNumber = cDataType.fLong.Empty Then
+                            Call SetMessage("Please enter valid check number.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .CheckAmount = cDataType.fDecimal.Empty Then
+                            Call SetMessage("Please enter valid check amount.", eSystemMessage.Warning, True)
+                            Return False
+                        ElseIf .CheckAmount > .GrossAmount Then
+                            Call SetMessage("Check amount exceeds gross amount.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .CheckBankName = cDataType.fString.Empty Then
+                            Call SetMessage("Please enter bank name.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .CheckBankBranch = cDataType.fString.Empty Then
+                            Call SetMessage("Please enter bank branch.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+                    Else
+                        Call SetMessage("Incorrect Payment Type tagging!", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidCheckDetails : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidCheckDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Function
+
+        Private Function IsValidCreditCardDetails() As Boolean
+
+            Try
+
+                With vwPaymentAckReceipt
+
+                    If .CreditCardPaymentTag = True Then
+
+                        If .CreditCardTerminalUse = cDataType.fString.Empty Then
+                            Call SetMessage("Please select terminal use.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .CreditCardSwipeDate.Date = cDataType.fDate.Empty Then
+                            Call SetMessage("Please enter swipe date.", eSystemMessage.Warning, True)
+                            Return False
+                        ElseIf .CreditCardSwipeDate.Date = cDataType.fDate.Invalid Then
+                            Call SetMessage("Invalid swipe date.", eSystemMessage.Warning, True)
+                            Return False
+                        ElseIf .CreditCardSwipeDate > CDate(String.Concat(.ARDate.ToShortDateString, " ", Now.TimeOfDay)) Then
+                            Call SetMessage("Swipe date exceeds AR Date.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .CreditCardMerchant = cDataType.fString.Empty Then
+                            Call SetMessage("Please select merchant.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .CreditCardNumber = cDataType.fString.Empty Then
+                            Call SetMessage("Please enter credit card number.", eSystemMessage.Warning, True)
+                            Return False
+                        ElseIf .CreditCardNumber <> cDataType.fString.Empty _
+                            And Not .CreditCardNumberTag Then
+                            Call SetMessage("Invalid credit card number.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .CreditCardTypeDesc = cDataType.fString.Empty Then
+                            Call SetMessage("Invalid card type. Please validate credit card number.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .CreditCardAmount = cDataType.fDecimal.Empty Then
+                            Call SetMessage("Please enter amount.", eSystemMessage.Warning, True)
+                            Return False
+                        ElseIf .CreditCardAmount > .GrossAmount Then
+                            Call SetMessage("Amount exceeds gross amount.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .CreditCardApprovalCode = cDataType.fString.Empty Then
+                            Call SetMessage("Please enter approval code.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .CreditCardBatchNumber = cDataType.fLong.Empty Then
+                            Call SetMessage("Please enter batch number.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+                    Else
+                        Call SetMessage("Incorrect Payment Type tagging!", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidCreditCardDetails : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidCreditCardDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Function
+
+        Private Function IsValidCreditCardNumber() As Boolean
+
+            Try
+
+                With vwPaymentAckReceipt
+
+                    If .CreditCardNumber = cDataType.fString.Empty Then
+                        Call SetMessage("Please enter credit card number.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidCreditCardNumber : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidCreditCardNumber.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Function
+
+        Private Function IsValidDebitCardDetails() As Boolean
+
+            Try
+
+                With vwPaymentAckReceipt
+
+                    If .DebitCardPaymentTag = True Then
+
+                        If .DebitCardTerminalUse = cDataType.fString.Empty Then
+                            Call SetMessage("Please select terminal use.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .DebitCardSwipeDate.Date = cDataType.fDate.Empty Then
+                            Call SetMessage("Please enter swipe date.", eSystemMessage.Warning, True)
+                            Return False
+                        ElseIf .DebitCardSwipeDate.Date = cDataType.fDate.Invalid Then
+                            Call SetMessage("Invalid swipe date.", eSystemMessage.Warning, True)
+                            Return False
+                        ElseIf .DebitCardSwipeDate > CDate(String.Concat(.ARDate.ToShortDateString, " ", Now.TimeOfDay)) Then
+                            Call SetMessage("Swipe date exceeds AR Date.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .DebitCardMerchant = cDataType.fString.Empty Then
+                            Call SetMessage("Please select merchant.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .DebitCardBankNetwork = cDataType.fString.Empty Then
+                            Call SetMessage("Please select bank network.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .DebitCardBankName = cDataType.fString.Empty Then
+                            Call SetMessage("Please enter bank name.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .DebitCardAccountType = cDataType.fString.Empty Then
+                            Call SetMessage("Please select account type.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .DebitCardAccountNumber = cDataType.fString.Empty Then
+                            Call SetMessage("Please enter account number.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .DebitCardChargeSlip = cDataType.fString.Empty Then
+                            Call SetMessage("Please enter charge slip number.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .DebitCardAmount = cDataType.fDecimal.Empty Then
+                            Call SetMessage("Please enter amount.", eSystemMessage.Warning, True)
+                            Return False
+                        ElseIf .DebitCardAmount > .GrossAmount Then
+                            Call SetMessage("Amount exceeds gross amount.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .DebitCardBatchNumber = cDataType.fLong.Empty Then
+                            Call SetMessage("Please enter batch number.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+                    Else
+                        Call SetMessage("Incorrect Payment Type tagging!", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidDebitCardDetails : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidDebitCardDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Function
+
+        Private Function IsValidECashPaymentDetails() As Boolean
+
+            Try
+
+                With vwPaymentAckReceipt
+
+                    If .ECashPaymentTag = True Then
+
+                        If .ECashPaymentChannel = cDataType.fString.Empty Then
+                            Call SetMessage("Please select payment channel.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .ECashPaymentReferenceNumber = cDataType.fString.Empty Then
+                            Call SetMessage("Please enter reference number.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                        If .ECashPaymentAmount = cDataType.fDecimal.Empty Then
+                            Call SetMessage("Please enter amount.", eSystemMessage.Warning, True)
+                            Return False
+                        ElseIf .ECashPaymentAmount > .GrossAmount Then
+                            Call SetMessage("Amount exceeds gross amount.", eSystemMessage.Warning, True)
+                            Return False
+                        End If
+
+                    Else
+                        Call SetMessage("Incorrect Payment Type tagging!", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                End With
+
+                Return True
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidECashPaymentDetails : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidDebitCardDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Function
+
+
+        Private Function IsValidPaymentTypeDetails(ByVal pPaymentType As String) As Boolean
+
+            Try
+                With vwPaymentAckReceipt
+
+                    If .PaymentType = String.Empty Then
+                        Call SetMessage("Please select Payment Type.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If .PaymentTotalAmount = .GrossAmount Then
+                        Call SetMessage("Payment Type Details Amount already reached Gross Amount.", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    If .PaymentTotalAmount + .CashAmount + .CheckAmount + .CreditCardAmount + .DebitCardAmount + .ECashPaymentTotalAmount > .GrossAmount Then
+                        Call SetMessage("Payment Type Details amount will exceed gross amount..", eSystemMessage.Warning, True)
+                        Return False
+                    End If
+
+                    Select Case pPaymentType
+                        Case eReference.PayTypeCSH
+                            Return IsValidCashDetails()
+                        Case eReference.PayTypeCHQ
+                            Return IsValidCheckDetails()
+                        Case eReference.PayTypeCCA
+                            Return IsValidCreditCardDetails()
+                        Case eReference.PayTypeDCA
+                            Return IsValidDebitCardDetails()
+                        Case eReference.PayTypeECP
+                            Return IsValidECashPaymentDetails()
+                    End Select
+
+                End With
+
+                Return False
+
+            Catch ex As Exception
+                Throw New Exception(String.Concat("IsValidPaymentTypeDetails : ", ex.Message))
+                'Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error IsValidPaymentTypeDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Function
+#End Region
+
+#Region "Transactions"
+
+#Region "Clear"
+        Private Sub ClearScreenMain(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Call ClearScreenInfo(sender, e)
+                Call ClearScreenViewAR(sender, e)
+                Call ClearScreenViewSI(sender, e)
+                Call ClearScreenPaymentDetails(sender, e)
+                Call ClearScreenPaymentTypeDetails(sender, e)
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenMain.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ClearScreenViewAR(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                With vwPaymentAckReceipt
+                    .ViewARFrom = cDataType.fDate.Empty
+                    .ViewARTo = cDataType.fDate.Empty
+                    .ViewARNumber = cDataType.fLong.Empty
+                    .ViewARBySINo = cDataType.fLong.Empty
+                    .dtViewAR = Nothing
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenViewAR.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ClearScreenViewSI(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                With vwPaymentAckReceipt
+                    .ViewSIFrom = cDataType.fDate.Empty
+                    .ViewSITo = cDataType.fDate.Empty
+                    .ViewSINumber = cDataType.fLong.Empty
+                    .ViewSIReferenceNumber = cDataType.fString.Empty
+                    .dtViewSI = Nothing
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenViewSI.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ClearScreenInfo(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+
+                With vwPaymentAckReceipt
+                    .SourceType = cDataType.fString.Empty
+                    .AckReceiptID = cDataType.fLong.Empty
+                    .ReferenceNo = cDataType.fString.Empty
+                    .PayorName = cDataType.fString.Empty
+                    .PayorAddress = cDataType.fString.Empty
+                    .PayorTIN = cDataType.fString.Empty
+                    .InsuredClientName = cDataType.fString.Empty
+                    .PolicyNumber = cDataType.fString.Empty
+                    .CoveragePeriodFrom = cDataType.fDate.Empty
+                    .CoveragePeriodTo = cDataType.fDate.Empty
+                    .InvoiceCurrency = cDataType.fString.Empty
+                    .InvoiceAmount = cDataType.fDecimal.Empty
+                    .PaymentTerm = cDataType.fString.Empty
+                    .NextDueDate = cDataType.fDate.Empty
+                    .AgentName = cDataType.fString.Empty
+                    .AgentCode = cDataType.fString.Empty
+                    .InvoiceNumber = cDataType.fLong.Empty
+                    .InvoiceDate = cDataType.fDate.Empty
+                    .AckReceiptRemarks = cDataType.fString.Empty
+                    .AckReceiptOtherInfo = cDataType.fString.Empty
+                    .Particulars = cDataType.fString.Empty
+                    .SIPrintStatus = cDataType.fString.Empty
+                    .ARPrintStatus = cDataType.fString.Empty
+                    .lstSIDetails = New List(Of cSIDetails)
+                End With
+                'Call ClearScreenPolicy(sender, e)
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenInfo.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub ClearScreenPaymentDetails(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                With vwPaymentAckReceipt
+                    .AckReceiptNumber = cDataType.fLong.Empty
+                    .ARDate = cDataType.fDate.Empty
+                    .PrevPayType = cDataType.fString.Empty
+                    .PaymentType = cDataType.fString.Empty
+                    .GrossAmount = cDataType.fDecimal.Empty
+                    .PayCurrency = cDataType.fString.Empty
+                    .CommissionAmount = cDataType.fDecimal.Empty
+                    .TotalSales = cDataType.fDecimal.Empty
+                    .WitholdingTax = cDataType.fDecimal.Empty
+                    .NetOfWitholdingTax = cDataType.fDecimal.Empty
+                    .Discount = cDataType.fDecimal.Empty
+                    .DiscountIdNo = cDataType.fString.Empty
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenPaymentDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub ClearScreenPaymentTypeDetails(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Call ClearScreenCashDetails(sender, e)
+                Call ClearScreenCheckDetails(sender, e)
+                Call ClearScreenCreditCardDetails(sender, e)
+                Call ClearScreenDebitCardDetails(sender, e)
+                Call ClearScreenECashPaymentDetails(sender, e)
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenPaymentTypeDetails.<br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ClearScreenCashDetails(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                With vwPaymentAckReceipt
+                    .CashAmount = cDataType.fDecimal.Empty
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenCashDetails.<br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub ClearScreenCheckDetails(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                With vwPaymentAckReceipt
+                    .CheckNumber = cDataType.fLong.Empty
+                    .CheckAmount = cDataType.fDecimal.Empty
+                    .CheckBankName = cDataType.fString.Empty
+                    .CheckBankBranch = cDataType.fString.Empty
+                    '.CheckTotalAmount = cDataType.fDecimal.Empty
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenCheckDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub ClearScreenCreditCardDetails(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                With vwPaymentAckReceipt
+                    .CreditCardTerminalUse = cDataType.fString.Empty
+                    .CreditCardSwipeDate = cDataType.fDate.Empty
+                    .CreditCardMerchant = cDataType.fString.Empty
+                    .CreditCardNumberTag = cDataType.fBoolean.Empty
+                    .CreditCardNumber = cDataType.fString.Empty
+                    .CreditCardType = cDataType.fString.Empty
+                    .CreditCardTypeDesc = cDataType.fString.Empty
+                    .CreditCardBatchNumber = cDataType.fLong.Empty
+                    .CreditCardApprovalCode = cDataType.fString.Empty
+                    .CreditCardAmount = cDataType.fDecimal.Empty
+                    .CreditCardRemarks = cDataType.fString.Empty
+                    '.CreditCardTotalAmount = cDataType.fDecimal.Empty
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenCreditCardDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub ClearScreenCreditCardNumber(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                With vwPaymentAckReceipt
+                    .CreditCardNumberTag = False
+                    .CreditCardType = cDataType.fString.Empty
+                    .CreditCardTypeDesc = cDataType.fString.Empty
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenCreditCardNumber.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub ClearScreenDebitCardDetails(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                With vwPaymentAckReceipt
+                    .DebitCardTerminalUse = cDataType.fString.Empty
+                    .DebitCardSwipeDate = cDataType.fDate.Empty
+                    .DebitCardMerchant = cDataType.fString.Empty
+                    .DebitCardBankNetwork = cDataType.fString.Empty
+                    .DebitCardBankName = cDataType.fString.Empty
+                    .DebitCardAccountType = cDataType.fString.Empty
+                    .DebitCardAccountNumber = cDataType.fString.Empty
+                    .DebitCardBatchNumber = cDataType.fLong.Empty
+                    .DebitCardChargeSlip = cDataType.fString.Empty
+                    .DebitCardAmount = cDataType.fDecimal.Empty
+                    .DebitCardRemarks = cDataType.fString.Empty
+                    '.DebitCardTotalAmount = cDataType.fDecimal.Empty
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenDebitCardDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub ClearScreenECashPaymentDetails(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                With vwPaymentAckReceipt
+                    .ECashPaymentChannel = cDataType.fString.Empty
+                    .ECashPaymentReferenceNumber = cDataType.fString.Empty
+                    .ECashPaymentAmount = cDataType.fDecimal.Empty
+                    .ECashPaymentRemarks = cDataType.fString.Empty
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ClearScreenECashPaymentDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+#End Region
+
+#Region "PayType Details"
+        Private Sub ValidateCreditCardNo(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+
+                Dim objLocal As New bllWorking.BSiteOPRCred
+                Dim strItem As String = String.Empty
+
+                With vwPaymentAckReceipt
+                    .CreditCardNumberTag = False
+                    If IsValidCreditCardNumber() Then
+                        strItem = objLocal.ValidateCreditCardNumber(.CreditCardNumber).ToString
+                        .CreditCardNumberTag = GetItemValue(strItem, "|", 0)
+                        If .CreditCardNumberTag Then
+                            .CreditCardType = GetItemValue(strItem, "|", 1)
+                            .CreditCardTypeDesc = GetItemValue(strItem, "|", 2)
+                        Else
+                            Call SetMessage(GetItemValue(strItem, "|", 3), eSystemMessage.Warning, True)
+                        End If
+                    End If
+                End With
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ValidateCreditCardNo.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub CreditCardFetchData(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim dtLocal As DataTable
+                Dim objLocal As New bllWorking.BSiteOPRCred
+                Dim cptLocalList As New List(Of cPaymentType)
+                Dim strRemark As String = Nothing
+
+                With vwPaymentAckReceipt
+
+                    dtLocal = objLocal.GetOPRCredByApprvCodeDt(.CreditCardApprovalCode, 0)
+                    If dtLocal.Rows.Count > 0 Then
+                        For Each dr As DataRow In dtLocal.Rows
+                            If cDataType.fInteger.IfNull(dr.Item("status_id")) <> 4 Then
+                                strRemark = String.Concat("Card payment Linked from OPR#", dr.Item("opr_nmbr"))
+                                cptLocalList.Add(New cPaymentType(dr, eReference.PayTypeCCA))
+                            End If
+                        Next
+                    End If
+
+                    For Each cptLocal As cPaymentType In cptLocalList
+                        .CreditCardTerminalUse = cptLocal.TerminalUse
+                        LoadMerchantId(Me, EventArgs.Empty)
+                        LoadDefaultTerminal(Me, EventArgs.Empty)
+                        .CreditCardSwipeDate = cptLocal.SwipeDate
+                        .CreditCardSwipeTime = cptLocal.SwipeDate
+                        .CreditCardMerchant = cptLocal.MerchantID
+                        .CreditCardNumber = cptLocal.CardNumber
+                        Call ValidateCreditCardNo(sender, e)
+                        .CreditCardApprovalCode = cptLocal.ApprovalCode
+                        .CreditCardBatchNumber = cptLocal.BatchNumber
+                        .CreditCardRemarks = strRemark
+                    Next cptLocal
+
+                End With
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error CreditCardFetchData.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub DebitCardFetchData(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim dtLocal As DataTable
+                Dim objLocal As New bllWorking.BSiteOPRDebit
+                Dim cptLocalList As New List(Of cPaymentType)
+                Dim strRemark As String = Nothing
+
+                With vwPaymentAckReceipt
+
+                    dtLocal = objLocal.GetOPRDebitByChargeSlipDt(.DebitCardChargeSlip, 0)
+                    If dtLocal.Rows.Count > 0 Then
+                        For Each dr As DataRow In dtLocal.Rows
+                            If cDataType.fInteger.IfNull(dr.Item("status_id")) <> 4 Then
+                                strRemark = String.Concat("Card payment Linked from OPR#", dr.Item("opr_nmbr"))
+                                cptLocalList.Add(New cPaymentType(dr, eReference.PayTypeDCA))
+                            End If
+                        Next
+                    End If
+
+                    For Each cptLocal As cPaymentType In cptLocalList
+                        .DebitCardTerminalUse = cptLocal.TerminalUse
+                        LoadMerchantId(Me, EventArgs.Empty)
+                        LoadDefaultTerminal(Me, EventArgs.Empty)
+                        .DebitCardSwipeDate = cptLocal.SwipeDate
+                        .DebitCardSwipeTime = cptLocal.SwipeDate
+                        .DebitCardMerchant = cptLocal.MerchantID
+                        .DebitCardBankNetwork = cptLocal.Network
+                        .DebitCardBankName = cptLocal.Bank
+                        .DebitCardAccountType = cptLocal.CASA
+                        .DebitCardAccountNumber = cptLocal.AccountNumber
+                        .DebitCardChargeSlip = cptLocal.ApprovalCode
+                        .DebitCardBatchNumber = cptLocal.BatchNumber
+                        .DebitCardRemarks = strRemark
+                    Next cptLocal
+
+                End With
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error DebitCardFetchData.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub AddCashPayment(ByVal sender As Object, ByVal e As EventArgs)
+            Dim lstLocal As New List(Of cPaymentType)
+            Dim cptLocal As New cPaymentType()
+
+            Dim mIsPaymentExists As Boolean = True
+
+            Try
+                With vwPaymentAckReceipt
+                    .IsPayTypeSuccessful = False
+                    'Check & Cash
+                    If IsValidPaymentTypeDetails(eReference.PayTypeCSH) Then
+                        If .PaymentType = eReference.PayTypeCHQ And .CashAmount > 0 Then
+
+                            mIsPaymentExists = CheckIfExisting("PAYTYPE", eReference.PayTypeCSH, String.Empty, cptLocal.Amount)
+                            If mIsPaymentExists Then
+                                Call SetMessage("Payment details or mode already exists.", eSystemMessage.Warning, True)
+                                Exit Sub
+                            Else
+                                cptLocal = New cPaymentType(
+                                    .CashAmount)
+
+                                lstLocal = .lstPaymentTypeDetails
+
+                                lstLocal.Add(cptLocal)
+                                Call AddToTotalAmount(cptLocal.PaymentType, cptLocal.Amount)
+
+                                .lstPaymentTypeDetails = lstLocal
+                                .IsPayTypeSuccessful = True
+                            End If
+                        End If
+                    End If
+                End With
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error AddCashPayment.<br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub AddPaymentTypeDetails(ByVal sender As Object, ByVal e As EventArgs)
+            Dim lstLocal As New List(Of cPaymentType)
+            Dim cptLocal As New cPaymentType()
+
+            Dim mIsPaymentExists As Boolean = True
+
+            Try
+                With vwPaymentAckReceipt
+                    .IsPayTypeSuccessful = False
+                    If IsValidPaymentTypeDetails(.PaymentType) Then
+
+                        lstLocal = .lstPaymentTypeDetails
+
+                        Select Case .PaymentType
+                            Case eReference.PayTypeCSH
+                                cptLocal = New cPaymentType(
+                                    .CashAmount)
+                            Case eReference.PayTypeCHQ
+                                cptLocal = New cPaymentType(
+                                    .CheckAmount,
+                                    .CheckNumber,
+                                    .CheckBankName,
+                                    .CheckBankBranch)
+                            Case eReference.PayTypeCCA
+                                cptLocal = New cPaymentType(
+                                    .CreditCardAmount,
+                                    .CreditCardTerminalUse,
+                                    .CreditCardMerchant,
+                                    .CreditCardSwipeDate,
+                                    .CreditCardType,
+                                    .CreditCardNumber,
+                                    .CreditCardBatchNumber,
+                                    .CreditCardApprovalCode,
+                                    .CreditCardRemarks)
+                            Case eReference.PayTypeDCA
+                                cptLocal = New cPaymentType(
+                                    .DebitCardAmount,
+                                    .DebitCardTerminalUse,
+                                    .DebitCardMerchant,
+                                    .DebitCardSwipeDate,
+                                    .DebitCardBankNetwork,
+                                    .DebitCardBankName,
+                                    .DebitCardAccountType,
+                                    .DebitCardAccountNumber,
+                                    .DebitCardBatchNumber,
+                                    .DebitCardChargeSlip,
+                                    .DebitCardRemarks)
+                            Case eReference.PayTypeECP
+                                cptLocal = New cPaymentType(
+                                    .ECashPaymentAmount,
+                                    .ECashPaymentChannel,
+                                    .ECashPaymentReferenceNumber,
+                                    .ECashPaymentRemarks,
+                                    GetServiceFeeRate(.ECashPaymentChannel))
+                        End Select
+
+                        mIsPaymentExists = CheckIfExisting("PAYTYPE", cptLocal.PaymentType, String.Concat(cptLocal.ReferenceNumber, "|", IIf(cptLocal.PaymentType = eReference.PayTypeCHQ, cptLocal.Bank, cptLocal.ApprovalCode)), cptLocal.Amount)
+                        If mIsPaymentExists Then
+                            Call SetMessage("Payment already exists.", eSystemMessage.Warning, True)
+                            Exit Sub
+                        Else
+                            lstLocal.Add(cptLocal)
+                            Call AddToTotalAmount(cptLocal.PaymentType, cptLocal.Amount)
+
+                            .lstPaymentTypeDetails = lstLocal
+                            .IsPayTypeSuccessful = True
+                        End If
+                    End If
+                End With
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error AddPaymentTypeDetails.<br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub DeletePaymentTypeDetails(ByVal sender As Object, ByVal e As EventArgs)
+            Dim lstLocal As New List(Of cPaymentType)
+
+            Try
+                With vwPaymentAckReceipt
+                    .IsPayTypeSuccessful = False
+
+                    For Each cptLocal As cPaymentType In .lstPaymentTypeDetails '.PaymentTypeListSession
+                        If cptLocal.PaymentTypeID <> .PaymentTypeID Then
+                            lstLocal.Add(cptLocal)
+                        Else
+                            Call AddToTotalAmount(cptLocal.PaymentType, -cptLocal.Amount)
+                        End If
+                    Next
+                    .lstPaymentTypeDetails = lstLocal
+                    .IsPayTypeSuccessful = True
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error DeletePaymentTypeDetails.<br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub GetPaymentTypeDetails(ByVal sender As Object, ByVal e As EventArgs)
+            Dim cptLocal As New cPaymentType
+
+            Try
+                With vwPaymentAckReceipt
+                    Dim lstRowLocal As List(Of cPaymentType) = (From l In .lstPaymentTypeDetails
+                               Where l.PaymentType = .PaymentType
+                               Select l).ToList
+
+
+                    For Each cptLocal In lstRowLocal
+                        Select Case .PaymentType
+                            Case eReference.PayTypeCSH
+                                .CashAmount = cptLocal.Amount
+                            Case eReference.PayTypeCHQ
+                                .CheckAmount = cptLocal.Amount
+                                .CheckNumber = cptLocal.CheckNumber
+                                .CheckBankName = cptLocal.Bank
+                                .CheckBankBranch = cptLocal.Branch
+                            Case eReference.PayTypeCCA
+                                .CreditCardAmount = cptLocal.Amount
+                                .CreditCardTerminalUse = cptLocal.TerminalUse
+                                .CreditCardSwipeDate = cptLocal.SwipeDate
+                                .CreditCardSwipeTime = cptLocal.SwipeDate
+                                .CreditCardMerchant = cptLocal.MerchantID
+                                .CreditCardNumber = cptLocal.CardNumber
+                                Call ValidateCreditCardNo(sender, e)
+                                .CreditCardBatchNumber = cptLocal.BatchNumber
+                                .CreditCardApprovalCode = cptLocal.ApprovalCode
+                                .CreditCardRemarks = cptLocal.Remarks
+                            Case eReference.PayTypeDCA
+                                .DebitCardAmount = cptLocal.Amount
+                                .DebitCardTerminalUse = cptLocal.TerminalUse
+                                .DebitCardSwipeDate = cptLocal.SwipeDate
+                                .DebitCardSwipeTime = cptLocal.SwipeDate
+                                .DebitCardMerchant = cptLocal.MerchantID
+                                .DebitCardBankNetwork = cptLocal.Network
+                                .DebitCardBankName = cptLocal.Bank
+                                .DebitCardAccountType = cptLocal.CASA
+                                .DebitCardAccountNumber = cptLocal.AccountNumber
+                                .DebitCardBatchNumber = cptLocal.BatchNumber
+                                .DebitCardChargeSlip = cptLocal.ApprovalCode
+                                .DebitCardRemarks = cptLocal.Remarks
+                            Case eReference.PayTypeECP
+                                .ECashPaymentAmount = cptLocal.Amount
+                                .ECashPaymentChannel = cptLocal.PaymentChannel
+                                .ECashPaymentRemarks = cptLocal.Remarks
+                                .ECashPaymentReferenceNumber = cptLocal.ReferenceID
+                            Case Else
+                        End Select
+                    Next
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error GetPaymentTypeDetails.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub CheckGrossAmount(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+
+                With vwPaymentAckReceipt
+                    .IsSuccessful = False
+
+                    If .GrossAmount <= 0 Then
+                        Call SetMessage("Gross Amount should be greater than zero(0).", eSystemMessage.Warning, True)
+                        Return
+                    End If
+
+                    .IsSuccessful = True
+                End With
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error CheckGrossAmount.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub LoadPaymentType(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim objBLL As New bllReference.BParamRef
+                vwPaymentAckReceipt.dtPaymentType = objBLL.GetRefPAYTYP
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadPaymentType.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub LoadCancellationReason(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim objBLL As New bllReference.BParamRef
+                vwPaymentAckReceipt.dtCancellationReason = objBLL.GetRefARCANCEL
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadCancellationReason.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub LoadMerchantId(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim objBLL As New bllReference.BMerchantSite
+                With vwPaymentAckReceipt
+                    .dtMerchantId = objBLL.GetRefMerchantSiteList(.SourceSite)
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadMerchantId.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub LoadBankNetwork(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim objBLL As New bllReference.BParamRef
+                vwPaymentAckReceipt.dtBankNetwork = objBLL.GetRefOcsBankNetwork
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadBankNetwork.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub LoadAccountType(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim objBLL As New bllReference.BParamRef
+                vwPaymentAckReceipt.dtAccountType = objBLL.GetRefOcsAccountType
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadAccountType.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub LoadBankList(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Dim objBLL As New bllReference.BBankDetails
+
+                vwPaymentAckReceipt.dtBankList = objBLL.LoadBankList() 'SiteCode      'LoadCheckBank
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadBankList.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub LoadDefaultTerminal(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim objBLL As New bllReference.BMerchantSite
+                Dim mTerminaluse As String
+                With vwPaymentAckReceipt
+                    Select Case .PaymentType
+                        Case eReference.PayTypeCCA
+                            mTerminaluse = .CreditCardTerminalUse
+                            .CreditCardMerchant = objBLL.GetMerchantId(.SourceSite, mTerminaluse)
+                        Case eReference.PayTypeDCA
+                            mTerminaluse = .DebitCardTerminalUse
+                            .DebitCardMerchant = objBLL.GetMerchantId(.SourceSite, mTerminaluse)
+                    End Select
+
+
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadDefaultTerminal.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub LoadECashPaymentChannel(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Dim objBLL As New bllReference.BParamRef
+                vwPaymentAckReceipt.dtECashPaymentChannel = objBLL.GetRefECASH
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadECashPaymentChannel.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+#End Region
+
+#Region "Load References"
+
+        Private Sub LoadSourceSite(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim objBLL As New bllReference.BSiteDetails
+                vwPaymentAckReceipt.dtSourceSite = objBLL.LoadSourceSite()
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadSourceSite.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub LoadCurrency(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim objBLL As New bllReference.BCurRef
+                vwPaymentAckReceipt.dtCurrency = objBLL.GetRefCurRefList
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadCurrency.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+#End Region
+
+#Region "Processing"
+        Private Sub CheckSourceSite(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+
+                With vwPaymentAckReceipt
+                    .IsSuccessful = False
+
+                    If .SourceSite = String.Empty Then
+                        Call SetMessage("Please select a Source Site.", eSystemMessage.Warning, True)
+                        Return
+                    End If
+
+                    .IsSuccessful = True
+                End With
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error CheckSourceSite.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub LoadNewAckReceipt(ByVal sender As Object, ByVal e As EventArgs)
+
+            Try
+                Dim objBLL As New bllStaging.BAckReceipt
+                With vwPaymentAckReceipt
+                    .IsSuccessful = False
+
+                    objBLL.LoadNewAckReceipt(vwPaymentAckReceipt.SiteCode, vwPaymentAckReceipt.UserID)
+
+                    .IsSuccessful = True
+                    .ReservedDocNo = objBLL.AckReceiptNumber
+                    .AckReceiptNumber = 0
+                    .ARDate = Now.ToShortDateString
+                End With
+
+            Catch ex As ArgumentException
+                Call SetMessage(String.Concat("New Document is not Allowed!<br /><br />", ex.Message), eSystemMessage.Information, True)
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadNewAckReceipt.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+
+        End Sub
+
+        Private Sub LoadViewAR(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Dim objBLL As New bllStaging.BAckReceipt
+                Dim dtLocal As New DataTable
+
+                With vwPaymentAckReceipt
+                    If IsValidLoadViewAR() Then
+                        If .ViewARNumber > 0 Then
+                            dtLocal = objBLL.LoadViewAR(.SiteCode, .ViewARNumber, 0)
+                        ElseIf .ViewARBySINo > 0 Then
+                            dtLocal = objBLL.LoadViewAR(.SiteCode, .ViewARBySINo, 1)
+                        Else
+                            dtLocal = objBLL.LoadViewAR(.SiteCode, .ViewARFrom, .ViewARTo)
+                        End If
+
+                        If dtLocal.Rows.Count = 0 Then
+                            Call SetMessage(String.Concat("View Ack Receipts.<br /><br />", "No AR found!"), eSystemMessage.Information, True)
+
+                        End If
+
+                        .dtViewAR = dtLocal
+                    End If
+                End With
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadViewAR.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub LoadViewSI(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                Dim objBLL As New bllReference.BSalesInvoice
+                Dim dtLocal As New DataTable
+
+                With vwPaymentAckReceipt
+                    If IsValidLoadViewSI() Then
+                        If .SourceType <> "SSO" Then
+                            If .ViewSINumber > 0 Then
+                                dtLocal = objBLL.LoadViewDoc(.SiteCode, .ViewSINumber, 2)
+                            Else
+                                dtLocal = objBLL.LoadViewDoc(.SiteCode, 2, .ViewSIFrom, .ViewSITo)
+                            End If
+                        Else
+                            If .ViewSINumber > 0 Then
+                                dtLocal = objBLL.LoadViewDoc(CLng(.SourceSite), .ViewSINumber, 0)
+                            ElseIf .ViewSIReferenceNumber <> String.Empty Then
+                                dtLocal = objBLL.LoadViewDoc(CLng(.SourceSite), .ViewSIReferenceNumber)
+                            Else
+                                dtLocal = objBLL.LoadViewDoc(CLng(.SourceSite), 0, .ViewSIFrom, .ViewSITo)
+                            End If
+                        End If
+
+                        If dtLocal.Rows.Count = 0 Then
+                            Call SetMessage(String.Concat("View Sales Invoices.<br /><br />", "No SI found!"), eSystemMessage.Information, True)
+
+                        End If
+
+                        .dtViewSI = dtLocal
+                    End If
+                End With
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadViewSI.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ProcessAckReceipt(ByVal sender As Object, ByVal e As EventArgs)
+            'Objects
+            Dim objAckReceipt As New bllStaging.BAckReceipt
+            Dim objARPayDetails As New bllStaging.BARPayDetails
+            'Lists
+            Dim lstARPayDetails As New List(Of bllStaging.BARPayDetails)
+            Dim lstIdARPayDetails As New List(Of Long)
+
+            Dim lstForDeletion As New List(Of Object)
+            Dim mDocSaveState As String = String.Empty
+
+            Try
+
+
+                With vwPaymentAckReceipt
+                    .IsSuccessful = False
+
+                    If IsValidPaymentAckReceipt() Then
+                        mDocSaveState = .DocSaveState
+
+                        Select Case mDocSaveState
+                            Case eReference.DocSaveState.Edit, eReference.DocSaveState.Cancel, eReference.DocSaveState.Print
+                                Dim dtARPayDetails = objARPayDetails.GetDt(.AckReceiptNumber, .UserID)
+
+                                For Each dr As DataRow In dtARPayDetails.Rows
+                                    If mDocSaveState = eReference.DocSaveState.Edit Or mDocSaveState = eReference.DocSaveState.Print Then
+                                        lstIdARPayDetails.Add(dr.Item("id"))
+                                        lstForDeletion.Add(New bllStaging.BARPayDetails() With {.ARPayDetailsID = dr.Item("id"), .ARNo = dr.Item("ar_no"), .Status = dr.Item("status"), .LastUpdateBy = vwPaymentAckReceipt.UserID})
+                                    Else
+                                        lstARPayDetails.Add(New bllStaging.BARPayDetails() With {.ARPayDetailsID = dr.Item("id"), .ARNo = dr.Item("ar_no"), .Status = dr.Item("status"), .LastUpdateBy = vwPaymentAckReceipt.UserID})
+                                    End If
+                                Next
+                        End Select
+
+                        Select Case mDocSaveState
+
+                            Case eReference.DocSaveState.AddNew, eReference.DocSaveState.Edit, eReference.DocSaveState.Print, eReference.DocSaveState.Cancel
+                                If .DocSaveState = eReference.DocSaveState.Print AndAlso .ARPrintStatus = "POSTED" Then
+                                    .IsSuccessful = True
+                                    SetMessage(String.Concat("<strong><h2>REMINDER:</h2></strong><br />Please print receipt using OCS - Printer!"), eSystemMessage.Information, True)
+                                    Exit Sub
+                                End If
+
+                                If .DocSaveState = eReference.DocSaveState.Cancel Then
+                                    .AckReceiptRemarks = String.Concat(.CancellationReason, ";", Chr(13), .AckReceiptRemarks)
+                                    .CancellationReason = String.Empty
+                                End If
+
+                                If .CashTotalAmount > 0 Then
+                                    lstARPayDetails.Clear()
+                                    lstARPayDetails.Add(New bllStaging.BARPayDetails(GetIdFromList(lstIdARPayDetails, lstARPayDetails.Count), .AckReceiptNumber, eReference.PayTypeCSH, .CashTotalAmount, "", 0, "", "", "", "", "", .ARDate, "", "", "", 0, 0, "READY", .UserID))
+                                End If
+                                For Each item In .lstPaymentTypeDetails
+                                    Select Case item.PaymentType
+                                        Case eReference.PayTypeCHQ
+                                            lstARPayDetails.Add(New bllStaging.BARPayDetails(GetIdFromList(lstIdARPayDetails, lstARPayDetails.Count), .AckReceiptNumber, item.PaymentType, item.Amount, item.CheckNumber, 0, item.Bank, item.Branch, "", "", "", .ARDate, "", "", "", 0, 0, "READY", .UserID))
+                                        Case eReference.PayTypeCCA
+                                            lstARPayDetails.Add(New bllStaging.BARPayDetails(GetIdFromList(lstIdARPayDetails, lstARPayDetails.Count), .AckReceiptNumber, item.PaymentType, item.Amount, item.ApprovalCode, item.BatchNumber, "", "", "", item.TerminalUse, item.MerchantID, item.SwipeDate, item.CardType, item.CardNumber, item.Remarks, 0, 0, "READY", .UserID))
+                                        Case eReference.PayTypeDCA
+                                            lstARPayDetails.Add(New bllStaging.BARPayDetails(GetIdFromList(lstIdARPayDetails, lstARPayDetails.Count), .AckReceiptNumber, item.PaymentType, item.Amount, item.ApprovalCode, item.BatchNumber, item.Bank, item.Branch, item.Network, item.TerminalUse, item.MerchantID, item.SwipeDate, item.CASA, item.AccountNumber, item.Remarks, 0, 0, "READY", .UserID))
+                                        Case eReference.PayTypeECP
+                                            lstARPayDetails.Add(New bllStaging.BARPayDetails(GetIdFromList(lstIdARPayDetails, lstARPayDetails.Count), .AckReceiptNumber, item.PaymentChannel, item.Amount, item.ReferenceID, 0, "", "", "", "", "", .ARDate, "", "", item.Remarks, item.ServiceFeeRate, 0, "READY", .UserID))
+                                    End Select
+                                Next
+
+                                objAckReceipt = New bllStaging.BAckReceipt(.AckReceiptID, .ReferenceNo, .PayorName, .PayorAddress, .PayorTIN,
+                                                                           .InsuredClientName, .PolicyNumber, .CoveragePeriodFrom, .CoveragePeriodTo, .InvoiceCurrency,
+                                                                           .PayCurrency, .GrossAmount, .TotalSales, .WitholdingTax, .NetOfWitholdingTax,
+                                                                           .Discount, .DiscountIdNo, .AckReceiptRemarks, .AckReceiptOtherInfo, .InvoiceNumber,
+                                                                           .AckReceiptNumber, .InvoiceDate, .ARDate, .ARPrintStatus, .UserID,
+                                                                           .SiteCode, .Particulars, .PaymentTerm, .NextDueDate, .AgentName,
+                                                                           .AgentCode, .CommissionAmount)
+
+                        End Select
+
+                        objPaymentAckReceipt = New bllPayment.BPaymentAckReceipt
+
+                        With objPaymentAckReceipt
+                            .SiteCode = vwPaymentAckReceipt.SiteCode
+                            .UserID = vwPaymentAckReceipt.UserID
+                            .AckReceipt = objAckReceipt
+                            .ARPayDetails = lstARPayDetails
+                            .lstForDeletion = lstForDeletion
+
+                            Select Case mDocSaveState
+                                Case eReference.DocSaveState.AddNew, eReference.DocSaveState.Edit
+                                    .IsSuccessful = True
+                                    .ProcessPaymentAckReceipt()
+                                    vwPaymentAckReceipt.AckReceiptNumber = .ReservedDocNo
+                                Case eReference.DocSaveState.Print
+                                    .IsSuccessful = True
+                                    .PrintPaymentAckReceipt()
+
+                                Case eReference.DocSaveState.Cancel
+                                    .IsSuccessful = True
+                                    .CancelPaymentAckReceipt()
+                            End Select
+                        End With
+                        .IsSuccessful = objPaymentAckReceipt.IsSuccessful
+                    End If
+                End With
+                If vwPaymentAckReceipt.IsSuccessful Then
+                    If mDocSaveState = eReference.DocSaveState.Print Then
+                        SetMessage(String.Concat("<strong><h2>REMINDER:</h2></strong><br />Please print receipt using OCS - Printer!"), eSystemMessage.Information, True)
+                    Else
+                        Call SetMessage(String.Concat("Ack Receipt.<br /><br />", "Transaction Successful!<br /><br />"), eSystemMessage.Information, True)
+                    End If
+                End If
+
+            Catch ex As Exception
+                Call SetMessage(String.Concat("An Error has occurred.<br /><br />", ex.Message), eSystemMessage.Information, True)
+            End Try
+
+        End Sub
+
+        Private Sub ConfirmCancel(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                With vwConfirmMsg
+                    .ConfirmCaller = "CANCEL"
+                    .Message = String.Concat("Are you sure you want to cancel Ack. Receipt#", vwPaymentAckReceipt.InvoiceNumber, "?")
+                    .isMessage = True
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ConfirmCancel.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ConfirmSave(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                With vwConfirmMsg
+                    .ConfirmCaller = "SAVE"
+                    .Message = "Are you sure you want to save this Ack. Receipt?"
+                    .isMessage = True
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ConfirmSave.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub ConfirmPrint(ByVal sender As Object, ByVal e As EventArgs)
+            Try
+                With vwConfirmMsg
+                    .ConfirmCaller = "PRINT"
+                    .Message = String.Concat("Are you sure you want to print Ack. Receipt#", vwPaymentAckReceipt.AckReceiptNumber, "?")
+                    .isMessage = True
+                End With
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error ConfirmPrint.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub LoadSalesInvoice(ByVal sender As Object, ByVal e As EventArgs)
+
+            Dim objBLL As New bllReference.BSalesInvoice
+            Dim lstLocal As New List(Of cSIDetails)
+
+            Try
+                If IsValidInvoiceNumber() Then
+                    With vwPaymentAckReceipt
+                        .IsInvoiceNoExisting = False
+                        objBLL.SearchSalesInvoiceByNo(.InvoiceNumber)
+
+                        .IsInvoiceNoExisting = objBLL.IsRecordExist
+                        If .IsInvoiceNoExisting Then
+                            .IsSourceSiteLocked = True
+                            If objBLL.SIPrintStatus = "CANCELLED" Then
+                                .IsInvoiceNoExisting = False
+                                Throw New ArgumentException("Invoice No : " & objBLL.InvoiceNumber)
+                            End If
+
+                            .ReferenceNo = objBLL.ReferenceNo
+                            .PayorName = objBLL.PayorName
+                            .PayorAddress = objBLL.PayorAddress
+                            .PayorTIN = objBLL.PayorTIN
+                            .InsuredClientName = objBLL.InsuredClientName
+                            .PolicyNumber = objBLL.PolicyNumber
+                            .CoveragePeriodFrom = objBLL.CoveragePeriodFrom
+                            .CoveragePeriodTo = objBLL.CoveragePeriodTo
+                            .InvoiceCurrency = objBLL.InvoiceCurrency
+                            .InvoiceAmount = objBLL.InvoiceAmount
+                            '.TotalSales = objBLL.TotalSales
+                            '.WitholdingTax = objBLL.WitholdingTax
+                            '.NetOfWitholdingTax = objBLL.NetOfWitholdingTax
+                            '.Discount = objBLL.Discount
+                            '.DiscountIdNo = objBLL.DiscountIdNo
+                            .PaymentTerm = objBLL.PaymentTerm
+                            .NextDueDate = objBLL.NextDueDate
+                            .AgentName = objBLL.AgentName
+                            .AgentCode = objBLL.AgentCode
+                            .InvoiceNumber = objBLL.InvoiceNumber
+                            .InvoiceDate = objBLL.InvoiceDate
+                            .AckReceiptRemarks = objBLL.InvoiceRemarks
+                            .AckReceiptOtherInfo = objBLL.InvoiceOtherInfo
+                            .SIPrintStatus = objBLL.SIPrintStatus
+                            For Each dr As DataRow In objBLL.dtSIDetails.Rows
+                                lstLocal.Add(New cSIDetails(dr))
+                            Next
+                            .lstSIDetails = lstLocal
+                        Else
+                            .IsInvoiceNoExisting = False
+                            Call ClearScreenInfo(sender, e)
+                            Call SetMessage("No Record(s) Found.", eSystemMessage.Information, True)
+                        End If
+                    End With
+                End If
+            Catch ex As ArgumentException
+                Call SetMessage(String.Concat("Invoice is Cancelled!.<br /><br />", ex.Message), eSystemMessage.Information, True)
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadSalesInvoice.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub LoadAckReceipt(ByVal sender As Object, ByVal e As EventArgs)
+
+            Dim objBLL As New bllStaging.BAckReceipt
+            Dim lstLocalSI As New List(Of cSIDetails)
+            Dim lstLocalARPay As New List(Of cPaymentType)
+
+            Try
+
+                If IsValidAckReceiptNumber() Then
+                    With vwPaymentAckReceipt
+                        .IsARNoExisting = False
+                        objBLL.LoadAckReceipt(.AckReceiptNumber, .UserID)
+                        .IsARNoExisting = objBLL.IsRecordExist
+
+                        If .IsARNoExisting Then
+                            'AR Details
+                            .AckReceiptID = objBLL.AckReceiptID
+                            .AckReceiptNumber = objBLL.AckReceiptNumber
+                            .ARDate = objBLL.ARDate
+                            .IsSourceSiteLocked = True
+                            .AckReceiptRemarks = objBLL.AckReceiptRemarks
+                            .AckReceiptOtherInfo = objBLL.AckReceiptOtherInfo
+                            .IsGrossAmountLocked = True
+                            'Sales Details
+                            .IsWTaxLocked = True
+                            .IsDiscountLocked = True
+                            .IsCommLocked = True
+                            .TotalSales = objBLL.TotalSales
+                            .WitholdingTax = objBLL.WitholdingTax
+                            .NetOfWitholdingTax = objBLL.NetOfWitholdingTax
+                            .Discount = objBLL.Discount
+                            .DiscountIdNo = objBLL.DiscountIdNo
+                            .CommissionAmount = objBLL.CommissionAmount
+                            '----------
+                            .ARPrintStatus = objBLL.ARPrintStatus
+                            Select Case .ARPrintStatus
+                                Case "CANCELLED"
+                                    .DocSaveState = eReference.DocSaveState.Cancel
+                                Case "READY"
+                                    .DocSaveState = eReference.DocSaveState.ViewEdit
+                                Case "PRINTED"
+                                    .DocSaveState = eReference.DocSaveState.Print
+                                Case Else
+                                    .DocSaveState = eReference.DocSaveState.ViewNoEdit
+                            End Select
+
+                            'SI Details
+                            .InvoiceNumber = objBLL.InvoiceNumber
+                            .InvoiceDate = objBLL.InvoiceDate
+                            .PolicyNumber = objBLL.PolicyNumber
+                            .ReferenceNo = objBLL.BillReferenceNo
+                            .InvoiceAmount = objBLL.PayAmount
+                            .InvoiceCurrency = objBLL.InvoiceCurrency
+                            .PayorName = objBLL.PayorName
+                            .PayorAddress = objBLL.PayorAddress
+                            .PayorTIN = objBLL.PayorTIN
+                            .InsuredClientName = objBLL.InsuredClientName
+                            .CoveragePeriodFrom = objBLL.InvoiceCovFrom
+                            .CoveragePeriodTo = objBLL.InvoiceCovTo
+                            .AgentName = objBLL.AgentName
+                            .AgentCode = objBLL.AgentCode
+                            .PaymentTerm = objBLL.PaymentTerm
+                            .NextDueDate = objBLL.NextDueDate
+                            .Particulars = objBLL.Particulars
+                            For Each dr As DataRow In objBLL.dtSIDetails.Rows
+                                lstLocalSI.Add(New cSIDetails(dr))
+                            Next
+                            .lstSIDetails = lstLocalSI
+
+                            If objBLL.dtARPayDetails.Rows.Count > 0 Then .PaymentTypeTag = True
+                            For Each dr As DataRow In objBLL.dtARPayDetails.Rows
+                                If dr.Item("status") = .ARPrintStatus Then
+                                    lstLocalARPay.Add(New cPaymentType(dr, dr.Item("payment_type"), 1))
+                                    AddToTotalAmount(dr.Item("payment_type"), cDataType.fDecimal.IfNull(dr.Item("amount")))
+                                End If
+                            Next
+                            .lstPaymentTypeDetails = lstLocalARPay
+                            .GrossAmount = objBLL.PayAmount
+                        Else
+                            .IsARNoExisting = False
+                            Call ClearScreenInfo(sender, e)
+                            Call SetMessage("No Record(s) Found.", eSystemMessage.Information, True)
+                        End If
+                    End With
+                End If
+            Catch ex As ArgumentException
+                Call SetMessage(String.Concat("Reference No Already Used!.<br /><br />", ex.Message), eSystemMessage.Information, True)
+            Catch ex As Exception
+                Call SetMessage(String.Concat("A runtime error has occurred.<br /><br />", "Error LoadAckReceipt.<br /><br />", ex.Message), eSystemMessage.Critical, True)
+            End Try
+        End Sub
+
+        Private Sub AddToTotalAmount(ByVal pPayType As String, ByVal pAmount As Decimal)
+            Try
+                With vwPaymentAckReceipt
+                    Select Case pPayType
+                        Case eReference.PayTypeCSH
+                            .CashTotalAmount += pAmount
+                        Case eReference.PayTypeCHQ
+                            .CheckTotalAmount += pAmount
+                        Case eReference.PayTypeCCA
+                            .CreditCardTotalAmount += pAmount
+                        Case eReference.PayTypeDCA
+                            .DebitCardTotalAmount += pAmount
+                        Case Else
+                            .ECashPaymentTotalAmount += pAmount
+                    End Select
+                End With
+            Catch ex As Exception
+                Throw New Exception(String.Concat("AddToTotalAmount : ", ex.Message))
+            End Try
+
+        End Sub
+
+        Private Sub SetMessage(ByVal pMessage As String, ByVal pMessageType As String, ByVal pIsMessage As Boolean)
+
+            Try
+                With vwSysMsg
+                    .Message = pMessage
+                    .MessageType = pMessageType
+                    .isMessage = pIsMessage
+                End With
+            Catch ex As Exception
+                Throw
+            End Try
+
+        End Sub
+
+        Private Sub GetConfirmation(ByVal pMessage As String, ByVal pIsMessage As Boolean)
+
+            Try
+                With vwConfirmMsg
+                    .ClickedState = False
+                    .Message = pMessage
+                    .isMessage = pIsMessage
+                End With
+            Catch ex As Exception
+                Throw
+            End Try
+
+        End Sub
+        ' -------------------------------------------------------------------------------
+#End Region
+
+
+
+
+#End Region
+
+    End Class
+
+End Namespace
+

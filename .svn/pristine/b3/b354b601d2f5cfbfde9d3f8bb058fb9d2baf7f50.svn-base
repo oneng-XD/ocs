@@ -1,0 +1,610 @@
+﻿#Region "Description"
+' PAGE NAME     : AR BLL
+' CREATED BY    : EJ
+' CREATED DATE  : 11/13/2024
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports System.Data.OracleClient
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports Cocolife.Utility.OCS.Classes
+Imports bllCommon = Cocolife.BLL.Common
+Imports dalReference = Cocolife.DAL.OCS.Reference
+Imports dalStaging = Cocolife.DAL.OCS.Staging
+Imports System.Configuration
+#End Region
+
+Namespace Staging
+
+    Public Class BAckReceipt
+
+#Region "Implements"
+        Implements IAckReceipt
+#End Region
+
+#Region "Variables"
+        Private mAckReceiptID As Long = cDataType.fLong.Empty
+        Private mBillReferenceNo As String = cDataType.fString.Empty
+        Private mPayorName As String = cDataType.fString.Empty
+        Private mPayorAddress As String = cDataType.fString.Empty
+        Private mPayorTIN As String = cDataType.fString.Empty
+        Private mInsuredClientName As String = cDataType.fString.Empty
+        Private mPolicyNumber As String = cDataType.fString.Empty
+        Private mInvoiceCovFrom As Date = cDataType.fDate.Empty
+        Private mInvoiceCovTo As Date = cDataType.fDate.Empty
+        Private mInvoiceCurrency As String = cDataType.fString.Empty
+        Private mPayCurrency As String = cDataType.fString.Empty
+        Private mPayAmount As Decimal = cDataType.fDecimal.Empty
+        Private mVATable As Decimal = cDataType.fDecimal.Empty
+        Private mVATExempt As Decimal = cDataType.fDecimal.Empty
+        Private mVATAmount As Decimal = cDataType.fDecimal.Empty
+        Private mNonVAT As Decimal = cDataType.fDecimal.Empty
+        Private mTotalSales As Decimal = cDataType.fDecimal.Empty
+        Private mWitholdingTax As Decimal = cDataType.fDecimal.Empty
+        Private mNetOfWitholdingTax As Decimal = cDataType.fDecimal.Empty
+        Private mDiscount As Decimal = cDataType.fDecimal.Empty
+        Private mDiscountIdNo As String = cDataType.fString.Empty
+        Private mPaymentTerm As String = cDataType.fString.Empty
+        Private mNextDueDate As Date = cDataType.fDate.Empty
+        Private mAgentName As String = cDataType.fString.Empty
+        Private mAgentCode As String = cDataType.fString.Empty
+        Private mAckReceiptRemarks As String = cDataType.fString.Empty
+        Private mAckReceiptOtherInfo As String = cDataType.fString.Empty
+        Private mSalesInvoiceNumber As Long = cDataType.fLong.Empty
+        Private mAckReceiptNumber As Long = cDataType.fLong.Empty
+        Private mInvoiceDate As Date = cDataType.fDate.Empty
+        Private mARDate As Date = cDataType.fDate.Empty
+        Private mSIPrintStatus As String = cDataType.fString.Empty
+        Private mARPrintStatus As String = cDataType.fString.Empty
+        Private mUploadDate As Date = cDataType.fDate.Empty
+        Private mSIPrintedBy As String = cDataType.fString.Empty
+        Private mARPrintedBy As String = cDataType.fString.Empty
+        Private mSiteCode As Long = cDataType.fLong.Empty
+        Private mParticulars As String = cDataType.fString.Empty
+        Private mCommissionAmount As Decimal = cDataType.fDecimal.Empty
+        Private mSIDetails As DataTable = New DataTable
+        Private mARPayDetails As DataTable = New DataTable
+        ' -------------------------------------------------------------------------------
+        Private mIsRecordExist As Boolean = False
+#End Region
+
+#Region "Properties"
+
+        Public Property AckReceiptID As Long Implements IAckReceipt.AckReceiptID
+            Get
+                Return mAckReceiptID
+            End Get
+            Set(value As Long)
+                mAckReceiptID = value
+            End Set
+        End Property
+
+        Public Property BillReferenceNo As String Implements IAckReceipt.BillReferenceNo
+            Get
+                Return mBillReferenceNo
+            End Get
+            Set(value As String)
+                mBillReferenceNo = value
+            End Set
+        End Property
+
+        Public Property PayorName As String Implements IAckReceipt.PayorName
+            Get
+                Return mPayorName
+            End Get
+            Set(value As String)
+                mPayorName = value
+            End Set
+        End Property
+
+        Public Property PayorAddress As String Implements IAckReceipt.PayorAddress
+            Get
+                Return mPayorAddress
+            End Get
+            Set(value As String)
+                mPayorAddress = value
+            End Set
+        End Property
+
+        Public Property PayorTIN As String Implements IAckReceipt.PayorTIN
+            Get
+                Return mPayorTIN
+            End Get
+            Set(value As String)
+                mPayorTIN = value
+            End Set
+        End Property
+        Public Property InsuredClientName As String Implements IAckReceipt.InsuredClientName
+            Get
+                Return mInsuredClientName
+            End Get
+            Set(value As String)
+                mInsuredClientName = value
+            End Set
+        End Property
+
+        Public Property PolicyNumber As String Implements IAckReceipt.PolicyNumber
+            Get
+                Return mPolicyNumber
+            End Get
+            Set(value As String)
+                mPolicyNumber = value
+            End Set
+        End Property
+
+        Public Property InvoiceCovFrom As Date Implements IAckReceipt.InvoiceCovFrom
+            Get
+                Return mInvoiceCovFrom
+            End Get
+            Set(value As Date)
+                mInvoiceCovFrom = value
+            End Set
+        End Property
+
+        Public Property InvoiceCovTo As Date Implements IAckReceipt.InvoiceCovTo
+            Get
+                Return mInvoiceCovTo
+            End Get
+            Set(value As Date)
+                mInvoiceCovTo = value
+            End Set
+        End Property
+
+        Public Property InvoiceCurrency As String Implements IAckReceipt.InvoiceCurrency
+            Get
+                Return mInvoiceCurrency
+            End Get
+            Set(value As String)
+                mInvoiceCurrency = value
+            End Set
+        End Property
+
+        Public Property PayCurrency As String Implements IAckReceipt.PayCurrency
+            Get
+                Return mPayCurrency
+            End Get
+            Set(value As String)
+                mPayCurrency = value
+            End Set
+        End Property
+
+        Public Property PayAmount As Decimal Implements IAckReceipt.PayAmount
+            Get
+                Return mPayAmount
+            End Get
+            Set(value As Decimal)
+                mPayAmount = value
+            End Set
+        End Property
+
+        Public Property TotalSales As Decimal Implements IAckReceipt.TotalSales
+            Get
+                Return mTotalSales
+            End Get
+            Set(value As Decimal)
+                mTotalSales = value
+            End Set
+        End Property
+
+        Public Property WitholdingTax As Decimal Implements IAckReceipt.WitholdingTax
+            Get
+                Return mWitholdingTax
+            End Get
+            Set(value As Decimal)
+                mWitholdingTax = value
+            End Set
+        End Property
+
+        Public Property NetOfWitholdingTax As Decimal Implements IAckReceipt.NetOfWitholdingTax
+            Get
+                Return mNetOfWitholdingTax
+            End Get
+            Set(value As Decimal)
+                mNetOfWitholdingTax = value
+            End Set
+        End Property
+
+        Public Property Discount As Decimal Implements IAckReceipt.Discount
+            Get
+                Return mDiscount
+            End Get
+            Set(value As Decimal)
+                mDiscount = value
+            End Set
+        End Property
+
+        Public Property DiscountIdNo As String Implements IAckReceipt.DiscountIdNo
+            Get
+                Return mDiscountIdNo
+            End Get
+            Set(value As String)
+                mDiscountIdNo = value
+            End Set
+        End Property
+
+        Public Property PaymentTerm As String Implements IAckReceipt.PaymentTerm
+            Get
+                Return mPaymentTerm
+            End Get
+            Set(value As String)
+                mPaymentTerm = value
+            End Set
+        End Property
+
+        Public Property NextDueDate As Date Implements IAckReceipt.NextDueDate
+            Get
+                Return mNextDueDate
+            End Get
+            Set(value As Date)
+                mNextDueDate = value
+            End Set
+        End Property
+
+        Public Property AgentName As String Implements IAckReceipt.AgentName
+            Get
+                Return mAgentName
+            End Get
+            Set(value As String)
+                mAgentName = value
+            End Set
+        End Property
+
+        Public Property AgentCode As String Implements IAckReceipt.AgentCode
+            Get
+                Return mAgentCode
+            End Get
+            Set(value As String)
+                mAgentCode = value
+            End Set
+        End Property
+
+        Public Property CommissionAmount As Decimal Implements IAckReceipt.CommissionAmount
+            Get
+                Return mCommissionAmount
+            End Get
+            Set(value As Decimal)
+                mCommissionAmount = value
+            End Set
+        End Property
+
+        Public Property AckReceiptRemarks As String Implements IAckReceipt.AckReceiptRemarks
+            Get
+                Return mAckReceiptRemarks
+            End Get
+            Set(value As String)
+                mAckReceiptRemarks = value
+            End Set
+        End Property
+
+        Public Property AckReceiptOtherInfo As String Implements IAckReceipt.AckReceiptOtherInfo
+            Get
+                Return mAckReceiptOtherInfo
+            End Get
+            Set(value As String)
+                mAckReceiptOtherInfo = value
+            End Set
+        End Property
+
+        Public Property InvoiceNumber As Long Implements IAckReceipt.InvoiceNumber
+            Get
+                Return mSalesInvoiceNumber
+            End Get
+            Set(value As Long)
+                mSalesInvoiceNumber = value
+            End Set
+        End Property
+
+        Public Property AckReceiptNumber As Long Implements IAckReceipt.AckReceiptNumber
+            Get
+                Return mAckReceiptNumber
+            End Get
+            Set(value As Long)
+                mAckReceiptNumber = value
+            End Set
+        End Property
+
+        Public Property InvoiceDate As Date Implements IAckReceipt.InvoiceDate
+            Get
+                Return mInvoiceDate
+            End Get
+            Set(value As Date)
+                mInvoiceDate = value
+            End Set
+        End Property
+
+        Public Property ARDate As Date Implements IAckReceipt.ARDate
+            Get
+                Return mARDate
+            End Get
+            Set(value As Date)
+                mARDate = value
+            End Set
+        End Property
+
+        Public Property SIPrintStatus As String Implements IAckReceipt.SIPrintStatus
+            Get
+                Return mSIPrintStatus
+            End Get
+            Set(value As String)
+                mSIPrintStatus = value
+            End Set
+        End Property
+
+        Public Property ARPrintStatus As String Implements IAckReceipt.ARPrintStatus
+            Get
+                Return mARPrintStatus
+            End Get
+            Set(value As String)
+                mARPrintStatus = value
+            End Set
+        End Property
+
+        Public Property UploadDate As Date Implements IAckReceipt.UploadDate
+            Get
+                Return mUploadDate
+            End Get
+            Set(value As Date)
+                mUploadDate = value
+            End Set
+        End Property
+
+        Public Property SiteCode As Long Implements IAckReceipt.SiteCode
+            Get
+                Return mSiteCode
+            End Get
+            Set(value As Long)
+                mSiteCode = value
+            End Set
+        End Property
+
+        Public Property ARPrintedBy() As String Implements IAckReceipt.ARPrintedBy
+            Get
+                Return mARPrintedBy
+            End Get
+            Set(ByVal value As String)
+                mARPrintedBy = value
+            End Set
+        End Property
+
+        Public Property Particulars As String Implements IAckReceipt.Particulars
+            Get
+                Return mParticulars
+            End Get
+            Set(value As String)
+                mParticulars = value
+            End Set
+        End Property
+
+        ' -------------------------------------------------------------------------------
+
+        Public Property IsRecordExist() As Boolean Implements IAckReceipt.IsRecordExist
+            Get
+                Return mIsRecordExist
+            End Get
+            Set(ByVal value As Boolean)
+                mIsRecordExist = value
+            End Set
+        End Property
+
+        Public Property dtSIDetails() As DataTable Implements IAckReceipt.lstSIDetails
+            Get
+                Return mSIDetails
+            End Get
+            Set(ByVal value As DataTable)
+                mSIDetails = value
+            End Set
+        End Property
+
+        Public Property dtARPayDetails() As DataTable Implements IAckReceipt.lstARPayDetails
+            Get
+                Return mARPayDetails
+            End Get
+            Set(value As DataTable)
+                mARPayDetails = value
+            End Set
+        End Property
+
+#End Region
+
+#Region "Constructor"
+
+        Sub New()
+
+        End Sub
+
+        Sub New(ByVal pAckReceiptID As Long, ByVal pBillReferenceNo As String, ByVal pPayorName As String, ByVal pPayorAddress As String, ByVal pPayorTIN As String,
+                ByVal pInsuredClientName As String, ByVal pPolicyNumber As String, ByVal pInvoiceCovFrom As Date, ByVal pInvoiceCovTo As Date, ByVal pInvoiceCurrency As String,
+                ByVal pPayCurrency As String, ByVal pPayAmount As Decimal, ByVal pTotalSales As Decimal, ByVal pWitholdingTax As Decimal, ByVal pNetOfWitholdingTax As Decimal,
+                ByVal pDiscount As Decimal, ByVal pDiscountIdNo As String, ByVal pAckReceiptRemarks As String, ByVal pAckReceiptOtherInfo As String, ByVal pSalesInvoiceNumber As Long,
+                ByVal pAckReceiptNumber As Long, ByVal pInvoiceDate As Date, ByVal pARDate As Date, ByVal pARPrintStatus As String, ByVal pARPrintedBy As String,
+                ByVal pSiteCode As Long, ByVal pParticulars As String, ByVal pPaymentTerm As String, ByVal pNextDueDate As Date, ByVal pAgentName As String,
+                ByVal pAgentCode As String, ByVal pCommissionAmount As Decimal)
+            AckReceiptID = pAckReceiptID
+            BillReferenceNo = pBillReferenceNo
+            PayorName = pPayorName
+            PayorAddress = pPayorAddress
+            PayorTIN = pPayorTIN
+            InsuredClientName = pInsuredClientName
+            PolicyNumber = pPolicyNumber
+            InvoiceCovFrom = pInvoiceCovFrom
+            InvoiceCovTo = pInvoiceCovTo
+            InvoiceCurrency = pInvoiceCurrency
+            PayCurrency = pPayCurrency
+            PayAmount = pPayAmount
+            TotalSales = pTotalSales
+            WitholdingTax = pWitholdingTax
+            NetOfWitholdingTax = pNetOfWitholdingTax
+            Discount = pDiscount
+            DiscountIdNo = pDiscountIdNo
+            AckReceiptRemarks = pAckReceiptRemarks
+            AckReceiptOtherInfo = pAckReceiptOtherInfo
+            InvoiceNumber = pSalesInvoiceNumber
+            AckReceiptNumber = pAckReceiptNumber
+            InvoiceDate = pInvoiceDate
+            ARDate = pARDate
+            ARPrintStatus = pARPrintStatus
+            ARPrintedBy = pARPrintedBy
+            SiteCode = pSiteCode
+            Particulars = pParticulars
+            PaymentTerm = pPaymentTerm
+            NextDueDate = pNextDueDate
+            AgentName = pAgentName
+            AgentCode = pAgentCode
+            CommissionAmount = pCommissionAmount
+        End Sub
+
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Data Retrieval"
+
+        Public Sub LoadNewAckReceipt(ByVal pSiteId As Long, ByVal pUserId As Long, Optional ByRef pConn As Object = Nothing, Optional ByRef pTrans As Object = Nothing) Implements IAckReceipt.LoadNewAckReceipt
+            Dim objDal As New dalReference.DSiteDetails
+            Dim mLastDocNo As String
+
+            Try
+                mLastDocNo = objDal.GetLastAckReceipt(pSiteId, pUserId, pConn, pTrans)
+
+                If IsNewAckReceiptAllowed(mLastDocNo) Then
+                    ARDate = Now
+                End If
+
+            Catch ex As Exception
+                Throw
+            End Try
+
+        End Sub
+
+        Public Function LoadViewAR(ByVal pPrspid As Long, ByVal pDocNumber As Long, ByVal pType As Integer) As DataTable Implements IAckReceipt.LoadViewAR
+
+            Dim objDAL As New dalStaging.DAckReceipt
+            Dim dtLocal As DataTable
+
+            Try
+                dtLocal = objDAL.GetDocList(pPrspid, pDocNumber, pType)
+
+                Return dtLocal
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+
+        Public Function LoadViewAR(ByVal pPrspid As Long, Optional ByVal pStartDate As Date? = Nothing, Optional ByVal pEndDate As Date? = Nothing) As DataTable Implements IAckReceipt.LoadViewAR
+
+            Dim objDAL As New dalStaging.DAckReceipt
+            Dim dtLocal As DataTable
+
+            Try
+
+                dtLocal = objDAL.GetDocList(pPrspid, pStartDate, pEndDate)
+
+                Return dtLocal
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+
+        Public Function IsNewAckReceiptAllowed(ByVal pNextDocNumber As String) As Boolean Implements IAckReceipt.IsNewAckReceiptAllowed
+            Dim mDocumentDetails() As String
+            Try
+                mDocumentDetails = Split(pNextDocNumber, "|")
+
+                If mDocumentDetails(0) = String.Empty Then
+                    Return True
+                End If
+
+                If mDocumentDetails(1) = "READY" Or mDocumentDetails(1) = "POSTED" Then
+                    Throw New ArgumentException("Please print previous document.")
+                Else
+                    Return True
+                End If
+            Catch ex As Exception
+                Throw
+            End Try
+
+            Return False
+        End Function
+
+        Public Sub LoadAckReceipt(ByVal pDocNo As Long, pUserID As Long) Implements IAckReceipt.SearchAckReceipt
+            Dim objDalAR As New dalStaging.DAckReceipt
+            Dim objDalARPay As New dalStaging.DARPayDetails
+            Dim objDalSI As New dalReference.DSalesInvoice
+
+            Dim dtAckReceipt As DataTable
+
+            Try
+                dtAckReceipt = objDalAR.SearchAckReceipt(pDocNo)
+                dtARPayDetails = objDalARPay.GetARPayDetails(pDocNo, pUserID)
+                For Each dr As DataRow In dtAckReceipt.Rows
+                    AckReceiptID = cDataType.fLong.IfNull(dr.Item("ID"))
+                    BillReferenceNo = cDataType.fString.IfNull(dr.Item("BILL_REFERENCE_NO"))
+                    PayorName = cDataType.fString.IfNull(dr.Item("PAYOR"))
+                    PayorAddress = cDataType.fString.IfNull(dr.Item("ADDRESS"))
+                    PayorTIN = cDataType.fString.IfNull(dr.Item("TIN"))
+                    InsuredClientName = cDataType.fString.IfNull(dr.Item("INSURED_CLIENT_NAME"))
+                    PolicyNumber = cDataType.fString.IfNull(dr.Item("POLICY_NUMBER"))
+                    InvoiceCovFrom = cDataType.fDate.IfNull(dr.Item("INVOICE_COV_FROM"))
+                    InvoiceCovTo = cDataType.fDate.IfNull(dr.Item("INVOICE_COV_TO"))
+                    InvoiceCurrency = cDataType.fString.IfNull(dr.Item("INVOICE_CURRENCY"))
+                    PayAmount = cDataType.fDecimal.IfNull(dr.Item("TOTAL_AMOUNT"))
+                    PayCurrency = cDataType.fDecimal.IfNull(dr.Item("PAY_CURRENCY"))
+                    TotalSales = cDataType.fDecimal.IfNull(dr.Item("TOTAL_SALES"))
+                    WitholdingTax = cDataType.fDecimal.IfNull(dr.Item("WITHHOLDING_TAX"))
+                    NetOfWitholdingTax = cDataType.fDecimal.IfNull(dr.Item("NET_WITHHOLDING_TAX"))
+                    Discount = cDataType.fDecimal.IfNull(dr.Item("DISCOUNT"))
+                    DiscountIdNo = cDataType.fString.IfNull(dr.Item("DISCOUNT_ID"))
+                    CommissionAmount = cDataType.fDecimal.IfNull(dr.Item("DEDUCTION_AMOUNT"))
+                    AckReceiptRemarks = cDataType.fString.IfNull(dr.Item("AR_REMARKS"))
+                    AckReceiptOtherInfo = cDataType.fString.IfNull(dr.Item("AR_OTHER_INFO"))
+                    InvoiceNumber = cDataType.fLong.IfNull(dr.Item("SALES_INVOICE_NO"))
+                    InvoiceDate = cDataType.fDate.IfNull(dr.Item("SALES_INVOICE_DATE"))
+                    AckReceiptNumber = cDataType.fLong.IfNull(dr.Item("AR_NO"))
+                    ARDate = cDataType.fDate.IfNull(dr.Item("AR_DATE"))
+                    'SIPrintStatus = cDataType.fString.IfNull(dr.Item("SI_PRINT_STATUS"))
+                    ARPrintStatus = cDataType.fString.IfNull(dr.Item("STATUS"))
+                    UploadDate = cDataType.fDate.IfNull(dr.Item("POSTED_DATE"))
+                    SiteCode = cDataType.fLong.IfNull(dr.Item("SITE_CODE"))
+                    ARPrintedBy = cDataType.fLong.IfNull(dr.Item("AR_PRINTED_BY"))
+                    Particulars = cDataType.fString.IfNull(dr.Item("PARTICULARS"))
+
+                    IsRecordExist = True
+                    Exit For
+                Next
+                If IsRecordExist Then dtSIDetails = objDalSI.SearchSIDetails(BillReferenceNo)
+
+            Catch ex As Exception
+                Throw
+            End Try
+        End Sub
+
+#End Region
+
+#Region "Transactions"
+        Public Function Alter(ByVal pAction As String, ByRef pConn As Object, ByRef pTrans As Object) As Long
+
+            Try
+                Dim objDAL As New dalStaging.DAckReceipt
+                objDAL.AlterAckReceipt(Me, pAction, pConn, pTrans)
+                Return objDAL.Reference
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+#End Region
+
+    End Class
+
+End Namespace
+
+

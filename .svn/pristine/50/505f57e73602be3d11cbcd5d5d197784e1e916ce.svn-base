@@ -1,0 +1,6669 @@
+﻿#Region "Description"
+' PAGE NAME     : Payment : Premium Related 
+' CREATED BY    : MPRO
+' CREATED DATE  : 11/11/2014
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports preSecurity = Cocolife.Presenter.Common.Security
+Imports preMessages = Cocolife.Utility.OCS.Messages
+Imports prePayment = Cocolife.Presenter.OCS.Payment
+Imports preSearch = Cocolife.Presenter.OCS.Search
+Imports preReport = Cocolife.Presenter.OCS.Report
+Imports eSystemMessage = Cocolife.Utility.Common.Enums.eSystemMessage
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports eCSS = Cocolife.Utility.OCS.Enums.eCSS
+Imports ePage = Cocolife.Utility.OCS.Enums.ePage
+Imports eReference = Cocolife.Utility.OCS.Enums.eReference
+Imports eDocSaveState = Cocolife.Utility.OCS.Enums.eReference.DocSaveState
+Imports eSession = Cocolife.Utility.OCS.Enums.eSession
+Imports eReport = Cocolife.Utility.OCS.Enums.eReport
+Imports Cocolife.Utility.OCS.Classes
+Imports System.Linq
+Imports System.Reflection
+Imports CrystalDecisions.CrystalReports.Engine
+Imports CrystalDecisions.Shared
+Imports cCrystalConn = Cocolife.Utility.OCS.Classes.cCrystalConn
+Imports System.Globalization
+
+#End Region
+
+Partial Public Class PaymentPremiumRelated
+    Inherits System.Web.UI.Page
+
+#Region "Implements"
+    Implements preSecurity.ISystemMessage
+    Implements preMessages.IConfirmationMessage
+    Implements prePayment.IPaymentPremiumRelated
+    Implements preSearch.IAgent
+    Implements preSearch.IInsured
+    Implements preSearch.IPayor
+    Implements preSearch.IPolicy
+    Implements preReport.IReport
+    Implements preSearch.IAgentPolicyContext
+    Implements preSearch.IPayorPolicyContext
+    Implements preSearch.IInsuredPolicyContext
+#End Region
+
+#Region "Variables"
+    Private pSystemMessage As preSecurity.PSystemMessage
+    Private pConfirmationMessage As preMessages.PConfirmationMessage
+    Private pPaymentPremiumRelated As prePayment.PPaymentPremiumRelated
+    Private pAgent As preSearch.PAgent
+    Private pInsured As preSearch.PInsured
+    Private pPayor As preSearch.PPayor
+    Private pPolicy As preSearch.PPolicy
+    Private pReport As preReport.PReport
+    '----------------------------------------------------------------------------------------------
+    Private mIsAgentExist As Boolean
+    Private mIsInsuredExist As Boolean
+    Private mIsPayorExist As Boolean
+    Private mIsPolicyExist As Boolean
+    Private mIsPayslipCodeExist As Boolean
+    Private mIsBillNoExist As Boolean
+    Private mIsGpaCardNoExist As Boolean
+    Private mIsSuccessful As Boolean
+    Private mIsPayTypeSuccessful As Boolean
+    Private mIsReceiptSuccessful As Boolean
+    Private mIsNewBizSuccessful As Boolean
+    '----------------------------------------------------------------------------------------------
+    Private mSearchAgentIDTag As Integer
+    Private arrAgentIDTag() As HiddenField
+    Public arrTxtAgentID() As TextBox
+    Public arrTxtAgentName() As TextBox
+    Public arrHdnAgentFnam() As HiddenField
+    Public arrHdnAgentLnam() As HiddenField
+    Public arrHdnAgentMnam() As HiddenField
+    Public arrHdnAgencyFnam() As HiddenField
+    Public arrHdnAgencyLnam() As HiddenField
+    Public arrHdnAgencyMnam() As HiddenField
+    Public arrHdnAgentSalesForce() As HiddenField
+    Public arrHdnAgentCatCod() As HiddenField
+    Public arrHdnAgentCommRate() As HiddenField
+    Public arrHdnAgentTaxRate() As HiddenField
+    Public arrTxtUsdId() As TextBox
+    Public arrTxtUsdName() As TextBox
+
+    Private mdtBusinessType As DataTable
+    Private mdtReceiptTransaction As DataTable
+#End Region
+
+#Region "ISystemMessage"
+
+#Region "Property"
+
+    Public WriteOnly Property Message() As String Implements preSecurity.ISystemMessage.Message
+        Set(ByVal value As String)
+            lblMessage.Text = value
+        End Set
+    End Property
+
+    Public WriteOnly Property MessageType() As String Implements preSecurity.ISystemMessage.MessageType
+        Set(ByVal value As String)
+            imgMessage.ImageUrl = value
+        End Set
+    End Property
+
+    Public WriteOnly Property IsMessage() As Boolean Implements preSecurity.ISystemMessage.isMessage
+        Set(ByVal value As Boolean)
+            If value Then
+                mpeMessage.Show()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+
+#End Region
+
+#End Region
+
+#Region "IConfirmationMessage"
+
+#Region "Property"
+
+    Public Property ConfirmCaller() As String Implements preMessages.IConfirmationMessage.ConfirmCaller
+        Get
+            Return cDataType.fString.IfNull(hdnConfirmCaller.Value)
+        End Get
+        Set(value As String)
+            hdnConfirmCaller.Value = value
+        End Set
+    End Property
+
+    Public Property ConfirmClickState() As Boolean Implements preMessages.IConfirmationMessage.ClickedState
+        Get
+            Return cDataType.fBoolean.IfNull(hdnClickStateTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnClickStateTag.Value = value
+        End Set
+    End Property
+
+    Public Property UserResponse() As Boolean Implements preMessages.IConfirmationMessage.UserResponse
+        Get
+            Return cDataType.fBoolean.IfNull(hdnConfirmTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnConfirmTag.Value = value
+        End Set
+    End Property
+
+    Public WriteOnly Property ConfirmMessage() As String Implements preMessages.IConfirmationMessage.Message
+        Set(ByVal value As String)
+            lblConfirm.Text = value
+        End Set
+    End Property
+
+    Public WriteOnly Property IsConfirmMessage() As Boolean Implements preMessages.IConfirmationMessage.isMessage
+        Set(ByVal value As Boolean)
+            If value Then
+                mpeConfirm.Show()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+
+#End Region
+
+#End Region
+
+#Region "IPaymentPremiumRelated"
+
+#Region "Property"
+
+#Region "Payment Details"
+
+    Public Property DocPrinted As Boolean Implements prePayment.IPaymentPremiumRelated.DocPrinted
+        Get
+            Return cDataType.fBoolean.IfNull(hdnDocPrinted.value)
+        End Get
+        Set(value As Boolean)
+            hdnDocPrinted.value = value
+        End Set
+    End Property
+
+    Public Property DocSaveState As Integer Implements prePayment.IPaymentPremiumRelated.DocSaveState
+        Get
+            Return cDataType.fInteger.IfNull(hdnDocSaveState.Value)
+        End Get
+        Set(value As Integer)
+            hdnDocSaveState.Value = value
+
+            ManageMain(value)
+
+            Select Case value
+                Case eDocSaveState.Initial
+                    ibtnViewOPRs.Visible = True
+                    btnReceiptAddNew.Enabled = True
+                    btnReceiptSave.Enabled = False
+                    btnReceiptSave.Text = "Save"
+                    btnReceiptPreview.Enabled = False
+                    btnReceiptPrint.Enabled = False
+                    btnReceiptCancel.Enabled = False
+
+                    RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+                Case eDocSaveState.ViewEdit
+                    If PolType = "G" Then
+                        Call ManagePolicy(eReference.MgePol.BillNo, True)
+                        Call ManagePolicy(eReference.MgePol.SubsNo, True)
+                        ibtnSearchBillNo.Visible = False
+                        ibtnClearBillNo.Visible = False
+                        ibtnSearchSubsNo.Visible = False
+                        ibtnClearSubsNo.Visible = False
+                    End If
+                    ibtnViewOPRs.Visible = True
+                    ibtnSearchPolicy.Visible = False
+                    ibtnSearchAgent.Visible = False
+                    ibtnSearchPayor.Visible = False
+                    ibtnSearchInsured.Visible = False
+                    ibtnAddNewBizPayor.Visible = False
+                    ibtnSearchPaCardID.Visible = False
+                    ibtnSearchSalesOff.Visible = False
+                    ibtnSearchPromoOff.Visible = False
+                    ibtnSearchUSD1.Visible = False
+                    ibtnClearAsd.Visible = False
+                    btnReceiptAddNew.Enabled = False
+                    btnReceiptSave.Enabled = True
+                    btnReceiptSave.Text = "Modify"
+                    btnReceiptPreview.Enabled = True
+                    btnReceiptPrint.Enabled = True
+                    btnReceiptCancel.Enabled = False
+
+                    Call ManagePolicy(eReference.MgePol.SamePayorInsured, IIf(PayorType = "C", False, True))
+                    chkSamePayorInsured.Enabled = False
+                Case eDocSaveState.ViewNoEdit
+                    ibtnViewOPRs.Visible = True
+                    ibtnSearchPolicy.Visible = False
+                    ibtnSearchAgent.Visible = False
+                    ibtnSearchPayor.Visible = False
+                    ibtnSearchInsured.Visible = False
+                    ibtnAddNewBizPayor.Visible = False
+                    ibtnSearchPaCardID.Visible = False
+                    ibtnSearchSalesOff.Visible = False
+                    ibtnSearchPromoOff.Visible = False
+                    ibtnSearchUSD1.Visible = False
+                    ibtnClearAsd.Visible = False
+                    btnReceiptAddNew.Enabled = True
+                    btnReceiptSave.Enabled = False
+                    btnReceiptSave.Text = "Modify"
+                    btnReceiptPreview.Enabled = False
+                    btnReceiptPrint.Enabled = True
+                    btnReceiptCancel.Enabled = True
+
+                    Call ManagePolicy(eReference.MgePol.SamePayorInsured, IIf(PayorType = "C", False, True))
+                    chkSamePayorInsured.Enabled = False
+                Case eDocSaveState.Edit
+                    'Main Buttons
+                    ibtnViewOPRs.Visible = False
+                    btnReceiptAddNew.Enabled = False
+                    btnReceiptSave.Enabled = True
+                    btnReceiptSave.Text = "Update"
+                    btnReceiptPreview.Enabled = False
+                    btnReceiptPrint.Enabled = False
+                    btnReceiptCancel.Enabled = False
+
+                    If NewBusinessTag Then
+                        If NewgenNewBusinessTag Then
+                            Call ManagePolicy(eReference.MgePol.Initial, False)
+                            Call ManagePolicy(eReference.MgePol.Search, False)
+                        Else
+                            ibtnSearchPolicy.Visible = Not NewBusinessTag
+                            ManagePolicy(eReference.MgePol.Policy, NewBusinessTag)
+                            ManagePolicy(eReference.MgePol.Payor, Not NewBusinessTag)
+                            ManagePolicy(eReference.MgePol.Insured, Not NewBusinessTag)
+                            ManageAgent(eReference.AgentTagType.Agent, Not NewBusinessTag)
+                            ManageNewBiz(eReference.MgeNewBiz.PayorId, Not WithNewBiz)
+                            ManageNewBiz(eReference.MgeNewBiz.Button, WithNewBiz)
+                        End If
+                    Else
+                        Call ManagePolicy(eReference.MgePol.Initial, False)
+                        Call ManagePolicy(eReference.MgePol.Search, False)
+                        If PolType = "R" Then Call ManagePolicy(eReference.MgePol.BalanceToHigher, True)
+                        If Not PolMod = "MWI" And PolicyNumber.IndexOf("-") > -1 Then
+                            PayslipCodeTag = IIf(PolMod = "HMO", True, False)
+                            BillNoTag = IIf(PolMod = "GLF", True, False)
+                            If PayslipCodeTag Then
+                                Call ManagePolicy(eReference.MgePol.Search, False)
+                                Call ManagePolicy(eReference.MgePol.Payslip, False)
+                            ElseIf BillNoTag Then
+                                Call ManagePolicy(eReference.MgePol.Search, False)
+                                Call ManagePolicy(eReference.MgePol.BillNo, False)
+                                Call ManagePolicy(eReference.MgePol.SubsNo, False)
+                            Else
+                                Call ManagePolicy(eReference.MgePol.Insured, True)
+                                Call ManagePolicy(eReference.MgePol.Payor, True)
+                                Call ManagePolicy(eReference.MgePol.SamePayorInsured, IIf(PayorType = "C", False, True))
+                                Call ManagePolicy(eReference.MgePol.Policy, True)
+                                Call ManageAgent(eReference.AgentTagType.Agent, True)
+                                For Each item As ListItem In ddlBusinessType.Items
+                                    Select Case item.Value
+                                        Case "GPA", "GPP"
+                                            item.Enabled = False
+                                    End Select
+                                Next
+                            End If
+                        End If
+                        If PolType = "G" Then
+                            divBillNo.Visible = True
+                            txtBillNo.Enabled = False
+                            txtSubsNo.Enabled = False
+                            divSubsNo.Visible = True
+                        Else
+                            divBillNo.Visible = False
+                            divSubsNo.Visible = False
+                            txtBillNo.Enabled = False
+                            txtSubsNo.Enabled = False
+                        End If
+                    End If
+
+                    If GpaPaymentTag Then
+                        ibtnClearPolicy.Visible = False
+                        ManageAgent(eReference.AgentTagType.SalesOfficer, False)
+                        ManageAgent(eReference.AgentTagType.PromoOfficer, False)
+                        ManageAgent(eReference.AgentTagType.Usd1, False)
+                        ManageAgent(eReference.AgentTagType.Asd, False)
+                        ManagePolicy(eReference.MgePol.Payor, False)
+                        ManagePolicy(eReference.MgePol.SamePayorInsured, True)
+                        ManagePolicy(eReference.MgePol.Insured, False)
+                        ManageGpaCardNo("SEARCH", False)
+                    End If
+
+                Case eDocSaveState.AddNew
+                    ibtnViewOPRs.Visible = True
+                    btnReceiptAddNew.Enabled = False
+                    btnReceiptSave.Enabled = True
+                    btnReceiptSave.Text = "Save"
+                    btnReceiptPreview.Enabled = False
+                    btnReceiptPrint.Enabled = False
+                    btnReceiptCancel.Enabled = False
+                Case eDocSaveState.Cancel
+                    ibtnViewOPRs.Visible = True
+                    btnReceiptAddNew.Enabled = True
+                    btnReceiptSave.Enabled = False
+                    btnReceiptSave.Text = "Save"
+                    btnReceiptPreview.Enabled = False
+                    btnReceiptPrint.Enabled = False
+                    btnReceiptCancel.Enabled = False
+                Case eDocSaveState.Print
+                    ibtnViewOPRs.Visible = True
+                    btnReceiptAddNew.Enabled = True
+                    btnReceiptSave.Enabled = False
+                    btnReceiptSave.Text = "Modify"
+                    btnReceiptPreview.Enabled = False
+                    btnReceiptPrint.Enabled = True
+                    If OPRDate.Date = Now.Date Then
+                        btnReceiptCancel.Enabled = DocPrinted
+                    Else
+                        btnReceiptCancel.Enabled = False
+                    End If
+            End Select
+        End Set
+    End Property
+
+    Public Property IsPreview As Boolean Implements preReport.IReport.IsPreview
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsPreviewTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnIsPreviewTag.Value = value
+        End Set
+    End Property
+
+    Public ReadOnly Property DocType As String Implements prePayment.IPaymentPremiumRelated.DocType
+        Get
+            Return eReference.DocTypeOPR
+        End Get
+    End Property
+
+    Public ReadOnly Property SiteCode As Long Implements prePayment.IPaymentPremiumRelated.SiteCode, preReport.IReport.SiteCode
+        Get
+            Return Master.SiteID
+        End Get
+    End Property
+
+    Public ReadOnly Property SiteIpAddr As String Implements preReport.IReport.SiteIpAddr
+        Get
+            Return Master.SiteIpAddr
+        End Get
+    End Property
+
+    Public ReadOnly Property UserID As Long Implements prePayment.IPaymentPremiumRelated.UserID, preReport.IReport.UserId
+        Get
+            Return Master.UserPrsPID
+        End Get
+    End Property
+
+    Public Property ReceiptByCode As String Implements prePayment.IPaymentPremiumRelated.ReceiptByCode
+        Get
+            Return cDataType.fString.IfNull(hdnReceiptByCode.Value)
+        End Get
+        Set(value As String)
+            hdnReceiptByCode.Value = value
+        End Set
+    End Property
+
+    Public Property ReceiptById As Long Implements prePayment.IPaymentPremiumRelated.ReceiptById
+        Get
+            Return cDataType.fString.IfNull(hdnReceiptById.Value)
+        End Get
+        Set(value As Long)
+            hdnReceiptById.Value = value
+        End Set
+    End Property
+
+    Public Property IsSuccessful As Boolean Implements prePayment.IPaymentPremiumRelated.IsSuccessful, preReport.IReport.IsSuccessful
+        Get
+            Return mIsSuccessful
+        End Get
+        Set(value As Boolean)
+            mIsSuccessful = value
+        End Set
+    End Property
+
+    Public Property IsSourceSiteLocked() As Boolean Implements prePayment.IPaymentPremiumRelated.IsSourceSiteLocked
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsSourceSiteLocked.Value)
+        End Get
+        Set(ByVal value As Boolean)
+            If value Then
+                If DocSaveState = eReference.DocSaveState.AddNew Or DocSaveState = eReference.DocSaveState.Edit Then
+                    RaiseEvent CheckSourceSite(Me, EventArgs.Empty)
+                    value = IsSuccessful
+                End If
+            End If
+            hdnIsSourceSiteLocked.Value = value
+            ManageOPRPaymentDetails("SOURCESITE", value)
+        End Set
+    End Property
+
+    Public Property SourceSite As String Implements prePayment.IPaymentPremiumRelated.SourceSite
+        Get
+            Return cDataType.fString.IfNull(ddlSourceSite.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlSourceSite.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property ECRNumber As Long Implements prePayment.IPaymentPremiumRelated.ECRNumber
+        Get
+            Return cDataType.fLong.IfNull(txtECRNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtECRNumber.Text = Nothing
+            Else
+                txtECRNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ECRDate As Date Implements prePayment.IPaymentPremiumRelated.ECRDate
+        Get
+            Return cDataType.fDate.IfNull(txtECRDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtECRDate.Text = Nothing
+            Else
+                txtECRDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property OPRNumber As Long Implements prePayment.IPaymentPremiumRelated.OPRNumber
+        Get
+            Return cDataType.fLong.IfNull(txtOPRNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtOPRNumber.Text = "AUTO"
+            Else
+                txtOPRNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property OPRDate As Date Implements prePayment.IPaymentPremiumRelated.OPRDate, preSearch.IAgent.LoadDocDate
+        Get
+            Return cDataType.fDate.IfNull(txtOPRDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtOPRDate.Text = Nothing
+            Else
+                txtOPRDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewOprFrom As Date Implements prePayment.IPaymentPremiumRelated.ViewOprFrom
+        Get
+            Return cDataType.fDate.IfNull(txtFromDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtFromDate.Text = cDataType.fDate.Current.AddDays(-3)
+            Else
+                txtFromDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewOprTo As Date Implements prePayment.IPaymentPremiumRelated.ViewOprTo
+        Get
+            Return cDataType.fDate.IfNull(txtToDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtToDate.Text = cDataType.fDate.Current
+            Else
+                txtToDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewOprDocNumber As Long Implements prePayment.IPaymentPremiumRelated.ViewOprDocNumber
+        Get
+            Return cDataType.fLong.IfNull(txtViewOPRNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtViewOPRNumber.Text = Nothing
+            Else
+                txtViewOPRNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property ViewOprPolicyNumber As String Implements prePayment.IPaymentPremiumRelated.ViewOprPolicyNumber
+        Get
+            Return cDataType.fString.IfNull(txtViewPolicyNumber.Text)
+        End Get
+        Set(value As String)
+            txtViewPolicyNumber.Text = value
+        End Set
+    End Property
+
+    Public Property ViewOprPayorName As String Implements prePayment.IPaymentPremiumRelated.ViewOprPayorName
+        Get
+            Return cDataType.fString.IfNull(txtViewPayorName.Text)
+        End Get
+        Set(value As String)
+            txtViewPayorName.Text = value
+        End Set
+    End Property
+
+    Public Property ViewOprinsuredName As String Implements prePayment.IPaymentPremiumRelated.ViewOprInsuredName
+        Get
+            Return cDataType.fString.IfNull(txtViewInsuredName.Text)
+        End Get
+        Set(value As String)
+            txtViewInsuredName.Text = value
+        End Set
+    End Property
+
+    Public Property TransactionType As String Implements prePayment.IPaymentPremiumRelated.TransactionType
+        Get
+            Return cDataType.fString.IfNull(ddlTransactionType.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlTransactionType.SelectedValue = value
+            Call ddlTransactionType_SelectedIndexChanged(Me, EventArgs.Empty)
+        End Set
+    End Property
+
+    Public Property OPRPaymentType As String Implements prePayment.IPaymentPremiumRelated.OPRPaymentType
+        Get
+            Return cDataType.fString.IfNull(ddlOPRPaymentType.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlOPRPaymentType.SelectedValue = value
+            Call ddlOPRPaymentType_SelectedIndexChanged(Me, EventArgs.Empty)
+        End Set
+    End Property
+
+    Public Property IsGrossAmountLocked As Boolean Implements prePayment.IPaymentPremiumRelated.IsGrossAmountLocked
+        Get
+            Return cDataType.fBoolean.IfNull(hdnIsGrossAmountLocked.Value)
+        End Get
+        Set(value As Boolean)
+            If value Then
+                If DocSaveState = eReference.DocSaveState.AddNew Or DocSaveState = eReference.DocSaveState.Edit Then
+                    RaiseEvent CheckGrossAmount(Me, EventArgs.Empty)
+                    value = IsSuccessful
+                    txtOPRGrossAmount.Text = OPRGrossAmount
+                End If
+            End If
+            hdnIsGrossAmountLocked.Value = value
+            ManageOPRPaymentDetails("GROSSAMOUNT", IsGrossAmountLocked)
+        End Set
+    End Property
+
+    Public Property OPRGrossAmount As Decimal Implements prePayment.IPaymentPremiumRelated.OPRGrossAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtOPRGrossAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtOPRGrossAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            If value > 0 AndAlso OPRGrossAmount > 0 AndAlso OPRGrossAmount = PaymentTotalAmount Then
+                OPRDetailTag = True
+            Else
+                OPRDetailTag = False
+            End If
+            If value > 0 AndAlso OPRGrossAmount > 0 AndAlso OPRGrossAmount = ReceiptTotalAmount Then
+                OPRVatTag = True
+            Else
+                OPRVatTag = False
+            End If
+        End Set
+    End Property
+
+    Public Property OPRCurrency As String Implements prePayment.IPaymentPremiumRelated.OPRCurrency
+        Get
+            Return cDataType.fString.IfNull(ddlOPRCurrency.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlOPRCurrency.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property WithAPR As Boolean Implements prePayment.IPaymentPremiumRelated.WithAPR
+        Get
+            Return cDataType.fBoolean.IfNull(chkWithAPR.Checked)
+        End Get
+        Set(value As Boolean)
+            chkWithAPR.Checked = value
+            accAPRDetails.Visible = value
+            If value = False Then
+                RaiseEvent ClearScreenAPRDetails(Me, EventArgs.Empty)
+            Else
+                APRAmount = OPRGrossAmount
+            End If
+        End Set
+    End Property
+
+    Public Property NoPolicy As Boolean Implements prePayment.IPaymentPremiumRelated.NoPolicy
+        Get
+            Return cDataType.fBoolean.IfNull(chkNoPolicy.Checked)
+        End Get
+        Set(value As Boolean)
+            chkNoPolicy.Checked = value
+        End Set
+    End Property
+
+    Public Property WithNewBiz As Boolean Implements prePayment.IPaymentPremiumRelated.WithNewBiz
+        Get
+            Return cDataType.fBoolean.IfNull(chkGP3.Checked)
+        End Get
+        Set(value As Boolean)
+            chkGP3.Checked = value
+            accNewBiz.Visible = value
+
+            ManagePolicy(eReference.MgePol.NewBiz, value)
+            ManageNewBiz(eReference.MgeNewBiz.Initial, True)
+            If value = False Then
+                RaiseEvent ClearScreenNewBizPayor(Me, EventArgs.Empty)
+                RaiseEvent ClearScreenNewBiz(Me, EventArgs.Empty)
+                NewBizName = cDataType.fString.Empty
+                lstNewBiz = New List(Of cNewBiz)
+            End If
+        End Set
+    End Property
+
+    Public Property BalanceToHigher As Boolean Implements prePayment.IPaymentPremiumRelated.BalanceToHigher
+        Get
+            Return cDataType.fBoolean.IfNull(chkBalanceToHigher.Checked)
+        End Get
+        Set(value As Boolean)
+            chkBalanceToHigher.Checked = value
+
+            divBalanceToHigher.Visible = value
+            RaiseEvent ClearScreenBalanceToHigher(Me, EventArgs.Empty)
+            If value 
+                'Validate if allowed
+                RaiseEvent LoadNewFrequency(Me, EventArgs.Empty)
+                RaiseEvent LoadPremiumBreakdown(Me, EventArgs.Empty)
+
+                ddlBalanceFrequency.SelectedIndex = 1
+
+                upPaymentPremiumRelated.Update()
+            End If
+        End Set
+    End Property
+
+    Public ReadOnly Property NewPremium As Decimal Implements prePayment.IPaymentPremiumRelated.NewPremium
+        Get
+            Dim intPolFrq As Integer
+            Select Case NewPolFrq
+                Case 1 : intPolFrq = 0
+                Case 2 : intPolFrq = 1
+                Case 4 : intPolFrq = 2
+                Case 12 : intPolFrq = 3
+            End Select
+
+            Return cDataType.fDecimal.IfNull(Split(hdnNewPremium.Value, "|")(intPolFrq))
+        End Get
+    End Property
+
+    Public Property NewPolFrq As Integer Implements prePayment.IPaymentPremiumRelated.NewPolFrq
+        Get
+            Return cDataType.fInteger.IfNull(ddlBalanceFrequency.SelectedValue)
+        End Get
+        Set(value As Integer)
+            ddlBalanceFrequency.SelectedValue = IIf(value, value, String.Empty)
+        End Set
+    End Property
+
+    Public Property OPRRemarks As String Implements prePayment.IPaymentPremiumRelated.OPRRemarks
+        Get
+            Return cDataType.fString.IfNull(txtOPRRemarks.Text)
+        End Get
+        Set(value As String)
+            txtOPRRemarks.Text = value
+        End Set
+    End Property
+
+    Public ReadOnly Property OPRFlags As String Implements prePayment.IPaymentPremiumRelated.OPRFlags
+        Get
+            Dim strReturn As String = String.Empty
+            strReturn += IIf(WithAPR, "1", "0")
+            strReturn += IIf(CheckPaymentTag, "1", "0")
+            strReturn += IIf(NewBusinessTag, "1", "0")
+            Return strReturn
+        End Get
+    End Property
+
+    Public Property WithCommission As Boolean Implements prePayment.IPaymentPremiumRelated.WithCommission
+        Get
+            Return cDataType.fBoolean.IfNull(hdnWithCommissionTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnWithCommissionTag.Value = value
+        End Set
+    End Property
+
+    Public Property CommissionAmount As Decimal Implements prePayment.IPaymentPremiumRelated.CommissionAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnCommissionAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnCommissionAmount.Value = value
+
+            If Val(value) = 0 Then
+                WithCommission = False
+            Else
+                WithCommission = True
+            End If
+        End Set
+    End Property
+#End Region
+
+#Region "Policy"
+
+    Property ApplicationNumber As Long Implements prePayment.IPaymentPremiumRelated.ApplicationNumber
+        Get
+            Return cDataType.fLong.IfNull(txtApplicationNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtApplicationNumber.Text = String.Empty
+                btnPrintAppNo.Visible = False
+            Else
+                txtApplicationNumber.Text = value
+                btnPrintAppNo.Visible = True
+            End If
+        End Set
+    End Property
+
+    Property PolType As String Implements prePayment.IPaymentPremiumRelated.PolType
+        Get
+            Return cDataType.fString.IfNull(ddlPolicyType.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlPolicyType.SelectedValue = value
+            ddlSearchPolicyType.SelectedValue = value
+            RaiseEvent LoadBusinessType(Me, EventArgs.Empty)
+            Call dllBusinessType_SelectIndexChanged(Me, EventArgs.Empty)
+        End Set
+    End Property
+
+    Property PType As String Implements prePayment.IPaymentPremiumRelated.PType
+        Get
+            Return cDataType.fString.IfNull(hdnPType.Value)
+        End Get
+        Set(value As String)
+            hdnPType.Value = value
+        End Set
+    End Property
+
+    Property PolicyNumber As String Implements prePayment.IPaymentPremiumRelated.PolicyNumber
+        Get
+            Return cDataType.fString.IfNull(txtPolicyNumber.Text)
+        End Get
+        Set(value As String)
+            If value = String.Empty Then PolicyNumberTag = False
+            txtPolicyNumber.Text = value
+        End Set
+    End Property
+
+    Property PolicyNumberTag As Boolean Implements prePayment.IPaymentPremiumRelated.PolicyNumberTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnPolicyNumberTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnPolicyNumberTag.Value = value
+        End Set
+    End Property
+
+    Property ModalPremium As Decimal Implements prePayment.IPaymentPremiumRelated.ModalPremium
+        Get
+            Return cDataType.fDecimal.IfNull(txtPremium.Text)
+        End Get
+        Set(value As Decimal)
+            If value = 0 Then
+                txtPremium.Text = Nothing
+            Else
+                txtPremium.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+                If DocSaveState = eReference.DocSaveState.AddNew Or DocSaveState = eReference.DocSaveState.Edit Then
+                    RaiseEvent CheckModalPremium(Me, EventArgs.Empty)
+                End If
+            End If
+        End Set
+    End Property
+
+    Property CovDue As Date Implements prePayment.IPaymentPremiumRelated.CovDue
+        Get
+            Return cDataType.fDate.IfNull(txtNextDueDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtNextDueDate.Text = Nothing
+            Else
+                txtNextDueDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Property CovEff As Date Implements prePayment.IPaymentPremiumRelated.CovEff
+        Get
+            Return cDataType.fDate.IfNull(txtIssueDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtIssueDate.Text = Nothing
+            Else
+                txtIssueDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Property CovSta As String Implements prePayment.IPaymentPremiumRelated.CovSta
+        Get
+            Return cDataType.fString.IfNull(hdnStatus.Value)
+        End Get
+        Set(value As String)
+            hdnStatus.Value = value
+        End Set
+    End Property
+
+    Property CovStaDes As String Implements prePayment.IPaymentPremiumRelated.CovStaDes
+        Get
+            Return cDataType.fString.IfNull(txtStatus.Text)
+        End Get
+        Set(value As String)
+            txtStatus.Text = value
+        End Set
+    End Property
+
+    Property PolCur As String Implements prePayment.IPaymentPremiumRelated.PolCur
+        Get
+            Return cDataType.fString.IfNull(ddlPlanCurrency.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlPlanCurrency.SelectedValue = value
+        End Set
+    End Property
+
+    Property PolMod As String Implements prePayment.IPaymentPremiumRelated.PolMod
+        Get
+            Return cDataType.fString.IfNull(ddlBusinessType.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlBusinessType.SelectedValue = value
+            Call dllBusinessType_SelectIndexChanged(Me, EventArgs.Empty)
+        End Set
+    End Property
+
+    Property LoadPolMod As String Implements prePayment.IPaymentPremiumRelated.LoadPolMod
+        Get
+            Return cDataType.fString.IfNull(hdnLoadPolMod.value)
+        End Get
+        Set(value As String)
+            hdnLoadPolMod.Value = value
+            If Not (value = String.Empty) Then
+                RaiseEvent LoadPolModDetails(Me, EventArgs.Empty)
+            End If
+        End Set
+    End Property
+
+    Property PolFrq As Integer Implements prePayment.IPaymentPremiumRelated.PolFrq
+        Get
+            Return cDataType.fString.IfNull(ddlFrequencyoOfPayment.SelectedValue)
+        End Get
+        Set(value As Integer)
+            ddlFrequencyoOfPayment.SelectedValue = value
+        End Set
+    End Property
+
+    Property LastBill As Date Implements prePayment.IPaymentPremiumRelated.LastBill
+        Get
+            Return cDataType.fDate.IfNull(hdnLstDueBill.Value)
+        End Get
+        Set(value As Date)
+            hdnLstDueBill.Value = value
+        End Set
+    End Property
+
+    Property ServUn As Long Implements prePayment.IPaymentPremiumRelated.ServUn
+        Get
+            Return cDataType.fLong.IfNull(hdnServUn.value)
+        End Get
+        Set(value As Long)
+            hdnServUn.value = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "Agent"
+
+    Public Property AgentID() As Long Implements prePayment.IPaymentPremiumRelated.AgentID, preSearch.IAgent.LoadAgentID
+        Get
+            Return cDataType.fLong.IfNull(arrTxtAgentID(SearchAgentTag).Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                arrTxtAgentID(SearchAgentTag).Text = Nothing
+            Else
+                arrTxtAgentID(SearchAgentTag).Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property AgentIDTag() As Boolean Implements prePayment.IPaymentPremiumRelated.AgentIDTag
+        Get
+            Return cDataType.fBoolean.IfNull(arrAgentIDTag(SearchAgentTag).Value)
+        End Get
+        Set(ByVal value As Boolean)
+            arrAgentIDTag(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+    Public Property AgentName() As String Implements prePayment.IPaymentPremiumRelated.AgentName, preSearch.IAgent.LoadAgentName
+        Get
+            Return cDataType.fString.IfNull(arrTxtAgentName(SearchAgentTag).Text)
+        End Get
+        Set(ByVal value As String)
+            arrTxtAgentName(SearchAgentTag).Text = value
+        End Set
+    End Property
+
+    Property AgentFirstName() As String Implements prePayment.IPaymentPremiumRelated.AgentFirstName, preSearch.IAgent.LoadAgentFName
+        Get
+            Return cDataType.fString.IfNull(arrHdnAgentFnam(SearchAgentTag).Value)
+        End Get
+        Set(value As String)
+            arrHdnAgentFnam(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+    Property AgentLastName() As String Implements prePayment.IPaymentPremiumRelated.AgentLastName, preSearch.IAgent.LoadAgentLName
+        Get
+            Return cDataType.fString.IfNull(arrHdnAgentLnam(SearchAgentTag).Value)
+        End Get
+        Set(value As String)
+            arrHdnAgentLnam(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+    Property AgentMiddleName() As String Implements prePayment.IPaymentPremiumRelated.AgentMiddleName, preSearch.IAgent.LoadAgentMName
+        Get
+            Return cDataType.fString.IfNull(Left(Trim(arrHdnAgentMnam(SearchAgentTag).Value), 1))
+        End Get
+        Set(value As String)
+            arrHdnAgentMnam(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+    Property AgentSalesForce() As String Implements prePayment.IPaymentPremiumRelated.AgentSalesForce
+        Get
+            Return cDataType.fString.IfNull(arrHdnAgentSalesForce(SearchAgentTag).Value)
+        End Get
+        Set(value As String)
+            arrHdnAgentSalesForce(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+    Property AgentCatCod() As String Implements prePayment.IPaymentPremiumRelated.AgentCatCod
+        Get
+            Return cDataType.fString.IfNull(arrHdnAgentCatCod(SearchAgentTag).Value)
+        End Get
+        Set(value As String)
+            arrHdnAgentCatCod(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+    Property AgentCommRate() As Decimal Implements prePayment.IPaymentPremiumRelated.AgentCommRate
+        Get
+            Return cDataType.fDecimal.IfNull(arrHdnAgentCommRate(SearchAgentTag).Value)
+        End Get
+        Set(value As Decimal)
+            arrHdnAgentCommRate(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+    Property AgentTaxRate() As Decimal Implements prePayment.IPaymentPremiumRelated.AgentTaxRate
+        Get
+            Return cDataType.fDecimal.IfNull(arrHdnAgentTaxRate(SearchAgentTag).Value)
+        End Get
+        Set(value As Decimal)
+            arrHdnAgentTaxRate(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+    Public Property AgencyID() As Long Implements prePayment.IPaymentPremiumRelated.AgencyID, preSearch.IAgent.LoadAgencyID
+        Get
+            Return cDataType.fLong.IfNull(txtAgencyID.Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                txtAgencyID.Text = Nothing
+            Else
+                txtAgencyID.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property AgencyName() As String Implements prePayment.IPaymentPremiumRelated.AgencyName, preSearch.IAgent.LoadAgencyName
+        Get
+            Return cDataType.fString.IfNull(txtAgencyName.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAgencyName.Text = value
+        End Set
+    End Property
+
+    Property AgencyFirstName() As String Implements prePayment.IPaymentPremiumRelated.AgencyFirstName, preSearch.IAgent.LoadAgencyFName
+        Get
+            Return arrHdnAgencyFnam(SearchAgentTag).Value
+        End Get
+        Set(value As String)
+            arrHdnAgencyFnam(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+    Property AgencyLastName() As String Implements prePayment.IPaymentPremiumRelated.AgencyLastName, preSearch.IAgent.LoadAgencyLName
+        Get
+            Return arrHdnAgencyLnam(SearchAgentTag).Value
+        End Get
+        Set(value As String)
+            arrHdnAgencyLnam(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+    Property AgencyMiddleName() As String Implements prePayment.IPaymentPremiumRelated.AgencyMiddleName, preSearch.IAgent.LoadAgencyMName
+        Get
+            Return arrHdnAgencyMnam(SearchAgentTag).Value
+        End Get
+        Set(value As String)
+            arrHdnAgencyMnam(SearchAgentTag).Value = value
+        End Set
+    End Property
+
+
+    Public Property SearchAgentPolType As String _
+    Implements preSearch.IAgentPolicyContext.SearchAgentPolType
+
+        Get
+            Return Convert.ToString(ViewState("SearchAgentPolType"))
+        End Get
+
+        Set(ByVal value As String)
+            ViewState("SearchAgentPolType") = value
+        End Set
+
+    End Property
+
+    Public Property Usd As Long Implements prePayment.IAgentDetails.Usd
+        Get
+            Return cDataType.fLong.IfNull(arrTxtUsdId(SearchAgentTag - 1).Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                arrTxtUsdId(SearchAgentTag - 1).Text = Nothing
+            Else
+                arrTxtUsdId(SearchAgentTag - 1).Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property UsdName As String Implements prePayment.IAgentDetails.UsdName
+        Get
+            Return cDataType.fString.IfNull(arrTxtUsdName(SearchAgentTag - 1).Text)
+        End Get
+        Set(ByVal value As String)
+            arrTxtUsdName(SearchAgentTag - 1).Text = value
+        End Set
+    End Property
+
+    Public Property Asd As Long Implements prePayment.IAgentDetails.Asd
+        Get
+            Return cDataType.fLong.IfNull(txtAsdID.Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                txtAsdID.Text = Nothing
+            Else
+                txtAsdID.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property AsdName As String Implements prePayment.IAgentDetails.AsdName
+        Get
+            Return cDataType.fString.IfNull(txtAsdName.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAsdName.Text = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "Payor"
+
+    Public Property PayorID() As Long Implements prePayment.IPaymentPremiumRelated.PayorID
+        Get
+            Return cDataType.fLong.IfNull(txtPayorID.Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                PayorIDTag = False
+                txtPayorID.Text = Nothing
+            Else
+                txtPayorID.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property PayorIDTag() As Boolean Implements prePayment.IPaymentPremiumRelated.PayorIDTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnPayorIDTag.Value)
+        End Get
+        Set(ByVal value As Boolean)
+            hdnPayorIDTag.Value = value
+        End Set
+    End Property
+
+    Public Property PayorType() As String Implements prePayment.IPaymentPremiumRelated.PayorType
+        Get
+            Return cDataType.fString.IfNull(hdnPayorSex.Value)
+        End Get
+        Set(value As String)
+            hdnPayorSex.Value = value
+        End Set
+    End Property
+
+    Public Property PayorName() As String Implements prePayment.IPaymentPremiumRelated.PayorName
+        Get
+            If PayorType = "C" Then
+                Return txtPayorName.Text 'PayorLastName
+            Else
+                If String.Concat(PayorLastName, PayorFirstName, PayorMiddleName).Trim() = String.Empty Then
+                    Return String.Empty
+                Else
+                    Return String.Concat(PayorLastName, ";", PayorFirstName, _
+                                         IIf(PayorMiddleName = String.Empty, String.Empty, String.Concat(" ", PayorMiddleName)), _
+                                         IIf(PayorSuffix = String.Empty, String.Empty, String.Concat(";", PayorSuffix)))
+                End If
+            End If
+        End Get
+        Set(ByVal value As String)
+            txtPayorName.Text = value
+        End Set
+    End Property
+
+    Public Property PayorLastName() As String Implements prePayment.IPaymentPremiumRelated.PayorLastName
+        Get
+            Return cDataType.fString.IfNull(hdnPayorLastName.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnPayorLastName.Value = value
+        End Set
+    End Property
+
+    Public Property PayorFirstName() As String Implements prePayment.IPaymentPremiumRelated.PayorFirstName
+        Get
+            Return cDataType.fString.IfNull(hdnPayorFirstName.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnPayorFirstName.Value = value
+        End Set
+    End Property
+
+    Public Property PayorMiddleName() As String Implements prePayment.IPaymentPremiumRelated.PayorMiddleName
+        Get
+            If Len(cDataType.fString.IfNull(hdnPayorMiddleName.Value)) > 2 Then
+                Return Left(cDataType.fString.IfNull(hdnPayorMiddleName.Value), 1)
+            Else
+                Return cDataType.fString.IfNull(hdnPayorMiddleName.Value)
+            End If
+        End Get
+        Set(ByVal value As String)
+            hdnPayorMiddleName.Value = value
+        End Set
+    End Property
+
+    Public Property PayorSuffix() As String Implements prePayment.IPaymentPremiumRelated.PayorSuffix
+        Get
+            Return cDataType.fString.IfNull(hdnPayorSuffix.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnPayorSuffix.Value = value
+        End Set
+    End Property
+
+    Public Property PayorTitle() As String Implements prePayment.IPaymentPremiumRelated.PayorTitle
+        Get
+            Return cDataType.fString.IfNull(hdnPayorTitle.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnPayorTitle.Value = value
+        End Set
+    End Property
+
+    Public Property PayorPlaceOfBirth() As String Implements prePayment.IPaymentPremiumRelated.PayorPlaceOfBirth
+        Get
+            Return cDataType.fString.IfNull(hdnPayorPlaceOfBirth.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnPayorPlaceOfBirth.Value = value
+        End Set
+    End Property
+
+    Public Property PayorDateOfBirth() As Date Implements prePayment.IPaymentPremiumRelated.PayorDateOfBirth
+        Get
+            Return cDataType.fDate.IfNull(hdnPayorDateOfBirth.Value)
+        End Get
+        Set(ByVal value As Date)
+            If value = cDataType.fDate.Empty Then
+                hdnPayorDateOfBirth.Value = Nothing
+            Else
+                hdnPayorDateOfBirth.Value = value
+            End If
+        End Set
+    End Property
+
+    Public Property PayorAddType() As String Implements prePayment.IPaymentPremiumRelated.PayorAddType
+        Get
+            Return cDataType.fString.IfNull(ddlAddPayorType.SelectedValue)
+        End Get
+        Set(value As String)
+            If ddlAddPayorType.Items.Count > 0 Then
+                ddlAddPayorType.SelectedValue = value
+            End If
+        End Set
+    End Property
+
+    Public Property PayorAddName() As String Implements prePayment.IPaymentPremiumRelated.PayorAddName
+        Get
+            Return cDataType.fString.IfNull(txtAddPayorName.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddPayorName.Text = value
+        End Set
+    End Property
+
+    Public Property PayorAddLastName() As String Implements prePayment.IPaymentPremiumRelated.PayorAddLastName
+        Get
+            Return cDataType.fString.IfNull(txtAddPayorLastName.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddPayorLastName.Text = value
+        End Set
+    End Property
+
+    Public Property PayorAddFirstName() As String Implements prePayment.IPaymentPremiumRelated.PayorAddFirstName
+        Get
+            Return cDataType.fString.IfNull(txtAddPayorFirstName.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddPayorFirstName.Text = value
+        End Set
+    End Property
+
+    Public Property PayorAddMiddleName() As String Implements prePayment.IPaymentPremiumRelated.PayorAddMiddleName
+        Get
+            Return cDataType.fString.IfNull(txtAddPayorMiddleName.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddPayorMiddleName.Text = value
+        End Set
+    End Property
+
+    Public Property PayorAddSuffix() As String Implements prePayment.IPaymentPremiumRelated.PayorAddSuffix
+        Get
+            Return cDataType.fString.IfNull(txtAddPayorSuffix.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddPayorSuffix.Text = value
+        End Set
+    End Property
+
+    Public Property PayorAddTitle() As String Implements prePayment.IPaymentPremiumRelated.PayorAddTitle
+        Get
+            Return cDataType.fString.IfNull(ddlAddPayorTitle.SelectedValue)
+        End Get
+        Set(ByVal value As String)
+            ddlAddPayorTitle.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property PayorAddPlaceOfBirth() As String Implements prePayment.IPaymentPremiumRelated.PayorAddPlaceOfBirth
+        Get
+            Return cDataType.fString.IfNull(txtAddPayorPlaceOfBirth.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddPayorPlaceOfBirth.Text = value
+        End Set
+    End Property
+
+    Public Property PayorAddDateOfBirth() As Date Implements prePayment.IPaymentPremiumRelated.PayorAddDateOfBirth
+        Get
+            Return cDataType.fDate.IfNull(txtAddPayorDoB.Text)
+        End Get
+        Set(ByVal value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtAddPayorDoB.Text = Nothing
+            Else
+                txtAddPayorDoB.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property PayorAddTin() As String Implements prePayment.IPaymentPremiumRelated.PayorAddTin
+        Get
+            Return cDataType.fString.IfNull(txtAddPayorTin.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddPayorTin.Text = value
+        End Set
+    End Property
+
+
+    Public Property PayorAddAddress() As String Implements prePayment.IPaymentPremiumRelated.PayorAddAddress
+        Get
+            Return cDataType.fString.IfNull(txtAddPayorAddress.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddPayorAddress.Text = value
+        End Set
+    End Property
+    Public Property PayorTin() As String Implements prePayment.IPaymentPremiumRelated.PayorTin
+        Get
+            Return txtPayorTin.Text
+        End Get
+        Set(ByVal value As String)
+            txtPayorTin.Text = value
+        End Set
+    End Property
+
+    Public Property PayorAddress() As String Implements prePayment.IPaymentPremiumRelated.PayorAddress
+        Get
+            Return txtPayorAddress.Text
+        End Get
+        Set(ByVal value As String)
+            txtPayorAddress.Text = value
+        End Set
+    End Property
+
+    Public Property SearchPayorPolType As String _
+    Implements preSearch.IPayorPolicyContext.SearchPayorPolType
+
+        Get
+            Return Convert.ToString(ViewState("SearchPayorPolType"))
+        End Get
+
+        Set(ByVal value As String)
+            ViewState("SearchPayorPolType") = value
+        End Set
+
+    End Property
+
+    'end
+
+#End Region
+
+#Region "Insured"
+
+    Public Property SamePayorInsured() As String Implements prePayment.IPaymentPremiumRelated.SamePayorInsured
+        Get
+            If hdnSamePayorInsured.Value Then
+                Return "Y"
+            Else
+                Return "N"
+            End If
+        End Get
+        Set(ByVal value As String)
+            If value = "Y" Then
+                If DocSaveState = eReference.DocSaveState.Edit Then ManagePolicy(eReference.MgePol.Insured, False)
+                hdnSamePayorInsured.Value = True
+                chkSamePayorInsured.Checked = True
+                chkAddPayorIsSame.Checked = True
+            Else
+                hdnSamePayorInsured.Value = False
+                chkSamePayorInsured.Checked = False
+                chkAddPayorIsSame.Checked = False
+            End If
+        End Set
+    End Property
+
+    Public Property InsuredID() As Long Implements prePayment.IPaymentPremiumRelated.InsuredID
+        Get
+            If SamePayorInsured = "Y" Then
+                Return PayorID
+            Else
+                Return cDataType.fLong.IfNull(txtInsuredID.Text)
+            End If
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                InsuredIDTag = False
+                txtInsuredID.Text = Nothing
+            Else
+                txtInsuredID.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property InsuredIDTag() As Boolean Implements prePayment.IPaymentPremiumRelated.InsuredIDTag
+        Get
+            If SamePayorInsured = "Y" Then
+                Return PayorIDTag
+            Else
+                Return cDataType.fBoolean.IfNull(hdnInsuredIDTag.Value)
+            End If
+        End Get
+        Set(ByVal value As Boolean)
+            hdnInsuredIDTag.Value = value
+        End Set
+    End Property
+
+    Public Property InsuredType() As String Implements prePayment.IPaymentPremiumRelated.InsuredType
+        Get
+            Return cDataType.fString.IfNull(hdnInsuredSex.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnInsuredSex.Value = value
+        End Set
+    End Property
+
+    Public Property InsuredName() As String Implements prePayment.IPaymentPremiumRelated.InsuredName
+        Get
+            If String.Concat(InsuredLastName, InsuredFirstName, InsuredMiddleName).Trim() = String.Empty Then
+                Return String.Empty
+            Else
+                Return String.Concat(InsuredLastName, ";", InsuredFirstName, _
+                                     IIf(InsuredMiddleName = String.Empty, String.Empty, String.Concat(" ", InsuredMiddleName)), _
+                                     IIf(InsuredSuffix = String.Empty, String.Empty, String.Concat(";", InsuredSuffix)))
+            End If
+        End Get
+        Set(ByVal value As String)
+            hdnInsuredName.Value = value
+            txtInsuredName.Text = value
+        End Set
+    End Property
+
+    Public Property InsuredLastName() As String Implements prePayment.IPaymentPremiumRelated.InsuredLastName
+        Get
+            Return cDataType.fString.IfNull(hdnInsuredLastName.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnInsuredLastName.Value = value
+        End Set
+    End Property
+
+    Public Property InsuredFirstName() As String Implements prePayment.IPaymentPremiumRelated.InsuredFirstName
+        Get
+            Return cDataType.fString.IfNull(hdnInsuredFirstName.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnInsuredFirstName.Value = value
+        End Set
+    End Property
+
+    Public Property InsuredMiddleName() As String Implements prePayment.IPaymentPremiumRelated.InsuredMiddleName
+        Get
+            If Len(cDataType.fString.IfNull(hdnInsuredMiddleName.Value)) > 2 Then
+                Return Left(cDataType.fString.IfNull(hdnInsuredMiddleName.Value), 1)
+            Else
+                Return cDataType.fString.IfNull(hdnInsuredMiddleName.Value)
+            End If
+
+        End Get
+        Set(ByVal value As String)
+            hdnInsuredMiddleName.Value = value
+        End Set
+    End Property
+
+    Public Property InsuredSuffix() As String Implements prePayment.IPaymentPremiumRelated.InsuredSuffix
+        Get
+            Return cDataType.fString.IfNull(hdnInsuredSuffix.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnInsuredSuffix.Value = value
+        End Set
+    End Property
+
+    Public Property InsuredTitle() As String Implements prePayment.IPaymentPremiumRelated.InsuredTitle
+        Get
+            Return cDataType.fString.IfNull(hdnInsuredTitle.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnInsuredTitle.Value = value
+        End Set
+    End Property
+
+    Public Property InsuredPlaceOfBirth() As String Implements prePayment.IPaymentPremiumRelated.InsuredPlaceOfBirth
+        Get
+            Return cDataType.fString.IfNull(hdnInsuredPlaceOfBirth.Value)
+        End Get
+        Set(ByVal value As String)
+            hdnInsuredPlaceOfBirth.Value = value
+        End Set
+    End Property
+
+    Public Property InsuredDateOfBirth() As Date Implements prePayment.IPaymentPremiumRelated.InsuredDateOfBirth
+        Get
+            Return cDataType.fDate.IfNull(hdnInsuredDateOfBirth.Value)
+
+        End Get
+        Set(ByVal value As Date)
+            If value = cDataType.fDate.Empty Then
+                hdnInsuredDateOfBirth.Value = Nothing
+            Else
+                hdnInsuredDateOfBirth.Value = value
+            End If
+        End Set
+    End Property
+
+    Public Property InsuredAddType() As String Implements prePayment.IPaymentPremiumRelated.InsuredAddType
+        Get
+            Return cDataType.fString.IfNull(ddlAddInsuredType.SelectedValue)
+        End Get
+        Set(ByVal value As String)
+            If ddlAddInsuredType.Items.Count > 0 Then
+                ddlAddInsuredType.SelectedValue = value
+            End If
+        End Set
+    End Property
+
+    Public Property InsuredAddLastName() As String Implements prePayment.IPaymentPremiumRelated.InsuredAddLastName
+        Get
+            Return cDataType.fString.IfNull(txtAddInsuredLastName.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddInsuredLastName.Text = value
+        End Set
+    End Property
+
+    Public Property InsuredAddFirstName() As String Implements prePayment.IPaymentPremiumRelated.InsuredAddFirstName
+        Get
+            Return cDataType.fString.IfNull(txtAddInsuredFirstName.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddInsuredFirstName.Text = value
+        End Set
+    End Property
+
+    Public Property InsuredAddMiddleName() As String Implements prePayment.IPaymentPremiumRelated.InsuredAddMiddleName
+        Get
+            Return cDataType.fString.IfNull(txtAddInsuredMiddleName.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddInsuredMiddleName.Text = value
+        End Set
+    End Property
+
+    Public Property InsuredAddSuffix() As String Implements prePayment.IPaymentPremiumRelated.InsuredAddSuffix
+        Get
+            Return cDataType.fString.IfNull(txtAddInsuredSuffix.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddInsuredSuffix.Text = value
+        End Set
+    End Property
+
+    Public Property InsuredAddTitle() As String Implements prePayment.IPaymentPremiumRelated.InsuredAddTitle
+        Get
+            Return cDataType.fString.IfNull(ddlAddInsuredTitle.SelectedValue)
+        End Get
+        Set(ByVal value As String)
+            ddlAddInsuredTitle.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property InsuredAddPlaceOfBirth() As String Implements prePayment.IPaymentPremiumRelated.InsuredAddPlaceOfBirth
+        Get
+            Return cDataType.fString.IfNull(txtAddInsuredPlaceOfBirth.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAddInsuredPlaceOfBirth.Text = value
+        End Set
+    End Property
+
+
+    Public Property InsuredAddDateOfBirth() As Date Implements prePayment.IPaymentPremiumRelated.InsuredAddDateOfBirth
+        Get
+            Return cDataType.fDate.IfNull(txtAddInsuredDoB.Text)
+
+        End Get
+        Set(ByVal value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtAddInsuredDoB.Text = Nothing
+            Else
+                txtAddInsuredDoB.Text = value
+            End If
+        End Set
+    End Property
+    Public Property SearchInsuredPolType As String _
+ Implements preSearch.IInsuredPolicyContext.SearchInsuredPolType
+
+        Get
+            Return Convert.ToString(
+                ViewState("SearchInsuredPolType")
+            )
+        End Get
+
+        Set(ByVal value As String)
+            ViewState("SearchInsuredPolType") = value
+        End Set
+
+    End Property
+
+
+#End Region
+
+#Region "GPA Details"
+
+    Public Property IsGpaCardNoExist As Boolean Implements prePayment.IPaymentPremiumRelated.IsGpaCardNoExist
+        Get
+            Return mIsGpaCardNoExist
+        End Get
+        Set(value As Boolean)
+            mIsGpaCardNoExist = value
+        End Set
+    End Property
+
+    Public Property GpaType As Integer Implements prePayment.IPaymentPremiumRelated.GpaType
+        Get
+            Return rblGpaType.SelectedValue
+        End Get
+        Set(value As Integer)
+            rblGpaType.SelectedValue = value
+            Call rblGpaType_SelectedIndexChanged(Me, EventArgs.Empty)
+        End Set
+    End Property
+
+    Public Property GpaCardNo As String Implements prePayment.IPaymentPremiumRelated.GpaCardNo
+        Get
+            Return cDataType.fString.IfNull(String.Concat(GpaPlan, "-", GpaNumber))
+        End Get
+        Set(value As String)
+            If value.Equals(String.Empty) Then value = "-"
+            GpaPlan = Split(value, "-")(0)
+            GpaNumber = Split(value, "-")(1)
+        End Set
+    End Property
+
+    Public Property GpaCardNoTag As Boolean Implements prePayment.IPaymentPremiumRelated.GpaCardNoTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnGpaCardNoTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnGpaCardNoTag.Value = value
+        End Set
+    End Property
+
+    Public Property GpaPlan As String Implements prePayment.IPaymentPremiumRelated.GpaPlan
+        Get
+            Return cDataType.fString.IfNull(ddlPAplan.SelectedValue)
+        End Get
+        Set(value As String)
+            If value = String.Empty Then
+                ddlPAplan.SelectedIndex = -1
+            Else
+                ddlPAplan.SelectedValue = value
+            End If
+        End Set
+    End Property
+
+    Public Property GpaNumber As String Implements prePayment.IPaymentPremiumRelated.GpaNumber
+        Get
+            Return cDataType.fString.IfNull(txtPAnumber.Text)
+        End Get
+        Set(value As String)
+            txtPAnumber.Text = value
+        End Set
+    End Property
+
+    Public Property GpaTerm As Integer Implements prePayment.IGpaDetails.GpaTerm
+        Get
+            Return cDataType.fInteger.IfNull(hdnGpaTerm.Value)
+        End Get
+        Set(value As Integer)
+            hdnGpaTerm.Value = value
+        End Set
+    End Property
+
+    Public Property GpaCoverage As Decimal Implements prePayment.IGpaDetails.GpaCoverage
+        Get
+            Return cDataType.fDecimal.IfNull(hdnGpaCoverage.Value)
+        End Get
+        Set(value As Decimal)
+            hdnGpaCoverage.Value = value
+        End Set
+    End Property
+
+    Public Property GpaPremium As Decimal Implements prePayment.IGpaDetails.GpaPremium
+        Get
+            Return cDataType.fDecimal.IfNull(hdnGpaPremium.Value)
+        End Get
+        Set(value As Decimal)
+            ModalPremium = value
+            hdnGpaPremium.Value = value
+        End Set
+    End Property
+
+    Public Property GpaPromoOff As Long Implements prePayment.IGpaDetails.GpaPromoOff
+        Get
+            Return cDataType.fLong.IfNull(txtPromoOffID.Text)
+        End Get
+        Set(value As Long)
+            If value = 0 Then
+                txtPromoOffID.Text = Nothing
+            Else
+                txtPromoOffID.Text = value
+                SearchAgentTag = eReference.AgentTagType.PromoOfficer
+                If AgentIDTag = True Then
+                    RaiseEvent LoadAgent(Me, EventArgs.Empty)
+                End If
+            End If
+        End Set
+    End Property
+
+    Public Property GpaSalesOff As Long Implements prePayment.IGpaDetails.GpaSalesOff
+        Get
+            Return cDataType.fLong.IfNull(txtSalesOffID.Text)
+        End Get
+        Set(value As Long)
+            If value = 0 Then
+                txtSalesOffID.Text = Nothing
+            Else
+                txtSalesOffID.Text = value
+                SearchAgentTag = eReference.AgentTagType.SalesOfficer
+                If AgentIDTag = True Then
+                    RaiseEvent LoadAgent(Me, EventArgs.Empty)
+                End If
+            End If
+        End Set
+    End Property
+
+    Public Property GpaUsd1 As Long Implements prePayment.IGpaDetails.GpaUsd1
+        Get
+            Return cDataType.fLong.IfNull(txtUSD1ID.Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                txtUSD1ID.Text = Nothing
+            Else
+                txtUSD1ID.Text = value
+                SearchAgentTag = eReference.AgentTagType.Usd1
+                If AgentIDTag = True Then
+                    RaiseEvent LoadAgent(Me, EventArgs.Empty)
+                End If
+            End If
+        End Set
+    End Property
+
+    Public Property GpaUsdName1 As String Implements prePayment.IGpaDetails.GpaUsdName1
+        Get
+            Return cDataType.fString.IfNull(txtUSD1Name.Text)
+        End Get
+        Set(ByVal value As String)
+            txtUSD1Name.Text = value
+        End Set
+    End Property
+
+    Public Property GpaUsd2 As Long Implements prePayment.IGpaDetails.GpaUsd2
+        Get
+            Return cDataType.fLong.IfNull(txtUSD2ID.Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                txtUSD2ID.Text = Nothing
+            Else
+                txtUSD2ID.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property GpaUsdName2 As String Implements prePayment.IGpaDetails.GpaUsdName2
+        Get
+            Return cDataType.fString.IfNull(txtUSD2Name.Text)
+        End Get
+        Set(ByVal value As String)
+            txtUSD2Name.Text = value
+        End Set
+    End Property
+
+    Public Property GpaAsd As Long Implements prePayment.IGpaDetails.GpaAsd1, prePayment.IGpaDetails.GpaAsd2
+        Get
+            Return cDataType.fLong.IfNull(txtAsdID.Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                txtAsdID.Text = Nothing
+            Else
+                txtAsdID.Text = value
+                SearchAgentTag = eReference.AgentTagType.Asd
+                If AgentIDTag = True Then
+                    RaiseEvent LoadAgent(Me, EventArgs.Empty)
+                End If
+            End If
+        End Set
+    End Property
+
+    Public Property GpaAsdName As String Implements prePayment.IGpaDetails.GpaAsdName1, prePayment.IGpaDetails.GpaAsdName2
+        Get
+            Return cDataType.fString.IfNull(txtAsdName.Text)
+        End Get
+        Set(ByVal value As String)
+            txtAsdName.Text = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "New Biz"
+
+    Public Property IsNewBizSuccessful As Boolean Implements prePayment.IPaymentPremiumRelated.IsNewBizSuccessful
+        Get
+            Return cDataType.fBoolean.IfNull(mIsNewBizSuccessful)
+        End Get
+        Set(value As Boolean)
+            mIsNewBizSuccessful = value
+        End Set
+    End Property
+
+    Public Property NewBizName As String Implements prePayment.IPaymentPremiumRelated.NewBizName
+        Get
+            Return cDataType.fString.IfNull(txtNewBizName.Text)
+        End Get
+        Set(value As String)
+            txtNewBizName.Text = value
+        End Set
+    End Property
+
+    Public Property NewBizApplNo As Long Implements prePayment.IPaymentPremiumRelated.NewBizApplNo
+        Get
+            Return cDataType.fLong.IfNull(txtNewBizApplNo.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtNewBizApplNo.Text = String.Empty
+            Else
+                txtNewBizApplNo.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property NewBizLastName As String Implements prePayment.IPaymentPremiumRelated.NewBizLastName
+        Get
+            Return cDataType.fString.IfNull(txtNewBizLastName.Text)
+        End Get
+        Set(value As String)
+            txtNewBizLastName.Text = value
+        End Set
+    End Property
+
+    Public Property NewBizFirstName As String Implements prePayment.IPaymentPremiumRelated.NewBizFirstName
+        Get
+            Return cDataType.fString.IfNull(txtNewBizFirstName.Text)
+        End Get
+        Set(value As String)
+            txtNewBizFirstName.Text = value
+        End Set
+    End Property
+
+    Public Property NewBizMiddleName As String Implements prePayment.IPaymentPremiumRelated.NewBizMiddleName
+        Get
+            Return cDataType.fString.IfNull(txtNewBizMiddleName.Text)
+        End Get
+        Set(value As String)
+            txtNewBizMiddleName.Text = value
+        End Set
+    End Property
+
+    Public Property NewBizSuffix As String Implements prePayment.IPaymentPremiumRelated.NewBizSuffix
+        Get
+            Return cDataType.fString.IfNull(txtNewBizSuffix.Text)
+        End Get
+        Set(value As String)
+            txtNewBizSuffix.Text = value
+        End Set
+    End Property
+
+    Public Property NewBizTitle As String Implements prePayment.IPaymentPremiumRelated.NewBizTitle
+        Get
+            Return cDataType.fString.IfNull(ddlNewBizTitle.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlNewBizTitle.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property NewBizSex As String Implements prePayment.IPaymentPremiumRelated.NewBizSex
+        Get
+            Return cDataType.fString.IfNull(ddlNewBizType.Text)
+        End Get
+        Set(value As String)
+            ddlNewBizType.Text = value
+        End Set
+    End Property
+
+    Public Property NewBizPlaceOfBirth As String Implements prePayment.IPaymentPremiumRelated.NewBizPlaceOfBirth
+        Get
+            Return cDataType.fString.IfNull(txtNewBizPlaceOfBirth.Text)
+        End Get
+        Set(value As String)
+            txtNewBizPlaceOfBirth.Text = value
+        End Set
+    End Property
+
+    Public Property NewBizDoB As Date Implements prePayment.IPaymentPremiumRelated.NewBizDoB
+        Get
+            Return cDataType.fDate.IfNull(txtNewBizDoB.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtNewBizDoB.Text = String.Empty
+            Else
+                txtNewBizDoB.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property NewBizEcrNumber As Long Implements prePayment.IPaymentPremiumRelated.NewBizEcrNumber
+        Get
+            Return cDataType.fLong.IfNull(txtNewBizEcrNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtNewBizEcrNumber.Text = String.Empty
+            Else
+                txtNewBizEcrNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property NewBizEcrDate As Date Implements prePayment.IPaymentPremiumRelated.NewBizEcrDate
+        Get
+            Return cDataType.fDate.IfNull(txtNewBizEcrDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtNewBizEcrDate.Text = String.Empty
+            Else
+                txtNewBizEcrDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property NewBizAmount As Decimal Implements prePayment.IPaymentPremiumRelated.NewBizAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtNewBizAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtNewBizAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property NewBizTotalAmount As Decimal Implements prePayment.IPaymentPremiumRelated.NewBizTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtNewBizTotalAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtNewBizTotalAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property NewBizID As String Implements prePayment.IPaymentPremiumRelated.NewBizID
+        Get
+            Return cDataType.fString.IfNull(hdnNewBizID.Value)
+        End Get
+        Set(value As String)
+            hdnNewBizID.Value = value
+        End Set
+    End Property
+
+    Public Property NewBizInsId As Long Implements prePayment.IPaymentPremiumRelated.NewBizInsId
+        Get
+            Return cDataType.fLong.IfNull(txtNewBizInsID.Text)
+        End Get
+        Set(value As Long)
+            txtNewBizInsID.Text = value
+        End Set
+    End Property
+
+    Public Property NewBizPayId As Long Implements prePayment.IPaymentPremiumRelated.NewBizPayId
+        Get
+            Return cDataType.fLong.IfNull(txtNewBizPayID.Text)
+        End Get
+        Set(value As Long)
+            txtNewBizPayID.Text = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "OPR Details"
+
+    Public Property IsReceiptSuccessful As Boolean Implements prePayment.IPaymentPremiumRelated.isReceiptSuccessful
+        Get
+            Return cDataType.fBoolean.IfNull(mIsReceiptSuccessful)
+        End Get
+        Set(value As Boolean)
+            mIsReceiptSuccessful = value
+        End Set
+    End Property
+
+    Public Property ReceiptIndex As Integer Implements prePayment.IPaymentPremiumRelated.ReceiptIndex
+        Get
+            Return cDataType.fInteger.IfNull(ddlTransactionType.SelectedIndex)
+        End Get
+        Set(value As Integer)
+            If ddlOPRTransaction.Items.Count > 0 Then
+                ddlOPRTransaction.SelectedIndex = value
+            End If
+        End Set
+    End Property
+
+    Public Property ReceiptDetailID As String Implements prePayment.IPaymentPremiumRelated.ReceiptDetailID
+        Get
+            Return cDataType.fString.IfNull(hdnOPRDetailID.Value)
+        End Get
+        Set(value As String)
+            hdnOPRDetailID.Value = value
+            Call ddlOPRPaymentType_SelectedIndexChanged(Me, EventArgs.Empty)
+        End Set
+    End Property
+
+    Public Property ReceiptTransactionCode As String Implements prePayment.IPaymentPremiumRelated.ReceiptTransactionCode
+        Get
+            Return cDataType.fString.IfNull(hdnOPRTransactionCode.Value)
+        End Get
+        Set(value As String)
+            hdnOPRTransactionCode.Value = value
+        End Set
+    End Property
+
+    Public Property ReceiptTransactionType As String Implements prePayment.IPaymentPremiumRelated.ReceiptTransactionType
+        Get
+            Return cDataType.fString.IfNull(hdnOPRTransactionType.Value)
+        End Get
+        Set(value As String)
+            hdnOPRTransactionType.Value = value
+        End Set
+    End Property
+
+    Public Property ReceiptTransactionDesc As String Implements prePayment.IPaymentPremiumRelated.ReceiptTransactionDesc
+        Get
+            Return cDataType.fString.IfNull(hdnOPRTransactionDesc.Value)
+        End Get
+        Set(value As String)
+            hdnOPRTransactionDesc.Value = value
+        End Set
+    End Property
+
+    Public Property ReceiptTransactionVat As String Implements prePayment.IPaymentPremiumRelated.ReceiptTransactionVat
+        Get
+            Return cDataType.fString.IfNull(hdnOPRTransactionVat.Value)
+        End Get
+        Set(value As String)
+            hdnOPRTransactionVat.Value = value
+        End Set
+    End Property
+
+    Public Property ReceiptAmount As Decimal Implements prePayment.IPaymentPremiumRelated.ReceiptAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtOPRAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtOPRAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property ReceiptCommissionAmount As Decimal Implements prePayment.IPaymentPremiumRelated.ReceiptCommissionAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtCommissionAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtCommissionAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property ReceiptTotalAmount As Decimal Implements prePayment.IPaymentPremiumRelated.ReceiptTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtOPRTotalAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtOPRTotalAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+#End Region
+
+#Region "Payslip"
+
+    Public Property IsPayslipCodeExist As Boolean Implements prePayment.IPaymentPremiumRelated.IsPayslipCodeExist
+        Get
+            Return mIsPayslipCodeExist
+        End Get
+        Set(value As Boolean)
+            mIsPayslipCodeExist = value
+        End Set
+    End Property
+
+    Public Property PayslipCode As String Implements prePayment.IPaymentPremiumRelated.PayslipCode
+        Get
+            Return cDataType.fString.IfNull(txtPayslipCode.Text)
+        End Get
+        Set(value As String)
+            txtPayslipCode.Text = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "BillNo"
+
+    Public Property IsBillNoExist As Boolean Implements prePayment.IPaymentPremiumRelated.IsBillNoExist
+        Get
+            Return mIsBillNoExist
+        End Get
+        Set(value As Boolean)
+            mIsBillNoExist = value
+        End Set
+    End Property
+
+    Public Property BillNo As String Implements prePayment.IPaymentPremiumRelated.BillNo
+        Get
+            Return cDataType.fString.IfNull(txtBillNo.Text)
+        End Get
+        Set(value As String)
+            txtBillNo.Text = value
+        End Set
+    End Property
+
+    Public Property SubsNo As String Implements prePayment.IPaymentPremiumRelated.SubsNo
+        Get
+            Return cDataType.fString.IfNull(txtSubsNo.Text)
+        End Get
+        Set(value As String)
+            txtSubsNo.Text = value
+        End Set
+    End Property
+#End Region
+
+#Region "APR Details"
+
+    Public Property APRNumber As Long Implements prePayment.IPaymentPremiumRelated.APRNumber
+        Get
+            Return cDataType.fLong.IfNull(txtAPRNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtAPRNumber.Text = Nothing
+            Else
+                txtAPRNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property APRDate As Date Implements prePayment.IPaymentPremiumRelated.APRDate
+        Get
+            Return cDataType.fDate.IfNull(txtAPRDate.Text)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtAPRDate.Text = Nothing
+            Else
+                txtAPRDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property APRAmount As Decimal Implements prePayment.IPaymentPremiumRelated.APRAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtAPRAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtAPRAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+#End Region
+
+#Region "Payment Type Details"
+
+#Region "Cash Details"
+
+    Public Property OPRCashAmount As Decimal Implements prePayment.IPaymentPremiumRelated.OPRCashAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtOPRCashAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtOPRCashAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+#End Region
+
+#Region "Check Details"
+
+    Public Property CheckNumber As Long Implements prePayment.IPaymentPremiumRelated.CheckNumber
+        Get
+            Return cDataType.fLong.IfNull(txtCheckNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtCheckNumber.Text = Nothing
+            Else
+                txtCheckNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property CheckAmount As Decimal Implements prePayment.IPaymentPremiumRelated.CheckAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtCheckAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtCheckAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property CheckBankName As String Implements prePayment.IPaymentPremiumRelated.CheckBankName
+        Get
+            If ddlCheckBankName.SelectedValue = "OTHER" Then
+                Return cDataType.fString.IfNull(txtOtherBank.Text)
+            Else
+                Return cDataType.fString.IfNull(ddlCheckBankName.SelectedValue)
+            End If
+        End Get
+        Set(value As String)
+            Try
+                ddlCheckBankName.SelectedValue = value
+                divOtherBank.Visible = False
+            Catch
+                ddlCheckBankName.SelectedValue = "OTHER"
+                txtOtherBank.Text = value
+                divOtherBank.Visible = True
+            End Try
+        End Set
+    End Property
+
+    Public Property CheckBankBranch As String Implements prePayment.IPaymentPremiumRelated.CheckBankBranch
+        Get
+            Return cDataType.fString.IfNull(txtCheckBankBranch.Text)
+        End Get
+        Set(value As String)
+            txtCheckBankBranch.Text = value
+        End Set
+    End Property
+
+    Public Property CheckLineNumber As Integer Implements prePayment.IPaymentPremiumRelated.CheckLineNumber
+    Public Property CheckOTCFlag As Integer Implements prePayment.IPaymentPremiumRelated.CheckOTCFlag
+
+#End Region
+
+#Region "Credit Card Details"
+
+    Public Property CreditCardTerminalUse As String Implements prePayment.IPaymentPremiumRelated.CreditCardTerminalUse
+        Get
+            Return cDataType.fString.IfNull(ddlCreditCardTerminalUse.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlCreditCardTerminalUse.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property CreditCardSwipeDate As Date Implements prePayment.IPaymentPremiumRelated.CreditCardSwipeDate
+        Get
+            Return String.Concat(cDataType.fDate.IfNull(txtCreditCardSwipeDate.Text, cDataType.fDate.Empty).ToShortDateString, " ", CreditCardSwipeTime.TimeOfDay)
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtCreditCardSwipeDate.Text = Nothing
+            Else
+                txtCreditCardSwipeDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property CreditCardSwipeTime As Date Implements prePayment.IPaymentPremiumRelated.CreditCardSwipeTime
+        Get
+            Return DateTime.ParseExact(String.Concat(ddlCreditSwipeHour.SelectedValue, ":", ddlCreditSwipeMinute.SelectedValue, " ", ddlCreditSwipeAmPm.SelectedValue), "hh:mm tt", CultureInfo.InvariantCulture)
+        End Get
+        Set(value As Date)
+
+            ddlCreditSwipeHour.SelectedValue = IIf(value.TimeOfDay.Hours = 0, "12", IIf(value.TimeOfDay.Hours > 12, (value.TimeOfDay.Hours - 12).ToString("00"), value.TimeOfDay.Hours.ToString("00")))
+            ddlCreditSwipeMinute.SelectedValue = value.TimeOfDay.Minutes.ToString("00")
+            ddlCreditSwipeAmPm.SelectedValue = IIf(value.TimeOfDay.Hours >= 12, "PM", "AM")
+        End Set
+    End Property
+
+    Public Property CreditCardMerchant As String Implements prePayment.IPaymentPremiumRelated.CreditCardMerchant
+        Get
+            Return cDataType.fString.IfNull(ddlCreditCardMerchant.SelectedValue)
+        End Get
+        Set(value As String)
+            Try
+                If ddlCreditCardMerchant.Items.Count > 1 Then
+                    ddlCreditCardMerchant.SelectedValue = value
+                End If
+            Catch
+                ddlCreditCardMerchant.SelectedIndex = -1
+            End Try
+        End Set
+    End Property
+
+    Public Property CreditCardNumberTag As Boolean Implements prePayment.IPaymentPremiumRelated.CreditCardNumberTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnCreditCardNumberTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnCreditCardNumberTag.Value = value
+        End Set
+    End Property
+
+    Public Property CreditCardNumber As String Implements prePayment.IPaymentPremiumRelated.CreditCardNumber
+        Get
+            Return cDataType.fString.IfNull(txtCreditCardNumber.Text)
+        End Get
+        Set(value As String)
+            txtCreditCardNumber.Text = value
+        End Set
+    End Property
+
+    Public Property CreditCardType As String Implements prePayment.IPaymentPremiumRelated.CreditCardType
+        Get
+            Return cDataType.fString.IfNull(hdnCreditCardType.Value)
+        End Get
+        Set(value As String)
+            hdnCreditCardType.Value = value
+        End Set
+    End Property
+
+    Public Property CreditCardTypeDesc As String Implements prePayment.IPaymentPremiumRelated.CreditCardTypeDesc
+        Get
+            Return cDataType.fString.IfNull(txtCreditCardType.Text)
+        End Get
+        Set(value As String)
+            txtCreditCardType.Text = value
+        End Set
+    End Property
+
+    Public Property CreditCardBatchNumber As Long Implements prePayment.IPaymentPremiumRelated.CreditCardBatchNumber
+        Get
+            Return cDataType.fLong.IfNull(txtCreditCardBatchNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtCreditCardBatchNumber.Text = String.Empty
+            Else
+                txtCreditCardBatchNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property CreditCardApprovalCode As String Implements prePayment.IPaymentPremiumRelated.CreditCardApprovalCode
+        Get
+            Return cDataType.fString.IfNull(txtCreditCardApprovalCode.Text)
+        End Get
+        Set(value As String)
+            txtCreditCardApprovalCode.Text = value
+        End Set
+    End Property
+
+    Public Property CreditCardAmount As Decimal Implements prePayment.IPaymentPremiumRelated.CreditCardAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtCreditCardAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtCreditCardAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property CreditCardRemarks As String Implements prePayment.IPaymentPremiumRelated.CreditCardRemarks
+        Get
+            Return cDataType.fString.IfNull(txtCreditCardRemarks.Text)
+        End Get
+        Set(value As String)
+            txtCreditCardRemarks.Text = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "Debit Card Details"
+
+    Public Property DebitCardTerminalUse As String Implements prePayment.IPaymentPremiumRelated.DebitCardTerminalUse
+        Get
+            Return cDataType.fString.IfNull(ddlDebitCardTerminalUse.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlDebitCardTerminalUse.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property DebitCardSwipeDate As Date Implements prePayment.IPaymentPremiumRelated.DebitCardSwipeDate
+        Get
+            Return cDataType.fDate.IfNull(String.Concat(cDataType.fDate.IfNull(txtDebitCardSwipeDate.Text, cDataType.fDate.Empty.Date).ToShortDateString, " ", DebitCardSwipeTime.TimeOfDay))
+        End Get
+        Set(value As Date)
+            If value = cDataType.fDate.Empty Then
+                txtDebitCardSwipeDate.Text = Nothing
+            Else
+                txtDebitCardSwipeDate.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property DebitCardSwipeTime As Date Implements prePayment.IPaymentPremiumRelated.DebitCardSwipeTime
+        Get
+            Return Date.ParseExact((String.Concat(ddlDebitSwipeHour.SelectedValue, ":", ddlDebitSwipeMinute.SelectedValue, " ", ddlDebitSwipeAmPm.SelectedValue)), "hh:mm tt", CultureInfo.InvariantCulture)
+        End Get
+        Set(value As Date)
+
+            ddlDebitSwipeHour.SelectedValue = IIf(value.TimeOfDay.Hours = 0, "12", IIf(value.TimeOfDay.Hours > 12, (value.TimeOfDay.Hours - 12).ToString("00"), value.TimeOfDay.Hours.ToString("00")))
+            ddlDebitSwipeMinute.SelectedValue = value.TimeOfDay.Minutes.ToString("00")
+            ddlDebitSwipeAmPm.SelectedValue = IIf(value.TimeOfDay.Hours >= 12, "PM", "AM")
+        End Set
+    End Property
+
+    Public Property DebitCardMerchant As String Implements prePayment.IPaymentPremiumRelated.DebitCardMerchant
+        Get
+            Return cDataType.fString.IfNull(ddlDebitCardMerchant.SelectedValue)
+        End Get
+        Set(value As String)
+            Try
+                If ddlDebitCardMerchant.Items.Count > 1 Then
+                    ddlDebitCardMerchant.SelectedValue = value
+                End If
+            Catch
+                ddlDebitCardMerchant.SelectedIndex = -1
+            End Try
+        End Set
+    End Property
+
+    Public Property DebitCardBankNetwork As String Implements prePayment.IPaymentPremiumRelated.DebitCardBankNetwork
+        Get
+            Return cDataType.fString.IfNull(ddlDebitCardBankNetwork.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlDebitCardBankNetwork.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property DebitCardBankName As String Implements prePayment.IPaymentPremiumRelated.DebitCardBankName
+        Get
+            If ddlDebitCardBankName.SelectedValue = "OTHER" Then
+                Return cDataType.fString.IfNull(txtDebitCardOtherBank.Text)
+            Else
+                Return cDataType.fString.IfNull(ddlDebitCardBankName.SelectedValue)
+            End If
+        End Get
+        Set(value As String)
+            Try
+                ddlDebitCardBankName.SelectedValue = value
+                'txtDebitCardOtherBank.Visible = False
+                lblDebitCardOtherBank.InnerText = String.Empty
+            Catch
+                ddlDebitCardBankName.SelectedValue = "OTHER"
+                txtDebitCardOtherBank.Text = value
+                txtDebitCardOtherBank.Style.Remove("display")
+                lblDebitCardOtherBank.InnerText = "Others:"
+            End Try
+        End Set
+    End Property
+
+    Public Property DebitCardAccountType As String Implements prePayment.IPaymentPremiumRelated.DebitCardAccountType
+        Get
+            Return cDataType.fString.IfNull(ddlDebitCardAccountType.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlDebitCardAccountType.SelectedValue = value
+        End Set
+    End Property
+
+    Public Property DebitCardAccountNumber As String Implements prePayment.IPaymentPremiumRelated.DebitCardAccountNumber
+        Get
+            Return cDataType.fString.IfNull(txtDebitCardAccountNumber.Text)
+        End Get
+        Set(value As String)
+            txtDebitCardAccountNumber.Text = value
+        End Set
+    End Property
+
+    Public Property DebitCardBatchNumber As Long Implements prePayment.IPaymentPremiumRelated.DebitCardBatchNumber
+        Get
+            Return cDataType.fLong.IfNull(txtDebitCardBatchNumber.Text)
+        End Get
+        Set(value As Long)
+            If value = cDataType.fLong.Empty Then
+                txtDebitCardBatchNumber.Text = String.Empty
+            Else
+                txtDebitCardBatchNumber.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property DebitCardChargeSlip As String Implements prePayment.IPaymentPremiumRelated.DebitCardChargeSlip
+        Get
+            Return cDataType.fString.IfNull(txtDebitCardChargeSlip.Text)
+        End Get
+        Set(value As String)
+            txtDebitCardChargeSlip.Text = value
+        End Set
+    End Property
+
+    Public Property DebitCardAmount As Decimal Implements prePayment.IPaymentPremiumRelated.DebitCardAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtDebitCardAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtDebitCardAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property DebitCardRemarks As String Implements prePayment.IPaymentPremiumRelated.DebitCardRemarks
+        Get
+            Return cDataType.fString.IfNull(txtDebitCardRemarks.Text)
+        End Get
+        Set(value As String)
+            txtDebitCardRemarks.Text = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "E-Cash Details"
+
+    Public Property ECashPaymentChannel As String Implements prePayment.IPaymentPremiumRelated.ECashPaymentChannel
+        Get
+            Return cDataType.fString.IfNull(ddlECashPaymentChannel.SelectedValue)
+        End Get
+        Set(value As String)
+            Try
+                If ddlECashPaymentChannel.Items.Count > 1 Then
+                    ddlECashPaymentChannel.SelectedValue = value
+                End If
+            Catch
+                ddlECashPaymentChannel.SelectedIndex = -1
+            End Try
+        End Set
+    End Property
+
+    Public Property ECashPaymentReferenceNumber As String Implements prePayment.IPaymentPremiumRelated.ECashPaymentReferenceNumber
+        Get
+            Return cDataType.fString.IfNull(txtECashPaymentReferenceNumber.Text)
+        End Get
+        Set(value As String)
+            txtECashPaymentReferenceNumber.Text = value
+        End Set
+    End Property
+
+    Public Property ECashPaymentAmount As Decimal Implements prePayment.IPaymentPremiumRelated.ECashPaymentAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtECashPaymentAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtECashPaymentAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property ECashPaymentRemarks As String Implements prePayment.IPaymentPremiumRelated.ECashPaymentRemarks
+        Get
+            Return cDataType.fString.IfNull(txtECashPaymentRemarks.Text)
+        End Get
+        Set(value As String)
+            txtECashPaymentRemarks.Text = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "Payment Totals"
+
+    Public Property IsPayTypeSuccessful As Boolean Implements prePayment.IPaymentPremiumRelated.IsPayTypeSuccessful
+        Get
+            Return cDataType.fBoolean.IfNull(mIsPayTypeSuccessful)
+        End Get
+        Set(value As Boolean)
+            mIsPayTypeSuccessful = value
+        End Set
+    End Property
+
+    Public Property CashTotalAmount As Decimal Implements prePayment.IPaymentPremiumRelated.CashTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnCashTotalAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnCashTotalAmount.Value = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            txtPaymentTypeTotalAmount.Text = FormatNumber(PaymentTotalAmount, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property CheckTotalAmount As Decimal Implements prePayment.IPaymentPremiumRelated.CheckTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnCheckTotalAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnCheckTotalAmount.Value = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            txtPaymentTypeTotalAmount.Text = FormatNumber(PaymentTotalAmount, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property CreditCardTotalAmount As Decimal Implements prePayment.IPaymentPremiumRelated.CreditCardTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnCreditCardTotalAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnCreditCardTotalAmount.Value = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            txtPaymentTypeTotalAmount.Text = FormatNumber(PaymentTotalAmount, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property DebitCardTotalAmount As Decimal Implements prePayment.IPaymentPremiumRelated.DebitCardTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnDebitCardTotalAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnDebitCardTotalAmount.Value = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            txtPaymentTypeTotalAmount.Text = FormatNumber(PaymentTotalAmount, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property ECashPaymentTotalAmount As Decimal Implements prePayment.IPaymentPremiumRelated.ECashPaymentTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(hdnECashPaymentTotalAmount.Value)
+        End Get
+        Set(value As Decimal)
+            hdnECashPaymentTotalAmount.Value = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+            txtPaymentTypeTotalAmount.Text = FormatNumber(PaymentTotalAmount, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public ReadOnly Property PaymentTotalAmount As Decimal Implements prePayment.IPaymentPremiumRelated.PaymentTotalAmount
+        Get
+            Return cDataType.fDecimal.IfNull(CashTotalAmount + CheckTotalAmount + CreditCardTotalAmount + DebitCardTotalAmount + ECashPaymentTotalAmount)
+        End Get
+    End Property
+
+    Public Property PaymentTypeID As String Implements prePayment.IPaymentPremiumRelated.PaymentTypeID
+        Get
+            Return cDataType.fString.IfNull(hdnPaymentTypeID.Value)
+        End Get
+        Set(value As String)
+            hdnPaymentTypeID.Value = value
+            Call ddlOPRPaymentType_SelectedIndexChanged(Me, EventArgs.Empty)
+        End Set
+    End Property
+
+#End Region
+
+#End Region
+
+#Region "VAT Computation"
+
+    Public Property VATableCollection As Decimal Implements prePayment.IPaymentPremiumRelated.VATableCollection
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATableCollection.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATableCollection.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property NonVATCollection As Decimal Implements prePayment.IPaymentPremiumRelated.NonVATCollection
+        Get
+            Return cDataType.fDecimal.IfNull(txtNonVATCollection.Text)
+        End Get
+        Set(value As Decimal)
+            txtNonVATCollection.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property VATExemptCollection As Decimal Implements prePayment.IPaymentPremiumRelated.VATExemptCollection
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATExemptCollection.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATExemptCollection.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property VATAmount As Decimal Implements prePayment.IPaymentPremiumRelated.VATAmount
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATAmount.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATAmount.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property VATTotalCollection As Decimal Implements prePayment.IPaymentPremiumRelated.VATTotalCollection
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATTotalCollection.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATTotalCollection.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property VATWithholdingTax As Decimal Implements prePayment.IPaymentPremiumRelated.VATWithholdingTax
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATWithholdingTax.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATWithholdingTax.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+    Public Property VATAmountNetWTax As Decimal Implements prePayment.IPaymentPremiumRelated.VATAmountNetWTax
+        Get
+            Return cDataType.fDecimal.IfNull(txtVATAmountNetWTax.Text)
+        End Get
+        Set(value As Decimal)
+            txtVATAmountNetWTax.Text = FormatNumber(value, 2, TriState.True, TriState.True, TriState.True)
+        End Set
+    End Property
+
+#End Region
+
+#Region "Tag"
+
+    Public Property PrevPayType As String Implements prePayment.IPaymentPremiumRelated.PrevPayType
+        Get
+            Return cDataType.fString.IfNull(hdnPrevPayType.Value)
+        End Get
+        Set(value As String)
+            hdnPrevPayType.Value = value
+        End Set
+    End Property
+
+    Public Property PaymentTypeAllowedArray As String Implements prePayment.IPaymentPremiumRelated.PaymentTypeAllowedArray
+        Get
+            Return cDataType.fString.IfNull(hdnAllowedPaymentType.Value)
+        End Get
+        Set(value As String)
+            hdnAllowedPaymentType.Value = value
+        End Set
+    End Property
+
+    Public Property GpaSettingsPolnum As String Implements prePayment.IPaymentPremiumRelated.GpaSettingsPolnum
+        Get
+            Return cDataType.fString.IfNull(hdnGpaSettingsPolnum.Value)
+        End Get
+        Set(value As String)
+            hdnGpaSettingsPolnum.Value = value
+            If value <> String.Empty Then
+                Select Case GpaType
+                    Case eReference.ColrefGPA, eReference.ColrefGpaRefund
+                        PolicyNumber = value
+                    Case eReference.ColrefGpaRenewal
+                        PolicyNumber = value & "B"
+                End Select
+                RaiseEvent LoadGpaPlan(Me, EventArgs.Empty)
+            End If
+        End Set
+    End Property
+
+    Public Property GpaSettingsPlanType As String Implements prePayment.IPaymentPremiumRelated.GpaSettingsPlanType
+        Get
+            Return cDataType.fString.IfNull(hdnGpaSettingsPlanType.Value)
+        End Get
+        Set(value As String)
+            hdnGpaSettingsPlanType.Value = value
+        End Set
+    End Property
+
+    Public Property GpaSettingsAllowCom As Boolean Implements prePayment.IPaymentPremiumRelated.GpaSettingsAllowCom
+        Get
+            Return cDataType.fBoolean.IfNull(hdnGpaSettingsAllowCom.Value)
+        End Get
+        Set(value As Boolean)
+            RaiseEvent ClearScreenReceiptDetails(Me, EventArgs.Empty)
+            hdnGpaSettingsAllowCom.Value = value
+            divCommission.Visible = IIf(GpaType = eReference.ColrefGpaRenewal, False, value)
+        End Set
+    End Property
+
+    Public Property GpaSettingsAllowPO As Boolean Implements prePayment.IPaymentPremiumRelated.GpaSettingsAllowPO
+        Get
+            Return cDataType.fBoolean.IfNull(hdnGpaSettingsAllowPO.Value)
+        End Get
+        Set(value As Boolean)
+            hdnGpaSettingsAllowPO.Value = value
+            If Not GpaType = eReference.ColrefGpaRenewal Then
+                divPromoOfficer.Visible = value
+                If Not value Then
+                    SearchAgentTag = eReference.AgentTagType.PromoOfficer
+                    RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+                End If
+            End If
+            ManageAgent(eReference.AgentTagType.PromoOfficer, value)
+        End Set
+    End Property
+
+    Public Property GpaSettingsAllowRenewal As Boolean Implements prePayment.IPaymentPremiumRelated.GpaSettingsAllowRenewal
+        Get
+            Return cDataType.fBoolean.IfNull(hdnGpaSettingsAllowRenewal.Value)
+        End Get
+        Set(value As Boolean)
+            hdnGpaSettingsAllowRenewal.Value = value
+        End Set
+    End Property
+
+    Public Property GpaSettingsAllowCommSharing As Boolean Implements prePayment.IPaymentPremiumRelated.GpaSettingsAllowCommSharing
+        Get
+            Return cDataType.fBoolean.IfNull(hdnGpaSettingsAllowCommSharing.Value)
+        End Get
+        Set(value As Boolean)
+            hdnGpaSettingsAllowCommSharing.Value = value
+        End Set
+    End Property
+
+    Public Property PayslipCodeTag As Boolean Implements prePayment.IPaymentPremiumRelated.PayslipCodeTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnPayslipCodeTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnPayslipCodeTag.Value = value
+            divPayslipCode.Visible = value
+
+            ManagePolicy(eReference.MgePol.Payslip, True)
+        End Set
+    End Property
+
+    Public Property BillNoTag As Boolean Implements prePayment.IPaymentPremiumRelated.BillNoTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnBillNoTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnBillNoTag.Value = value
+            divBillNo.Visible = value
+            divSubsNo.Visible = value
+            ManagePolicy(eReference.MgePol.BillNo, True)
+            ManagePolicy(eReference.MgePol.SubsNo, True)
+        End Set
+    End Property
+
+    Public Property PaymentTypeTag As Boolean Implements prePayment.IPaymentPremiumRelated.PaymentTypeTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnPaymentTypeTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnPaymentTypeTag.Value = value
+            accPaymentTypeDetails.Visible = value
+
+            RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+            RaiseEvent LoadAllowedPaymentType(Me, EventArgs.Empty)
+            CashTotalAmount = cDataType.fDecimal.Empty
+            CheckTotalAmount = cDataType.fDecimal.Empty
+            CreditCardTotalAmount = cDataType.fDecimal.Empty
+            DebitCardTotalAmount = cDataType.fDecimal.Empty
+            ECashPaymentTotalAmount = cDataType.fDecimal.Empty
+            PrevPayType = cDataType.fString.Empty
+            lstPaymentTypeDetails = New List(Of cPaymentType)
+            OPRPaymentType = cDataType.fString.Empty
+
+            If value Then
+                'Manage Payment Type|Enable addition of Payment Type Details
+                ManagePaymentType(String.Empty, True)
+            End If
+        End Set
+    End Property
+
+    Public Property PolicyInfoTag As Boolean Implements prePayment.IPaymentPremiumRelated.PolicyInfoTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnPolicyInfoTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnPolicyInfoTag.Value = value
+            accPolicyInformation.Visible = value
+
+            RaiseEvent ClearScreenPolicy(Me, EventArgs.Empty)
+
+            If value Then
+                'Manage Policy|Enable Policy Info fields
+                ManagePolicy(eReference.MgePol.Initial, value)
+
+            End If
+        End Set
+    End Property
+
+    Public Property OPRDetailTag As Boolean Implements prePayment.IPaymentPremiumRelated.OPRDetailTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnOPRDtlTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnOPRDtlTag.Value = value
+            accOPRDetails.Visible = value
+
+            RaiseEvent ClearScreenReceiptDetails(Me, EventArgs.Empty)
+            ReceiptTotalAmount = cDataType.fDecimal.Empty
+            CommissionAmount = cDataType.fDecimal.Empty
+            lstReceiptDetails = New List(Of cReceiptDetail)
+
+            If value Then
+                'Manage OPR Detail|Enable addition of OPR Details
+                ManageReceiptDetails("ADD", True)
+                RaiseEvent LoadReceiptTransaction(Me, EventArgs.Empty)
+            End If
+        End Set
+    End Property
+
+    Public Property OPRVatTag As Boolean Implements prePayment.IPaymentPremiumRelated.OPRVatTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnOPRVatTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnOPRVatTag.Value = value
+            accVATComputation.Visible = value
+
+            RaiseEvent ClearScreenVATComputation(Me, EventArgs.Empty)
+
+            If value Then
+                'Manage VAT|Enable VAT fields
+                ManageVatDetails("ADD", True)
+            End If
+        End Set
+    End Property
+
+    Public Property CashPaymentTag As Boolean Implements prePayment.IPaymentPremiumRelated.CashPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnCashPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnCashPaymentTag.Value = value
+            pnlCashDetails.Visible = value
+
+            RaiseEvent ClearScreenCashDetails(Me, EventArgs.Empty)
+
+        End Set
+    End Property
+
+    Public Property CheckPaymentTag As Boolean Implements prePayment.IPaymentPremiumRelated.CheckPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnCheckPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnCheckPaymentTag.Value = value
+            pnlCheckDetails.Visible = value
+            ibtnAddCash.Visible = value
+
+            RaiseEvent ClearScreenCheckDetails(Me, EventArgs.Empty)
+
+        End Set
+    End Property
+
+    Public Property CreditCardPaymentTag As Boolean Implements prePayment.IPaymentPremiumRelated.CreditCardPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnCreditCardPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnCreditCardPaymentTag.Value = value
+            pnlCreditCardDetails.Visible = value
+
+            RaiseEvent ClearScreenCreditCardDetails(Me, EventArgs.Empty)
+            If value Then
+                CreditCardSwipeDate = Now
+                CreditCardSwipeTime = Now
+            End If
+
+        End Set
+    End Property
+
+    Public Property DebitCardPaymentTag As Boolean Implements prePayment.IPaymentPremiumRelated.DebitCardPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnDebitCardPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnDebitCardPaymentTag.Value = value
+            pnlDebitCardDetails.Visible = value
+
+            RaiseEvent ClearScreenDebitCardDetails(Me, EventArgs.Empty)
+            If value Then
+                DebitCardSwipeDate = Now
+                DebitCardSwipeTime = Now
+            End If
+
+        End Set
+    End Property
+
+    Public Property ECashPaymentTag As Boolean Implements prePayment.IPaymentPremiumRelated.ECashPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnECashPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnECashPaymentTag.Value = value
+            pnlECashPaymentDetails.Visible = value
+
+            RaiseEvent ClearScreenECashPaymentDetails(Me, EventArgs.Empty)
+
+        End Set
+    End Property
+
+    Public Property GpaPaymentTag As Boolean Implements prePayment.IGpaDetails.GpaPaymentTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnGpaPaymentTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnGpaPaymentTag.Value = value
+            pnlLoadPolicyID.Enabled = Not value
+            divEcr.Visible = Not value
+            divNonGPA0.Visible = Not value
+            divNonGPA1.Visible = Not value
+            divNonGPA2.Visible = Not value
+            divNonGPA3.Visible = Not value
+            divGPA1.Visible = value
+            divGPA2.Visible = value
+            ManagePolicy(eReference.MgePol.Search, Not value)
+            ibtnClearPolicy.Visible = False
+            ManageAgent(eReference.AgentTagType.SalesOfficer, value)
+            'Hide PO by default-----------------------------------
+            ManageAgent(eReference.AgentTagType.Usd1, False)
+            ibtnClearUSD1.Visible = False
+            ManageAgent(eReference.AgentTagType.Asd, False)
+            ibtnClearAsd.Visible = False
+            divPromoOfficer.Visible = False
+            '-----------------------------------------------------
+            ManageGpaCardNo("SEARCH", True)
+            ManageOPRPaymentDetails("NEWBUSINESS", value)
+
+            For Each item As ListItem In ddlAddPayorType.Items
+                If item.Value = "C" Then item.Enabled = Not GpaPaymentTag 'DISABLED FOR GPA
+            Next
+
+            For Each item As ListItem In ddlSearchPayorType.Items
+                If item.Value = "C" Then item.Enabled = Not GpaPaymentTag 'DISABLED FOR GPA
+            Next
+
+            RaiseEvent ClearGpaSettings(Me, EventArgs.Empty)
+            RaiseEvent ClearScreenGpaDetails(Me, EventArgs.Empty)
+            dtGpaPlan = New DataTable
+            RaiseEvent ClearScreenGpaPaymentDetails(Me, EventArgs.Empty)
+            OPRRemarks = String.Empty
+
+            If value Then
+                PolMod = "GPA"
+                PolType = "G"
+                PType = "G"
+            End If
+        End Set
+    End Property
+
+    Public Property NewBusinessTag As Boolean Implements prePayment.IPaymentPremiumRelated.NewBusinessTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnNewBusinessTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnNewBusinessTag.Value = value
+            If Not (Boolean.Parse(If(ConfigurationManager.AppSettings("Newgen-Life"), "false"))) Then
+                pnlLoadPolicyID.Enabled = Not value
+                divNewBusiness.Visible = value
+                ibtnSearchPolicy.Visible = Not value
+                chkGP3.Visible = value
+
+                ManagePolicy(eReference.MgePol.Policy, value)
+                ManagePolicy(eReference.MgePol.Payor, value)
+                ManagePolicy(eReference.MgePol.SamePayorInsured, value)
+                ManagePolicy(eReference.MgePol.Insured, value)
+                ManageAgent(eReference.AgentTagType.Agent, value)
+            End If
+            ManageOPRPaymentDetails("NEWBUSINESS", value)
+
+            RaiseEvent ClearScreenNewBusiness(Me, EventArgs.Empty)
+
+            If Not value Then
+                WithNewBiz = False
+            End If
+        End Set
+    End Property
+
+    Public Property NewgenNewBusinessTag As Boolean Implements prePayment.IPaymentPremiumRelated.NewgenNewBusinessTag
+        Get
+            Return cDataType.fBoolean.IfNull(hdnNewgenNewBusinessTag.Value)
+        End Get
+        Set(value As Boolean)
+            hdnNewgenNewBusinessTag.Value = value
+        End Set
+    End Property
+
+    Public Property GroupTag As Boolean Implements prePayment.IPaymentPremiumRelated.GroupTag
+        Get
+            Return IIf(ddlPolicyType.SelectedValue = "GRP", True, False)
+        End Get
+        Set(value As Boolean)
+            If value Then
+                ddlPolicyType.SelectedValue = "GRP"
+            Else
+                ddlPolicyType.SelectedValue = String.Empty
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "DataTable"
+
+    Public WriteOnly Property dtViewAppNo As DataTable Implements prePayment.IPaymentPremiumRelated.dtViewAppNo
+        Set(value As DataTable)
+            If Not IsNothing(value) Then
+                Dim dtFiltered = From c In value.AsEnumerable
+                                 Where c.Item("doctyp") = eReference.DocTypeOPR And cDataType.fLong.IfNull(c.Item("applno")) > 0
+                                 Select c
+                If dtFiltered.Any() Then
+                    value = dtFiltered.CopyToDataTable
+                Else
+                    value.Clear()
+                End If
+            End If
+
+            gvwViewAppNo.DataSource = value
+            gvwViewAppNo.DataBind()
+        End Set
+    End Property
+
+    Public WriteOnly Property dtViewOPR As DataTable Implements prePayment.IPaymentPremiumRelated.dtViewOPR
+        Set(value As DataTable)
+            If Not IsNothing(value) Then
+                Dim dtFiltered = From c In value.AsEnumerable
+                                 Where c.Item("doctyp") = eReference.DocTypeOPR
+                                 Select c
+                If dtFiltered.Any() Then
+                    value = dtFiltered.CopyToDataTable
+                Else
+                    value.Clear()
+                End If
+            End If
+
+            gvwViewOpr.DataSource = value
+            gvwViewOpr.DataBind()
+        End Set
+    End Property
+
+    Public WriteOnly Property dtBalanceFrequency As DataTable Implements prePayment.IPaymentPremiumRelated.dtBalanceFrequency
+        Set(value As DataTable)
+            value.DefaultView.Sort = "FRQCOD ASC"
+            value = value.DefaultView.ToTable
+            Dim dtFiltered = From c In value.AsEnumerable
+                             Where CInt(c.Item("FRQCOD")) < PolFrq
+                             Select c
+
+            If dtFiltered.Any Then
+                value = dtFiltered.CopyToDataTable
+            Else
+                value = New DataTable
+            End If
+
+            Call SetDropDownList(ddlBalanceFrequency, value, "FRQDES", "FRQCOD", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtBalanceToHigher As DataTable Implements prePayment.IPaymentPremiumRelated.dtBalanceToHigher
+        Set(value As DataTable)
+
+            gvwBalanceToHigher.DataSource = value
+            gvwBalanceToHigher.DataBind()
+
+            If value.AsEnumerable.Any() Then
+                Dim decAnnPrem = Aggregate c In value.AsEnumerable
+                                 Into Sum(CDec(c.Item("annprem")))
+
+                Dim decSemPrem = Aggregate c In value.AsEnumerable
+                                 Into Sum(CDec(c.Item("semprem")))
+
+                Dim decQtrPrem = Aggregate c In value.AsEnumerable
+                                 Into Sum(CDec(c.Item("qtrprem")))
+
+                Dim decMonPrem = Aggregate c In value.AsEnumerable
+                                 Into Sum(CDec(c.Item("monprem")))
+
+                Dim decPremRat = Aggregate c In value.AsEnumerable
+                                 Into Sum(CDec(c.Item("premrat")))
+
+                Dim decSubRat = Aggregate c In value.AsEnumerable
+                                Into Sum(CDec(c.Item("subrat")))
+
+                hdnNewPremium.Value = String.Concat(decAnnPrem, "|", decSemPrem, "|", decQtrPrem, "|", decMonPrem, "|", decPremRat, "|", decSubRat)
+
+                gvwBalanceToHigher.FooterRow.Cells(3).Text = "TOTAL"
+                gvwBalanceToHigher.FooterRow.Cells(4).Text = decAnnPrem.ToString("#,##0.00")
+                gvwBalanceToHigher.FooterRow.Cells(5).Text = decSemPrem.ToString("#,##0.00")
+                gvwBalanceToHigher.FooterRow.Cells(6).Text = decQtrPrem.ToString("#,##0.00")
+                gvwBalanceToHigher.FooterRow.Cells(7).Text = decMonPrem.ToString("#,##0.00")
+                gvwBalanceToHigher.FooterRow.Cells(8).Text = decPremRat.ToString("#,##0.00")
+                gvwBalanceToHigher.FooterRow.Cells(9).Text = decSubRat.ToString("#,##0.00")
+
+                upPaymentPremiumRelated.Update()
+            Else
+                hdnNewPremium.Value = String.Empty
+            End If
+        End Set
+    End Property
+
+    Public WriteOnly Property dtSourceSite As DataTable Implements prePayment.IPaymentPremiumRelated.dtSourceSite
+        Set(value As DataTable)
+            Call SetDropDownList(ddlSourceSite, value, "PRSNME", "PRSPID", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtCurrency As DataTable Implements prePayment.IPaymentPremiumRelated.dtCurrency
+        Set(value As DataTable)
+            Call SetDropDownList(ddlOPRCurrency, value, "CURNAM", "CURCOD", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlPlanCurrency, value, "CURNAM", "CURCOD", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtFrequencyOfPayment As DataTable Implements prePayment.IPaymentPremiumRelated.dtFrequencyOfPayment
+        Set(value As DataTable)
+            value.DefaultView.Sort = "FRQCOD ASC"
+            value = value.DefaultView.ToTable
+            Call SetDropDownList(ddlFrequencyoOfPayment, value, "FRQDES", "FRQCOD", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtGpaPlan As DataTable Implements prePayment.IPaymentPremiumRelated.dtGpaPlan
+        Set(value As DataTable)
+            If GpaType = eReference.ColrefGpaRenewal Then
+                Call SetDropDownList(ddlPAplan, value, "PLAN", "PLAN", "R1", "R1")
+            Else
+                Call SetDropDownList(ddlPAplan, value, "PLAN", "PLAN", String.Empty, String.Empty)
+            End If
+            If value.AsEnumerable.Count = 1 Then
+                ddlPAplan.SelectedIndex = 1
+            End If
+        End Set
+    End Property
+
+    Public WriteOnly Property dtBusinessType As DataTable Implements prePayment.IPaymentPremiumRelated.dtBusinessType
+        Set(value As DataTable)
+            Dim dtFiltered = From c In value.AsEnumerable
+                             Where CBool(c.Item("mnew_flg")) = IIf(WithNewBiz, WithNewBiz, CBool(c.Item("mnew_flg")))
+                             Select c
+            If dtFiltered.Any() Then
+                value = dtFiltered.CopyToDataTable()
+                value.DefaultView.Sort = "METDES ASC"
+                value = value.DefaultView.ToTable
+            Else
+                value.Clear()
+            End If
+
+            Call SetDropDownList(ddlBusinessType, value, "METDES", "METCOD", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtPaymentType As DataTable Implements prePayment.IPaymentPremiumRelated.dtPaymentType
+        Set(value As DataTable)
+            value.DefaultView.Sort = "DESCRP ASC"
+            value = value.DefaultView.ToTable
+            Call SetDropDownList(ddlOPRPaymentType, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtECashPaymentChannel As DataTable Implements prePayment.IPaymentPremiumRelated.dtECashPaymentChannel
+        Set(value As DataTable)
+            value.DefaultView.Sort = "DESCRP ASC"
+            value = value.DefaultView.ToTable
+            Call SetDropDownList(ddlECashPaymentChannel, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtTransactionType As DataTable Implements prePayment.IPaymentPremiumRelated.dtTransactionType
+        Set(value As DataTable)
+            value.DefaultView.Sort = "CODE ASC"
+            value = value.DefaultView.ToTable
+            Call SetDropDownList(ddlTransactionType, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtPolicyType As DataTable Implements prePayment.IPaymentPremiumRelated.dtPolicyType
+        Set(value As DataTable)
+            value.DefaultView.Sort = "NUMCODE ASC"
+            value = value.DefaultView.ToTable
+            Call SetDropDownList(ddlPolicyType, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlSearchPolicyType, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtGpaType As DataTable Implements prePayment.IPaymentPremiumRelated.dtGpaType
+        Set(value As DataTable)
+            value.DefaultView.Sort = "NUMCODE ASC"
+            value = value.DefaultView.ToTable
+            Call SetRadioButtonList(rblGpaType, value, "DESCRP", "NUMCODE")
+        End Set
+    End Property
+
+    Public WriteOnly Property dtReceiptTransaction As DataTable Implements prePayment.IPaymentPremiumRelated.dtReceiptTransaction
+        Set(value As DataTable)
+            Dim dtFiltered = From c In value.AsEnumerable
+                         Where Replace(c.Item("covsta"), "-", String.Empty) = CovSta Or c.Item("covsta") = "ALL"
+                         Select c
+
+            If dtFiltered.Any() Then
+                value = dtFiltered.CopyToDataTable()
+            Else
+                value.Clear()
+            End If
+
+            Call SetDropDownList(ddlOPRTransaction, value, "COLDES", "COLREF", "-- SELECT ITEM --", String.Empty)
+            If value.AsEnumerable.Count = 1 Then
+                ddlOPRTransaction.SelectedIndex = 1
+                ReceiptTransactionCode = ddlOPRTransaction.SelectedValue()
+                RaiseEvent GetReceiptTransactionDetails(Me, EventArgs.Empty)
+                ReceiptAmount = OPRGrossAmount
+            End If
+        End Set
+    End Property
+
+
+    'Public WriteOnly Property dtTerminalUseCCA As DataTable Implements prePayment.IPaymentPremiumRelated.dtTerminalUseCCA
+    '    Set(value As DataTable)
+    '        Call SetDropDownList(ddlCreditCardTerminalUse, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+    '    End Set
+    'End Property
+
+    'Public WriteOnly Property dtTerminalUseDCA As DataTable Implements prePayment.IPaymentPremiumRelated.dtTerminalUseDCA
+    '    Set(value As DataTable)
+    '        Call SetDropDownList(ddlDebitCardTerminalUse, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+    '    End Set
+    'End Property
+
+    Public WriteOnly Property dtMerchantId As DataTable Implements prePayment.IPaymentPremiumRelated.dtMerchantId
+        Set(value As DataTable)
+            Dim dtMerch As New DataTable
+            Dim dtMerchCCA As New DataTable
+            Dim dtMerchDCA As New DataTable
+            Dim dtTerminal As New DataTable
+            Dim dtTerminalCCA As New DataTable
+            Dim dtTerminalDCA As New DataTable
+            Dim dtLocal As New DataTable
+
+            Dim dtFiltered = From c In value.AsEnumerable
+                             Where CDate(c.Item("eff_date")) <= Now _
+                             And (c.Item("term_date") >= Now Or c.Item("term_date") = Nothing Or c.Item("term_date") = #1/1/1900#) _
+                             And c.Item("status_id") = 1
+                             Select c
+
+            'And c.Item("terminal_id") = IIf(OPRPaymentType = eReference.PayTypeCCA, CreditCardTerminalUse, DebitCardTerminalUse) _
+            If dtFiltered.Any() Then
+                dtLocal = dtFiltered.CopyToDataTable
+
+                Dim results1 = From c In dtFiltered.AsEnumerable
+                               Where c.Item("terminal_id") = IIf(OPRPaymentType = eReference.PayTypeCCA, CreditCardTerminalUse, DebitCardTerminalUse)
+                               Select c
+                If results1.Any Then
+                    dtMerch = results1.CopyToDataTable
+                End If
+
+                Dim results2 = (From c In dtLocal.AsEnumerable()
+                               Select Terminal_Id = c.Field(Of String)("terminal_id"), Descrp = c.Field(Of String)("descrp"), C_Type = c.Field(Of String)("ctype")).Distinct().ToList()
+
+                dtTerminal.Columns.Add(New DataColumn("terminal_id", GetType(String)))
+                dtTerminal.Columns.Add(New DataColumn("descrp", GetType(String)))
+                dtTerminal.Columns.Add(New DataColumn("ctype", GetType(String)))
+                For Each dataRow In results2
+                    Dim row As DataRow = dtTerminal.NewRow()
+                    row("terminal_id") = dataRow.Terminal_Id
+                    row("descrp") = dataRow.Descrp
+                    row("ctype") = dataRow.C_Type
+                    dtTerminal.Rows.Add(row)
+                Next
+            End If
+
+            Dim MerchCCA = From c In dtMerch.AsEnumerable
+                             Where c.Field(Of String)("Ctype") = "CCA"
+                             Select c
+            If MerchCCA.Any Then
+                dtMerchCCA = MerchCCA.CopyToDataTable
+            End If
+
+            Dim MerchDCA = From c In dtMerch.AsEnumerable
+                             Where c.Field(Of String)("Ctype") = "DCA"
+                             Select c
+            If MerchDCA.Any Then
+                dtMerchDCA = MerchDCA.CopyToDataTable
+            End If
+
+            Call SetDropDownList(ddlCreditCardMerchant, dtMerchCCA, "DBA_NAME", "MERCHANT_ID", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlDebitCardMerchant, dtMerchDCA, "DBA_NAME", "MERCHANT_ID", "-- SELECT ITEM --", String.Empty)
+
+            If Not IsSourceSiteLocked OrElse (ddlCreditCardTerminalUse.SelectedIndex < 1 AndAlso ddlDebitCardTerminalUse.SelectedIndex < 1) Then
+                Dim TerminalCCA = From c In dtTerminal.AsEnumerable
+                            Where c.Field(Of String)("Ctype") = "CCA"
+                            Select c
+                If TerminalCCA.Any Then
+                    dtTerminalCCA = TerminalCCA.CopyToDataTable
+                End If
+
+                Dim TerminalDCA = From c In dtTerminal.AsEnumerable
+                                 Where c.Field(Of String)("Ctype") = "DCA"
+                                 Select c
+                If TerminalDCA.Any Then
+                    dtTerminalDCA = TerminalDCA.CopyToDataTable
+                End If
+
+                Call SetDropDownList(ddlCreditCardTerminalUse, dtTerminalCCA, "descrp", "terminal_id", "-- SELECT ITEM --", String.Empty)
+                Call SetDropDownList(ddlDebitCardTerminalUse, dtTerminalDCA, "descrp", "terminal_id", "-- SELECT ITEM --", String.Empty)
+            End If
+
+        End Set
+    End Property
+
+    Public WriteOnly Property dtBankNetwork As DataTable Implements prePayment.IPaymentPremiumRelated.dtBankNetwork
+        Set(value As DataTable)
+            Call SetDropDownList(ddlDebitCardBankNetwork, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtAccountType As DataTable Implements prePayment.IPaymentPremiumRelated.dtAccountType
+        Set(value As DataTable)
+            Call SetDropDownList(ddlDebitCardAccountType, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtPayorType As DataTable Implements prePayment.IPaymentPremiumRelated.dtPayorType
+        Set(value As DataTable)
+            Call SetDropDownList(ddlSearchPayorType, value, "PRSDES", "PRSCOD", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlAddPayorType, value, "PRSDES", "PRSCOD", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtInsuredType As DataTable Implements prePayment.IPaymentPremiumRelated.dtInsuredType
+        Set(value As DataTable)
+            Call SetDropDownList(ddlAddInsuredType, value, "PRSDES", "PRSCOD", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlNewBizType, value, "PRSDES", "PRSCOD", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtPersonTitle() As DataTable Implements prePayment.IPaymentPremiumRelated.dtPersonTitle
+        Set(ByVal value As DataTable)
+            Call SetDropDownList(ddlAddPayorTitle, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlAddInsuredTitle, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlNewBizTitle, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+    Public WriteOnly Property dtBankList As DataTable Implements prePayment.IPaymentPremiumRelated.dtBankList
+        Set(value As DataTable)
+            Call SetDropDownList(ddlCheckBankName, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+            Call SetDropDownList(ddlDebitCardBankName, value, "DESCRP", "CODE", "-- SELECT ITEM --", String.Empty)
+        End Set
+    End Property
+
+#End Region
+
+#Region "List (Of Class)"
+
+    Public Property lstPaymentTypeDetails As List(Of cPaymentType) Implements prePayment.IPaymentPremiumRelated.lstPaymentTypeDetails
+        Get
+            Return ConvertToList(Of cPaymentType)(gvwPaymentTypeDetails)
+        End Get
+        Set(ByVal value As List(Of cPaymentType))
+            If value.Count > 0 _
+                AndAlso OPRGrossAmount > cDataType.fDecimal.Empty _
+                AndAlso OPRGrossAmount = PaymentTotalAmount Then
+
+                OPRDetailTag = True
+
+                If GpaSettingsAllowCom And CashTotalAmount > 0 Then
+                    Dim decComm As Decimal
+                    SearchAgentTag = eReference.AgentTagType.SalesOfficer
+
+                    decComm = OPRGrossAmount * AgentCommRate * (1 - AgentTaxRate)
+                    If decComm > CashTotalAmount Then decComm = CashTotalAmount
+
+                    ReceiptCommissionAmount = decComm
+                    ReceiptAmount = OPRGrossAmount - ReceiptCommissionAmount
+                End If
+            Else
+                OPRDetailTag = False
+            End If
+            gvwPaymentTypeDetails.DataSource = value
+            gvwPaymentTypeDetails.DataBind()
+        End Set
+    End Property
+
+    Public Property lstReceiptDetails As List(Of cReceiptDetail) Implements prePayment.IPaymentPremiumRelated.lstReceiptDetails
+        Get
+            Return ConvertToList(Of cReceiptDetail)(gvwOPRDetails)
+        End Get
+        Set(ByVal value As List(Of cReceiptDetail))
+            If value.Count > 0 _
+                AndAlso OPRGrossAmount > cDataType.fDecimal.Empty _
+                AndAlso ReceiptTotalAmount = OPRGrossAmount Then
+                OPRVatTag = True
+            Else
+                OPRVatTag = False
+            End If
+            gvwOPRDetails.DataSource = value
+            gvwOPRDetails.DataBind()
+        End Set
+    End Property
+
+    Public Property lstNewBiz As List(Of cNewBiz) Implements prePayment.IPaymentPremiumRelated.lstNewBiz
+        Get
+            Return ConvertToList(Of cNewBiz)(gvwNewBiz)
+        End Get
+        Set(value As List(Of cNewBiz))
+            gvwNewBiz.DataSource = value
+            gvwNewBiz.DataBind()
+        End Set
+    End Property
+
+#End Region
+
+#End Region
+
+#Region "Event"
+    Public Event ClearScreenInsured(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenInsured
+    Public Event ClearScreenAddInsured(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenAddInsured
+    Public Event ClearScreenPayor(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenPayor
+    Public Event ClearScreenAddPayor(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenAddPayor
+    Public Event ClearScreenPayorType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenPayorType
+    Public Event ClearScreenPayslipCode(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenPayslipCode
+    Public Event ClearScreenBillNo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenBillNo
+    Public Event ClearScreenSubsNo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenSubsNo
+    Public Event ClearScreenGpaPaymentDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenGpaPaymentDetails
+    Public Event ClearScreenGpaDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenGpaDetails
+    Public Event ClearScreenGpaCardNo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenGpaCardNo
+    Public Event ClearScreenBalanceToHigher(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenBalanceToHigher
+    Public Event ClearScreenNewBusiness(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenNewBusiness
+    Public Event ClearScreenNewBiz(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenNewBiz
+    Public Event ClearScreenNewBizPayor(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenNewBizPayor
+    Public Event ClearScreenAPRDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenAPRDetails
+    Public Event ClearScreenAgent(sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenAgent
+    Public Event ClearScreenAgentDetails(sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenAgentDetails
+    Public Event ClearScreenCheckDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenCheckDetails
+    Public Event ClearScreenCreditCardDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenCreditCardDetails
+    Public Event ClearScreenCreditCardNumber(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenCreditCardNumber
+    Public Event ClearScreenDebitCardDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenDebitCardDetails
+    Public Event ClearScreenECashPaymentDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenECashPaymentDetails
+    Public Event ClearScreenMain(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenMain
+    Public Event ClearScreenReceiptDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenReceiptDetails
+    Public Event ClearScreenPaymentDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenPaymentDetails
+    Public Event ClearScreenPolicy(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenPolicy
+    Public Event ClearScreenVATComputation(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenVATComputation
+    Public Event ClearScreenCashDetails(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenCashDetails
+    Public Event ClearScreenPaymentTypeDetails(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenPaymentTypeDetails
+    Public Event ClearGpaSettings(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearGpaSettings
+    Public Event ClearScreenViewAppNo(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenViewAppNo
+    Public Event ClearScreenViewOPR(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ClearScreenViewOPR
+    ' -------------------------------------------------------------------------------
+    Public Event LoadApplicationNo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadApplicationNo
+    Public Event LoadViewAppNo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadViewAppNo
+    Public Event LoadViewOPR(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadViewOPR
+    Public Event LoadSourceSite(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadSourceSite
+    Public Event LoadCurrency(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadCurrency
+    Public Event LoadPersonType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadPersonType
+    Public Event LoadPersonTitle(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadPersonTitle
+    Public Event LoadFrequencyOfPayment(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadFrequencyOfPayment
+    Public Event LoadGpaPlan(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadGpaPlan
+    Public Event LoadBusinessType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadBusinessType
+    Public Event LoadAllowedPaymentType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadAllowedPaymentType
+    Public Event LoadGpaPolicy(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadGpaPolicy
+    Public Event LoadGpaSettings(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadGpaSettings
+    Public Event LoadGpaRenewalAsd(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadGpaRenewalAsd
+    Public Event LoadPaymentType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadPaymentType
+    Public Event LoadTransactionType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadTransactionType
+    Public Event LoadPolicyType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadPolicyType
+    Public Event LoadGpaType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadGpaType
+    Public Event LoadReceiptTransaction(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadReceiptTransaction
+    'Public Event LoadTerminalUseCCA(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadTerminalUseCCA
+    'Public Event LoadTerminalUseDCA(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadTerminalUseDCA
+    Public Event LoadMerchantId(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadMerchantId
+    Public Event LoadBankNetwork(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadBankNetwork
+    Public Event LoadAccountType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadAccountType
+    Public Event LoadNewOpr(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadNewOPR
+    Public Event SetSamePayorInsured(sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.SetSamePayorInsured
+    Public Event LoadAddInsured(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadAddInsured
+    Public Event LoadAddPayor(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadAddPayor
+    Public Event LoadGpaCardNo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadGpaCardNo
+    Public Event LoadBankList(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadBankList
+    Public Event LoadDefaultTerminal(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadDefaultTerminal
+    Public Event LoadECashPaymentChannel(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadECashPaymentChannel
+    Public Event LoadPolModDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadPolModDetails
+    Public Event LoadPayslipCode(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadPayslipCode
+    Public Event LoadPolicyBilling(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadPolicyBilling
+    Public Event LoadPremiumBreakdown(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadPremiumBreakdown
+    Public Event LoadNewFrequency(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadNewFrequency
+    ' -------------------------------------------------------------------------------
+    Public Event CheckPrevPayType(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.CheckPrevPayType
+    Public Event CheckAllowedPaytype(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.CheckAllowedPaytype
+    Public Event CheckModalPremium(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.CheckModalPremium
+    Public Event CheckGrossAmount(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.CheckGrossAmount
+    Public Event CheckSourceSite(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.CheckSourceSite
+    ' -------------------------------------------------------------------------------
+    Public Event GetAgentDetails(sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.GetAgentDetails
+    Public Event GetPayorDetails(sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.GetPayorDetails
+    Public Event GetInsuredDetails(send As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.GetInsuredDetails
+    Public Event GetPolicyDetails(send As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.GetPolicyDetails
+    ' -------------------------------------------------------------------------------
+    Public Event CreditCardFetchData(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.CreditCardFetchData
+    Public Event DebitCardFetchData(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.DebitCardFetchData
+    Public Event ValidateCreditCardNo(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ValidateCreditCardNo
+    ' -------------------------------------------------------------------------------
+    Public Event AddCashPayment(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.AddCashPayment
+    Public Event AddPaymentTypeDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.AddPaymentTypeDetails
+    Public Event DeletePaymentTypeDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.DeletePaymentTypeDetails
+    Public Event GetPaymentTypeDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.GetPaymentTypeDetails
+    ' -------------------------------------------------------------------------------
+    Public Event GetReceiptTransactionDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.GetReceiptTransactionDetails
+    Public Event AddReceiptDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.AddReceiptDetails
+    Public Event DeleteReceiptDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.DeleteReceiptDetails
+    Public Event CheckReceiptTransaction(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.CheckReceiptTransaction
+    ' -------------------------------------------------------------------------------
+    Public Event ComputeVatDetails(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ComputeVatDetails
+    ' -------------------------------------------------------------------------------
+    Public Event AddNewBizPayor(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.AddNewBizPayor
+    Public Event AddNewBiz(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.AddNewBiz
+    Public Event DeleteNewBiz(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.DeleteNewBiz
+    Public Event GetNewBiz(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.GetNewBiz
+    ' -------------------------------------------------------------------------------
+    Public Event ConfirmCancel(sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ConfirmCancel
+    Public Event ConfirmSave(sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ConfirmSave
+    Public Event ConfirmPrint(sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ConfirmPrint
+    Public Event ProcessPaymentPremium(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.ProcessPaymentPremium
+    Public Event LoadOPR(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.LoadOPR
+    Public Event GenerateReport(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.GenerateReport
+#End Region
+
+#End Region
+
+#Region "IAgent"
+
+#Region "Property"
+
+    Public Property IsAgentExist() As Boolean Implements preSearch.IAgent.IsAgentExist
+        Get
+            Return mIsAgentExist
+        End Get
+        Set(ByVal value As Boolean)
+            mIsAgentExist = value
+        End Set
+    End Property
+
+    ' ------------------------------------------------------------------------------- 
+
+    Public Property SearchAgentTag() As Integer Implements preSearch.IAgent.SearchAgentTag, prePayment.IPaymentPremiumRelated.AgentSearchTag
+        Get
+            Return cDataType.fInteger.IfNull(hdnSearchAgentTag.Value)
+        End Get
+        Set(ByVal value As Integer)
+            hdnSearchAgentTag.Value = value
+        End Set
+    End Property
+
+    Public WriteOnly Property CallLoadAgent() As Boolean Implements prePayment.IPaymentPremiumRelated.CallLoadAgent
+        Set(value As Boolean)
+            If value Then
+                RaiseEvent LoadAgent(Me, EventArgs.Empty)
+            End If
+        End Set
+    End Property
+    ' ------------------------------------------------------------------------------- 
+
+    Public Property SearchAgentID() As Long Implements preSearch.IAgent.SearchAgentID
+        Get
+            Return cDataType.fLong.IfNull(txtSearchAgentID.Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                txtSearchAgentID.Text = Nothing
+            Else
+                txtSearchAgentID.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property SearchAgentName() As String Implements preSearch.IAgent.SearchAgentName
+        Get
+            Return cDataType.fString.IfNull(txtSearchAgentName.Text.Replace(";", ", "))
+        End Get
+        Set(ByVal value As String)
+            txtSearchAgentName.Text = value
+        End Set
+    End Property
+
+    ' ------------------------------------------------------------------------------- 
+
+    Public WriteOnly Property dtSearchAgent As DataTable Implements preSearch.IAgent.dtSearchAgent
+        Set(ByVal value As DataTable)
+            gvwSearchAgent.DataSource = value
+            gvwSearchAgent.DataBind()
+        End Set
+    End Property
+
+#End Region
+
+#Region "Events"
+    Public Event LoadAgent(sender As Object, e As EventArgs) Implements Presenter.OCS.Search.IAgent.LoadAgent
+    Public Event LoadSearchAgent(sender As Object, e As EventArgs) Implements Presenter.OCS.Search.IAgent.LoadSearchAgent
+    Public Event ClearScreenLoadAgent(sender As Object, e As EventArgs) Implements Presenter.OCS.Search.IAgent.ClearScreenLoadAgent
+    Public Event ClearScreenSearchAgent(sender As Object, e As EventArgs) Implements Presenter.OCS.Search.IAgent.ClearScreenSearchAgent
+
+#End Region
+
+#End Region
+
+#Region "IInsured"
+
+#Region "Properties"
+
+    Public Property IsInsuredExist() As Boolean Implements preSearch.IInsured.IsInsuredExist
+        Get
+            Return mIsInsuredExist
+        End Get
+        Set(ByVal value As Boolean)
+            mIsInsuredExist = value
+        End Set
+    End Property
+
+    ' ------------------------------------------------------------------------------- 
+
+    Public Property LoadInsuredID() As Long Implements preSearch.IInsured.LoadInsuredID
+        Get
+            If WithNewBiz Then
+                Return NewBizInsId
+            Else
+                Return InsuredID
+            End If
+        End Get
+        Set(ByVal value As Long)
+            If WithNewBiz Then
+                NewBizInsId = value
+            Else
+                InsuredID = value
+            End If
+        End Set
+    End Property
+
+    ' ------------------------------------------------------------------------------- 
+
+    Public Property SearchInsuredID() As Long Implements preSearch.IInsured.SearchInsuredID
+        Get
+            Return cDataType.fLong.IfNull(txtSearchInsuredID.Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                txtSearchInsuredID.Text = Nothing
+            Else
+                txtSearchInsuredID.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property SearchInsuredName() As String Implements preSearch.IInsured.SearchInsuredName
+        Get
+            Return cDataType.fString.IfNull(txtSearchInsuredName.Text.Replace(";", ", "))
+        End Get
+        Set(ByVal value As String)
+            txtSearchInsuredName.Text = value
+        End Set
+    End Property
+
+    Public Property SearchInsuredType() As String _
+    Implements preSearch.IInsured.SearchInsuredType
+
+        Get
+            Return cDataType.fString.IfNull(
+                hdnInsuredSex.Value
+            )
+        End Get
+
+        Set(ByVal value As String)
+            hdnInsuredSex.Value =
+                cDataType.fString.IfNull(value)
+        End Set
+
+    End Property
+
+    Public Property LoadInsuredFirstName As String _
+    Implements preSearch.IInsured.LoadInsuredFirstName
+
+        Get
+            Return InsuredFirstName
+        End Get
+
+        Set(ByVal value As String)
+            InsuredFirstName =
+                cDataType.fString.IfNull(value)
+        End Set
+
+    End Property
+
+    Public Property LoadInsuredLastName As String _
+        Implements preSearch.IInsured.LoadInsuredLastName
+
+        Get
+            Return InsuredLastName
+        End Get
+
+        Set(ByVal value As String)
+            InsuredLastName =
+                cDataType.fString.IfNull(value)
+        End Set
+
+    End Property
+
+    Public Property LoadInsuredMiddleName As String _
+        Implements preSearch.IInsured.LoadInsuredMiddleName
+
+        Get
+            Return InsuredMiddleName
+        End Get
+
+        Set(ByVal value As String)
+            InsuredMiddleName =
+                cDataType.fString.IfNull(value)
+        End Set
+
+    End Property
+
+    ' ------------------------------------------------------------------------------- 
+
+    Public WriteOnly Property dtSearchInsured() As DataTable Implements preSearch.IInsured.dtSearchInsured
+        Set(ByVal value As DataTable)
+            gvwSearchInsured.DataSource = value
+            gvwSearchInsured.DataBind()
+        End Set
+    End Property
+
+#End Region
+
+#Region "Events"
+
+    Public Event ClearScreenSearchInsured(sender As Object, e As EventArgs) Implements Presenter.OCS.Search.IInsured.ClearScreenSearchInsured
+    ' -------------------------------------------------------------------------------
+    Public Event LoadInsured(sender As Object, e As EventArgs) Implements Presenter.OCS.Search.IInsured.LoadInsured
+    Public Event LoadSearchInsured(sender As Object, e As EventArgs) Implements Presenter.OCS.Search.IInsured.LoadSearchInsured
+
+
+#End Region
+
+#End Region
+
+#Region "IPayor"
+
+#Region "Properties"
+
+    Public Property IsPayorExist() As Boolean Implements preSearch.IPayor.IsPayorExist
+        Get
+            Return mIsPayorExist
+        End Get
+        Set(ByVal value As Boolean)
+            mIsPayorExist = value
+        End Set
+    End Property
+
+    Public Property LoadPayorID() As Long Implements preSearch.IPayor.LoadPayorID
+        Get
+            If WithNewBiz Then
+                Return NewBizPayId
+            Else
+                Return PayorID
+            End If
+        End Get
+        Set(ByVal value As Long)
+            If WithNewBiz Then
+                NewBizPayId = value
+            Else
+                PayorID = value
+            End If
+        End Set
+    End Property
+
+    Public Property LoadPayorType() As String Implements preSearch.IPayor.LoadPayorType
+        Get
+            Return PayorType
+        End Get
+        Set(ByVal value As String)
+            PayorType = value
+        End Set
+    End Property
+
+    Public Property LoadSearchType() As Integer Implements preSearch.IPayor.LoadSearchType
+        Get
+            Return cDataType.fInteger.IfNull(hdnLoadSearchType.Value)
+        End Get
+        Set(value As Integer)
+            hdnLoadSearchType.Value = value
+        End Set
+    End Property
+    ' ------------------------------------------------------------------------------- 
+
+    Public Property SearchPayorID() As Long Implements preSearch.IPayor.SearchPayorID
+        Get
+            Return cDataType.fLong.IfNull(txtSearchPayorID.Text)
+        End Get
+        Set(ByVal value As Long)
+            If value = 0 Then
+                txtSearchPayorID.Text = Nothing
+            Else
+                txtSearchPayorID.Text = value
+            End If
+        End Set
+    End Property
+
+    Public Property SearchPayorName() As String Implements preSearch.IPayor.SearchPayorName
+        Get
+            Return cDataType.fString.IfNull(txtSearchPayorName.Text.Replace(";", ", "))
+        End Get
+        Set(ByVal value As String)
+            txtSearchPayorName.Text = value
+        End Set
+    End Property
+
+    Public Property SearchPayorType() As String Implements preSearch.IPayor.SearchPayorType
+        Get
+            Return cDataType.fString.IfNull(ddlSearchPayorType.SelectedValue)
+        End Get
+        Set(value As String)
+            ddlSearchPayorType.SelectedValue = value
+        End Set
+    End Property
+
+    ' ------------------------------------------------------------------------------- 
+
+    Public WriteOnly Property dtSearchPayor() As DataTable Implements preSearch.IPayor.dtSearchPayor
+        Set(ByVal value As DataTable)
+            If GpaPaymentTag And Not IsNothing(value) Then
+                Dim dtFiltered = From c In value.AsEnumerable
+                                 Where c.Item("prssex") <> "C"
+                                 Select c
+                If dtFiltered.Any() Then
+                    value = dtFiltered.CopyToDataTable
+                Else
+                    value.Clear()
+                End If
+
+            End If
+            gvwSearchPayor.DataSource = value
+            gvwSearchPayor.DataBind()
+        End Set
+    End Property
+
+#End Region
+
+#Region "Events"
+
+    Public Event ClearScreenSearchPayor(sender As Object, e As EventArgs) Implements Presenter.OCS.Search.IPayor.ClearScreenSearchPayor
+    Public Event LoadPayor(sender As Object, e As EventArgs) Implements Presenter.OCS.Search.IPayor.LoadPayor
+    Public Event LoadSearchPayor(sender As Object, e As EventArgs) Implements Presenter.OCS.Search.IPayor.LoadSearchPayor
+
+#End Region
+
+#End Region
+
+#Region "IPolicy"
+
+#Region "Properties"
+    Public Property IsPolicyExist As Boolean Implements preSearch.IPolicy.IsPolicyExist
+        Get
+            Return mIsPolicyExist
+        End Get
+        Set(value As Boolean)
+            mIsPolicyExist = value
+        End Set
+    End Property
+
+    Public Property SearchPolicyType As String Implements preSearch.IPolicy.SearchPolicyType
+        Get
+            Return PolType
+        End Get
+        Set(value As String)
+            PolType = value
+        End Set
+    End Property
+
+    Public Property SearchPolicyNo As String Implements preSearch.IPolicy.SearchPolicyNo
+        Get
+            Return cDataType.fString.IfNull(txtSPPolicyNumber.Text)
+        End Get
+        Set(ByVal value As String)
+            txtSPPolicyNumber.Text = value
+        End Set
+    End Property
+
+    Public Property SearchPolicyInsured As String Implements preSearch.IPolicy.SearchPolicyInsured
+        Get
+            Return cDataType.fString.IfNull(txtSPInsuredName.Text.Replace(", ", ";"))
+        End Get
+        Set(ByVal value As String)
+            txtSPInsuredName.Text = value
+        End Set
+    End Property
+
+
+    Public Property SearchPolicyPayor As String Implements preSearch.IPolicy.SearchPolicyPayor
+        Get
+            Return cDataType.fString.IfNull(txtSPPayorName.Text.Replace(", ", ";"))
+        End Get
+        Set(ByVal value As String)
+            txtSPPayorName.Text = value
+        End Set
+    End Property
+
+
+    'Public Property LoadInsuredName As String Implements preSearch.IPolicy.LoadInsuredName, preSearch.IInsuredPolicyContext.LoadInsuredName
+    '    Get
+    '        Return InsuredName.ToString.Replace("; ", String.Empty)
+    '    End Get
+    '    Set(value As String)
+    '        InsuredName = value
+    '    End Set
+    'End Property
+    Public Property LoadInsuredName As String Implements preSearch.IPolicy.LoadInsuredName, preSearch.IInsured.LoadInsuredName
+        Get
+            Return cDataType.fString.IfNull(
+                InsuredName
+            ).Replace(
+                "; ",
+                String.Empty
+            )
+        End Get
+
+        Set(ByVal value As String)
+            InsuredName =
+                cDataType.fString.IfNull(value)
+        End Set
+
+    End Property
+
+
+    Public Property LoadPayorName As String Implements preSearch.IPolicy.LoadPayorName
+        Get
+            Return PayorName.ToString.Replace("; ", String.Empty)
+        End Get
+        Set(value As String)
+            PayorName = value
+        End Set
+    End Property
+
+    Public Property LoadPolTyp As String Implements preSearch.IPolicy.LoadPolicyType
+        Get
+            Return PolType
+        End Get
+        Set(value As String)
+            PolType = value
+        End Set
+    End Property
+
+    Public Property LoadPolicyNo As String Implements preSearch.IPolicy.LoadPolicyNo
+        Get
+            Return PolicyNumber
+        End Get
+        Set(value As String)
+            PolicyNumber = value
+        End Set
+    End Property
+
+    Public Property LoadMetCod As String Implements preSearch.IPolicy.LoadMetCod
+        Get
+            Return PolMod
+        End Get
+        Set(value As String)
+            PolMod = value
+        End Set
+    End Property
+
+    Public WriteOnly Property dtSearchPolicy As DataTable Implements preSearch.IPolicy.dtSearchPolicy
+        Set(value As DataTable)
+            gvwSearchPolicy.DataSource = value
+            gvwSearchPolicy.DataBind()
+        End Set
+    End Property
+#End Region
+
+#Region "Event"
+
+    Public Event ClearScreenLoadPolicy(sender As Object, e As EventArgs) Implements preSearch.IPolicy.ClearScreenLoadPolicy
+
+    Public Event ClearScreenSearchPolicy(sender As Object, e As EventArgs) Implements preSearch.IPolicy.ClearScreenSearchPolicy
+
+    Public Event LoadPolicy(sender As Object, e As EventArgs) Implements preSearch.IPolicy.LoadPolicy
+
+    Public Event LoadSearchPolicy(sender As Object, e As EventArgs) Implements preSearch.IPolicy.LoadSearchPolicy
+
+#End Region
+
+#End Region
+
+#Region "IReport"
+
+#Region "Properties"
+
+    Public Property ReportType() As eReport Implements preReport.IReport.ReportType
+        Get
+            Return cDataType.fString.IfNull(hdnReportType.Value)
+        End Get
+        Set(value As eReport)
+            hdnReportType.Value = value
+        End Set
+    End Property
+
+    Public Property RptParamString() As String Implements preReport.IReport.RptParamString
+        Get
+            Return Session(eSession.ReportParam)
+        End Get
+        Set(ByVal value As String)
+            Session(eSession.ReportParam) = value
+        End Set
+    End Property
+
+#End Region
+
+#Region "Event"
+
+    Public Event ClearScreenReport(sender As Object, e As EventArgs) Implements preReport.IReport.ClearScreenReport
+
+#End Region
+
+#End Region
+
+#Region "Event Handlers"
+
+#Region "Page"
+
+    Private Sub PaymentPremiumRelated_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Init
+        pSystemMessage = New preSecurity.PSystemMessage(Me)
+        pConfirmationMessage = New preMessages.PConfirmationMessage(Me)
+        pPaymentPremiumRelated = New prePayment.PPaymentPremiumRelated(Me)
+        pAgent = New preSearch.PAgent(Me)
+        pInsured = New preSearch.PInsured(Me)
+        pPayor = New preSearch.PPayor(Me)
+        pPolicy = New preSearch.PPolicy(Me)
+        pReport = New preReport.PReport(Me)
+    End Sub
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        Page.MaintainScrollPositionOnPostBack = True
+        arrTxtAgentID = {txtAgentID, txtSalesOffID, txtPromoOffID, txtUSD1ID, txtAsdID}
+        arrAgentIDTag = {hdnAgentIDTag, hdnSOAgentIDTag, hdnPOAgentIDTag, hdnUSDAgentIDTag, hdnASDAgentIDTag}
+        arrTxtAgentName = {txtAgentName, txtSalesOffName, txtPromoOffName, txtUSD1Name, txtAsdName}
+        arrTxtUsdId = {txtUSD1ID, txtUSD2ID}
+        arrTxtUsdName = {txtUSD1Name, txtUSD2Name}
+        arrHdnAgentFnam = {hdnAgentFirstName, hdnSalesAgentFirstName, hdnPromoAgentFirstName, hdnUsdAgentFirstName, hdnAsdAgentFirstName}
+        arrHdnAgentLnam = {hdnAgentLastName, hdnSalesAgentLastName, hdnPromoAgentLastName, hdnUsdAgentLastName, hdnAsdAgentLastName}
+        arrHdnAgentMnam = {hdnAgentMiddleName, hdnSalesAgentMiddleName, hdnPromoAgentMiddleName, hdnUsdAgentMiddleName, hdnAsdAgentMiddleName}
+        arrHdnAgencyFnam = {hdnAgencyFirstName, hdnSalesAgencyFirstName, hdnPromoAgencyFirstName, hdnUsdAgencyFirstName, hdnAsdAgencyFirstName}
+        arrHdnAgencyLnam = {hdnAgencyLastName, hdnSalesAgencyLastName, hdnPromoAgencyLastName, hdnUsdAgencyLastName, hdnAsdAgencyLastName}
+        arrHdnAgencyMnam = {hdnAgencyMiddleName, hdnSalesAgencyMiddleName, hdnPromoAgencyMiddleName, hdnUsdAgencyMiddleName, hdnAsdAgencyMiddleName}
+        arrHdnAgentSalesForce = {hdnAgentSalesForce, hdnSOSalesForce, hdnPOSalesForce, hdnUsdSalesForce, hdnAsdSalesForce}
+        arrHdnAgentCatCod = {hdnAgentCatCod, hdnSOCatCod, hdnPOCatCod, hdnUsdCatCod, hdnAsdCatCod}
+        arrHdnAgentCommRate = {hdnAgentCommRate, hdnSOCommRate, hdnPOCommRate, hdnUsdCommRate, hdnAsdCommRate}
+        arrHdnAgentTaxRate = {hdnAgentTaxRate, hdnSOTaxRate, hdnPOTaxRate, hdnUsdTaxRate, hdnAsdTaxRate}
+
+        If Not IsPostBack Then
+            Call AddAttributes()
+            Call LoadReference()
+            Call ClearFields()
+            Call ManageMain(eDocSaveState.Initial)
+        End If
+
+    End Sub
+
+#End Region
+
+#Region "Button"
+
+    Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
+        Call ClearSession()
+        Response.Redirect(ePage.PaymentPremiumRelated, False)
+    End Sub
+
+    Private Sub btnMessageOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnMessageOk.Click
+        mpeMessage.Hide()
+        Select Case Session(eSession.Modal)
+            Case "mpeSearchAgent"
+                Call SetModalSession(mpeSearchAgent, True, txtSearchAgentID)
+            Case "mpeSearchInsured"
+                Call SetModalSession(mpeSearchInsured, True, txtSearchInsuredName)
+            Case "mpeSearchPayor"
+                Call SetModalSession(mpeSearchPayor, True, txtSearchPayorName)
+            Case "mpeSearchPolicy"
+                Call SetModalSession(mpeSearchPolicy, True, txtSPPolicyNumber)
+            Case "mpeViewOPRs"
+                Call SetModalSession(mpeViewOPRs, True, btnLoadViewOpr)
+            Case "mpeAddInsured"
+                Call SetModalSession(mpeAddInsured, True, btnAddInsuredOk)
+            Case "mpeAddPayor"
+                Call SetModalSession(mpeAddPayor, True, btnAddInsuredOk)
+        End Select
+
+        Call ClearSession()
+    End Sub
+
+    Private Sub btnPaymentTypeAdd_Click(sender As Object, e As EventArgs) Handles btnPaymentTypeAdd.Click
+        Call ClearSession()
+        RaiseEvent AddPaymentTypeDetails(Me, EventArgs.Empty)
+        If IsPayTypeSuccessful Then
+            RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+            ManageCardPayment("ALL", True)
+            If CashTotalAmount > 0 And GpaSettingsAllowCom Then
+                divCommission.Visible = True
+            Else
+                divCommission.Visible = False
+            End If
+        End If
+
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub btnPaymentTypeClear_Click(sender As Object, e As EventArgs) Handles btnPaymentTypeClear.Click
+        RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+        ManageCardPayment("ALL", True)
+    End Sub
+
+    Private Sub btnSearchInsuredClose_Click(sender As Object, e As EventArgs) Handles btnSearchInsuredClose.Click
+        Call ClearSession()
+        Call SetModalSession(mpeSearchInsured, False, ibtnSearchInsured)
+    End Sub
+
+    Private Sub btnSearchPolicyClear_Click(sender As Object, e As EventArgs) Handles btnSearchPolicyClear.Click
+        Call ClearSession()
+        Call SetModalSession(mpeSearchPolicy, True, txtSPPolicyNumber)
+    End Sub
+
+    Private Sub btnSearchPolicyClose_Click(sender As Object, e As EventArgs) Handles btnSearchPolicyClose.Click
+        Call ClearSession()
+        Call SetModalSession(mpeSearchPolicy, False, ibtnSearchPolicy)
+    End Sub
+
+    Private Sub btnSearchPolicySearch_Click(sender As Object, e As EventArgs) Handles btnSearchPolicySearch.Click
+        Call ClearSession()
+        RaiseEvent LoadSearchPolicy(Me, EventArgs.Empty)
+        If gvwSearchAgent.Rows.Count = 0 Then
+            Call SetModalSession(mpeSearchPolicy, True, btnMessageOk)
+        Else
+            Call SetModalSession(mpeSearchPolicy, True, btnSearchPolicySearch)
+        End If
+    End Sub
+
+    Private Sub btnValidateCreditCardNo_Click(sender As Object, e As EventArgs) Handles btnValidateCreditCardNo.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenCreditCardNumber(Me, EventArgs.Empty)
+        RaiseEvent ValidateCreditCardNo(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub btnOprDtlAdd_Click(sender As Object, e As EventArgs) Handles btnOprDtlAdd.Click
+        Call ClearSession()
+        RaiseEvent AddReceiptDetails(Me, EventArgs.Empty)
+        If GpaSettingsAllowCom AndAlso ReceiptCommissionAmount > 0 Then
+            ReceiptAmount = ReceiptCommissionAmount
+            ReceiptTransactionCode = eReference.ColrefAgentsAccount
+            ReceiptTransactionDesc = eReference.ColrefAgentsAccountDesc
+            RaiseEvent AddReceiptDetails(Me, EventArgs.Empty)
+        End If
+        RaiseEvent ComputeVatDetails(Me, EventArgs.Empty)
+        If IsReceiptSuccessful Then
+            RaiseEvent ClearScreenReceiptDetails(Me, EventArgs.Empty)
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub btnNewBizAdd_Click(sender As Object, e As EventArgs) Handles btnNewBizAdd.Click
+        Call ClearSession()
+        If btnNewBizAdd.Text = "Save" Then
+            RaiseEvent AddNewBiz(Me, EventArgs.Empty)
+            If IsNewBizSuccessful Then
+                InsuredIDTag = False
+                RaiseEvent ClearScreenNewBiz(Me, EventArgs.Empty)
+                Call ManageNewBiz(eReference.MgeNewBiz.Insured, False)
+                Call ManageNewBiz(eReference.MgeNewBiz.NewBiz, False)
+                Call ManageNewBiz(eReference.MgeNewBiz.NewInsured, False)
+                Call ManageNewBiz(eReference.MgeNewBiz.Button, False)
+                Call ManageNewBiz(eReference.MgeNewBiz.ButtonAdd, True)
+                ibtnClearNewBizInsured.Visible = False
+            End If
+        Else
+            RaiseEvent LoadApplicationNo(Me, EventArgs.Empty)
+            Call ManageNewBiz(eReference.MgeNewBiz.Insured, True)
+            Call ManageNewBiz(eReference.MgeNewBiz.Button, True)
+            Call ManageNewBiz(eReference.MgeNewBiz.NewInsured, False)
+            Call ManageNewBiz(eReference.MgeNewBiz.NewBiz, True)
+
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub btnNewBizCancel_Click(sender As Object, e As EventArgs) Handles btnNewBizCancel.Click
+        RaiseEvent ClearScreenNewBiz(Me, EventArgs.Empty)
+        Call ManageNewBiz(eReference.MgeNewBiz.Initial, True)
+        Call ManageNewBiz(eReference.MgeNewBiz.PayorId, False)
+        InsuredIDTag = False
+        PayorIDTag = True
+        PayorType = "C"
+        Call ManageNewBiz(eReference.MgeNewBiz.ButtonAdd, True)
+        Call ManageNewBiz(eReference.MgeNewBiz.PayorName, False)
+        Call ManageNewBiz(eReference.MgeNewBiz.PayorAdd, False)
+    End Sub
+
+    Private Sub btnViewOPRsClose_Click(sender As Object, e As EventArgs) Handles btnViewOPRsClose.Click
+        Call ClearSession()
+        Call SetModalSession(mpeViewOPRs, False, ibtnViewOPRs)
+    End Sub
+
+    Private Sub btnSearchAgentClear_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSearchAgentClear.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenSearchAgent(Me, EventArgs.Empty)
+        Call SetModalSession(mpeSearchAgent, True, txtSearchAgentID)
+    End Sub
+
+    Private Sub btnSearchAgentClose_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSearchAgentClose.Click
+
+        Call ClearSession()
+        Call SetModalSession(mpeSearchAgent, False, ibtnSearchAgent)
+    End Sub
+
+    Private Sub btnSearchAgentSearch_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSearchAgentSearch.Click
+
+        Call ClearSession()
+        RaiseEvent LoadSearchAgent(Me, EventArgs.Empty)
+        If gvwSearchAgent.Rows.Count = 0 Then
+            Call SetModalSession(mpeSearchAgent, True, btnMessageOk)
+        Else
+            Call SetModalSession(mpeSearchAgent, True, gvwSearchAgent)
+        End If
+
+    End Sub
+
+    Private Sub btnSearchPayorClear_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSearchPayorClear.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenSearchPayor(Me, EventArgs.Empty)
+        Call SetModalSession(mpeSearchPayor, True, txtSearchPayorID)
+    End Sub
+
+    Private Sub btnSearchPayorClose_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSearchPayorClose.Click
+        Call ClearSession()
+        Call SetModalSession(mpeSearchPayor, False, ibtnSearchPayor)
+    End Sub
+
+    Private Sub btnSearchPayorSearch_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSearchPayorSearch.Click
+
+        Call ClearSession()
+        RaiseEvent LoadSearchPayor(Me, EventArgs.Empty)
+        If WithNewBiz Then
+            Call ManageNewBiz(eReference.MgeNewBiz.PayorId, False)
+            Call ManageNewBiz(eReference.MgeNewBiz.ButtonAdd, True)
+            Call ManageNewBiz(eReference.MgeNewBiz.PayorName, True)
+            Call ManageNewBiz(eReference.MgeNewBiz.PayorAdd, True)
+        Else
+            Call ManagePolicy(eReference.MgePol.Payor, False)
+            Call ManagePolicy(eReference.MgePol.PayorAdd, True)
+        End If
+
+        If gvwSearchPayor.Rows.Count = 0 Then
+            Call SetModalSession(mpeSearchPayor, True, btnMessageOk)
+        Else
+            Call SetModalSession(mpeSearchPayor, True, gvwSearchPayor)
+        End If
+
+    End Sub
+
+    Private Sub btnSearchInsuredClear_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSearchInsuredClear.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenSearchInsured(Me, EventArgs.Empty)
+        Call SetModalSession(mpeSearchInsured, True, txtSearchInsuredID)
+    End Sub
+
+    Private Sub btnSearchInsuredSearch_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnSearchInsuredSearch.Click
+
+        Call ClearSession()
+        RaiseEvent LoadSearchInsured(Me, EventArgs.Empty)
+        If WithNewBiz Then
+            Call ManageNewBiz(eReference.MgeNewBiz.Insured, False)
+            Call ManageNewBiz(eReference.MgeNewBiz.InsuredAdd, True)
+        Else
+            Call ManagePolicy(eReference.MgePol.Insured, False)
+            Call ManagePolicy(eReference.MgePol.InsuredAdd, True)
+        End If
+
+        If gvwSearchInsured.Rows.Count = 0 Then
+            Call SetModalSession(mpeSearchInsured, True, btnMessageOk)
+        Else
+            Call SetModalSession(mpeSearchInsured, True, gvwSearchInsured)
+        End If
+    End Sub
+
+    Private Sub btnReceiptAddNew_Click(sender As Object, e As EventArgs) Handles btnReceiptAddNew.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+        RaiseEvent LoadNewOpr(Me, EventArgs.Empty)
+        Call SetDefaults()
+        If IsSuccessful Then
+            DocSaveState = eDocSaveState.AddNew
+            IsSourceSiteLocked = True
+            IsGrossAmountLocked = False
+        Else
+            DocSaveState = eDocSaveState.Initial
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub btnReceiptSave_Click(sender As Object, e As EventArgs) Handles btnReceiptSave.Click
+        Select Case DocSaveState
+            Case eDocSaveState.ViewEdit
+                DocSaveState = eReference.DocSaveState.Edit
+                ManageMain(DocSaveState)
+                IsSourceSiteLocked = True
+                IsGrossAmountLocked = True
+            Case eDocSaveState.AddNew, eDocSaveState.Edit
+                RaiseEvent ConfirmSave(Me, EventArgs.Empty)
+        End Select
+    End Sub
+#End Region
+
+#Region "CheckBox"
+
+    Private Sub chkBalanceToHigher_CheckedChanged(sender As Object, e As EventArgs) Handles chkBalanceToHigher.CheckedChanged
+        BalanceToHigher = DirectCast(sender, CheckBox).Checked
+    End Sub
+
+    Private Sub chkWithAPR_CheckedChanged(sender As Object, e As EventArgs) Handles chkWithAPR.CheckedChanged
+        WithAPR = DirectCast(sender, CheckBox).Checked
+    End Sub
+
+    Private Sub chkGP3_CheckedChanged(sender As Object, e As EventArgs) Handles chkGP3.CheckedChanged
+        Dim mChk As Boolean = DirectCast(sender, CheckBox).Checked
+        If Not (mChk) Then
+            RaiseEvent LoadApplicationNo(Me, EventArgs.Empty)
+        End If
+        WithNewBiz = mChk
+    End Sub
+
+    Private Sub chkAddPayorIsSame_CheckedChanged(sender As Object, e As EventArgs) Handles chkAddPayorIsSame.CheckedChanged
+        SamePayorInsured = IIf(DirectCast(sender, CheckBox).Checked, "Y", "N")
+        If SamePayorInsured = "Y" Then
+            RaiseEvent SetSamePayorInsured(Me, EventArgs.Empty)
+        End If
+        Call SetModalSession(mpeAddPayor, True, chkAddPayorIsSame)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub chkSamePayorInsured_CheckedChanged(sender As Object, e As EventArgs) Handles chkSamePayorInsured.CheckedChanged
+        SamePayorInsured = IIf(DirectCast(sender, CheckBox).Checked, "Y", "N")
+        If SamePayorInsured = "Y" Then
+            RaiseEvent SetSamePayorInsured(Me, EventArgs.Empty)
+            InsuredIDTag = True
+        Else
+            RaiseEvent ClearScreenInsured(Me, EventArgs.Empty)
+            RaiseEvent ClearScreenAddInsured(Me, EventArgs.Empty)
+            InsuredIDTag = False
+        End If
+        Call ManagePolicy(eReference.MgePol.Insured, IIf(SamePayorInsured = "Y", False, True))
+
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+#End Region
+
+#Region "DropDownList"
+
+    Private Sub ddlSourceSite_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlSourceSite.SelectedIndexChanged
+        If Not GpaSalesOff = 0 OrElse Not GpaUsd1 = 0 Then
+            RaiseEvent LoadGpaPlan(Me, EventArgs.Empty)
+        End If
+        RaiseEvent LoadMerchantId(Me, EventArgs.Empty)
+        ddlSourceSite.Focus()
+    End Sub
+
+    Private Sub ddlOPRPaymentType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlOPRPaymentType.SelectedIndexChanged
+        RaiseEvent CheckAllowedPaytype(Me, EventArgs.Empty)
+        If IsPayTypeSuccessful Then
+            IsPayTypeSuccessful = False
+
+            If DocSaveState = eDocSaveState.Edit OrElse DocSaveState = eDocSaveState.AddNew Then
+                RaiseEvent CheckPrevPayType(Me, EventArgs.Empty)
+            Else
+                IsPayTypeSuccessful = True
+            End If
+
+            If IsPayTypeSuccessful Then
+                ManagePaymentType(OPRPaymentType, True)
+                ManageCardPayment("ALL", True)
+                PrevPayType = ddlOPRPaymentType.SelectedValue
+                If SourceSite <> String.Empty Then
+                    RaiseEvent LoadMerchantId(Me, EventArgs.Empty)
+                End If
+            Else
+                OPRPaymentType = PrevPayType
+            End If
+        Else
+            OPRPaymentType = PrevPayType
+        End If
+    End Sub
+
+    Private Sub dllBusinessType_SelectIndexChanged(sender As Object, e As EventArgs) Handles ddlBusinessType.SelectedIndexChanged
+        If Not PolMod.Equals(String.Empty) And IsGrossAmountLocked Then
+            Select Case PolMod
+                Case "ESP", "SSI", "DCS"
+                    LoadSearchType = 1
+                Case "HMO"
+                    LoadSearchType = 2
+                Case "VLB", "VLP", "VLT"
+                    LoadSearchType = 3
+                Case "MWI"
+                    LoadSearchType = 4
+                Case Else
+                    LoadSearchType = 0
+            End Select
+
+            If PolMod = "GPA" And TransactionType <> 3 Then
+                PaymentTypeTag = False
+            ElseIf PolMod = "GPP" And PolicyNumber.IndexOf("-") > 0 Then
+                PaymentTypeTag = False
+            Else
+                PaymentTypeTag = True
+            End If
+        Else
+            PaymentTypeTag = False
+        End If
+    End Sub
+
+    Private Sub ddlTransactionType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlTransactionType.SelectedIndexChanged
+        GpaPaymentTag = False
+        NewBusinessTag = False
+        If TransactionType.Equals(String.Empty) Then
+            PolicyInfoTag = False
+        Else
+            PolicyInfoTag = True
+            RaiseEvent LoadBusinessType(Me, EventArgs.Empty)
+
+            Select Case TransactionType
+                Case eReference.TranType.GPA
+                    GpaPaymentTag = True
+                    ManagePolicy(eReference.MgePol.Payor, Not PayorIDTag)
+                    ManagePolicy(eReference.MgePol.SamePayorInsured, Not PayorIDTag)
+                    ManagePolicy(eReference.MgePol.Insured, Not InsuredIDTag)
+                Case eReference.TranType.NewBusiness
+                    NewBusinessTag = True
+                Case eReference.TranType.Regular
+            End Select
+        End If
+    End Sub
+
+    Private Sub ddlOPRTransaction_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlOPRTransaction.SelectedIndexChanged
+
+        If Not ddlOPRTransaction.SelectedIndex.Equals(0) Then
+            ReceiptTransactionCode = ddlOPRTransaction.SelectedValue
+            'Get details
+            RaiseEvent GetReceiptTransactionDetails(sender, e)
+            If DocSaveState = eReference.DocSaveState.AddNew Or DocSaveState = eReference.DocSaveState.Edit Then
+                RaiseEvent CheckReceiptTransaction(sender, e)
+                If Not IsSuccessful Then
+                    ddlOPRTransaction.SelectedIndex = 0
+                End If
+            End If
+        End If
+    End Sub
+
+#End Region
+
+#Region "ImageButton"
+
+    Private Sub ibtnClearPolicy_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearPolicy.Click
+        Call ManagePolicy(eReference.MgePol.Initial, False)
+        Call ManagePolicy(eReference.MgePol.Search, True)
+        RaiseEvent ClearScreenPolicy(Me, EventArgs.Empty)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnClearPaCardID_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearPaCardID.Click
+        Call ManageGpaCardNo("SEARCH", True)
+        RaiseEvent ClearScreenGpaCardNo(Me, EventArgs.Empty)
+        RaiseEvent ClearScreenGpaDetails(Me, EventArgs.Empty)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnClearPayslipCode_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearPayslipCode.Click
+        Call ManagePolicy(eReference.MgePol.Initial, False)
+        Call ManagePolicy(eReference.MgePol.Search, True)
+        RaiseEvent ClearScreenPayslipCode(Me, EventArgs.Empty)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnClearBillNo_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearBillNo.Click
+        Call ManagePolicy(eReference.MgePol.Initial, False)
+        Call ManagePolicy(eReference.MgePol.Search, True)
+        RaiseEvent ClearScreenBillNo(Me, EventArgs.Empty)
+        upPaymentPremiumRelated.Update()
+    End Sub
+    Private Sub ibtnClearSubsNo_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearSubsNo.Click
+        Call ManagePolicy(eReference.MgePol.Initial, False)
+        Call ManagePolicy(eReference.MgePol.Search, True)
+        RaiseEvent ClearScreenSubsNo(Me, EventArgs.Empty)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnClearPayor_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearPayor.Click
+        Call ManagePolicy(eReference.MgePol.Payor, True)
+        Call ManagePolicy(eReference.MgePol.PayorAdd, False)
+        Call ManagePolicy(eReference.MgePol.SamePayorInsured, True)
+        SamePayorInsured = Nothing
+        RaiseEvent ClearScreenPayor(Me, EventArgs.Empty)
+        RaiseEvent ClearScreenAddPayor(Me, EventArgs.Empty)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnClearInsured_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearInsured.Click
+        Call ManagePolicy(eReference.MgePol.Insured, True)
+        Call ManagePolicy(eReference.MgePol.InsuredAdd, False)
+        SamePayorInsured = Nothing
+        RaiseEvent ClearScreenInsured(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub ibtnClearAgent_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearAgent.Click
+        SearchAgentTag = eReference.AgentTagType.Agent
+
+        Call ManageAgent(SearchAgentTag, True)
+        RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnClearSalesOff_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearSalesOff.Click
+        SearchAgentTag = eReference.AgentTagType.SalesOfficer
+
+        Call ManageAgent(SearchAgentTag, True)
+        RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+        RaiseEvent ClearScreenAgentDetails(Me, EventArgs.Empty)
+        GpaPaymentTag = True
+        upPaymentPremiumRelated.Update()
+    End Sub
+    Private Sub ibtnClearPromoOff_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearPromoOff.Click
+        SearchAgentTag = eReference.AgentTagType.PromoOfficer
+
+        Call ManageAgent(SearchAgentTag, True)
+        RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+        RaiseEvent ClearScreenAgentDetails(Me, EventArgs.Empty)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnClearUSD1_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearUSD1.Click
+        SearchAgentTag = eReference.AgentTagType.Usd1
+
+        Call ManageAgent(SearchAgentTag, True)
+        RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+        RaiseEvent ClearScreenAgentDetails(Me, EventArgs.Empty)
+        GpaType = eReference.ColrefGpaRenewal
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnClearAsd_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearAsd.Click
+        SearchAgentTag = eReference.AgentTagType.Asd
+
+        Call ManageAgent(SearchAgentTag, True)
+        RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+        RaiseEvent ClearScreenAgentDetails(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub ibtnSearchAgent_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchAgent.Click
+        SearchAgentTag = eReference.AgentTagType.Agent
+        Call ClearSession()
+        Call SearchAgent()
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub SearchAgent()
+        SearchAgentPolType = PolType
+        If AgentID = 0 Or AgentIDTag Then
+            RaiseEvent ClearScreenSearchAgent(Me, EventArgs.Empty)
+            Call SetModalSession(mpeSearchAgent, True, btnSearchAgentClose)
+        Else
+            RaiseEvent LoadAgent(Me, EventArgs.Empty)
+            If IsAgentExist Then
+                AgentIDTag = True
+                Call ManageAgent(SearchAgentTag, False)
+            Else
+                Call ManageAgent(SearchAgentTag, True)
+            End If
+        End If
+    End Sub
+
+    Private Sub ibtnSearchInsured_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchInsured.Click
+        Call ClearSession()
+        Call SearchInsured()
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub SearchInsured()
+        SearchInsuredPolType = PolType
+        If InsuredID = 0 Or InsuredIDTag Then
+            RaiseEvent ClearScreenSearchInsured(Me, EventArgs.Empty)
+            Call SetModalSession(mpeSearchInsured, True, txtSearchInsuredID)
+        Else
+            RaiseEvent LoadInsured(Me, EventArgs.Empty)
+            Call ManagePolicy(eReference.MgePol.Insured, False)
+            If IsInsuredExist Then
+                InsuredIDTag = True
+                RaiseEvent GetInsuredDetails(Me, EventArgs.Empty)
+                Call ManagePolicy(eReference.MgePol.InsuredAdd, False)
+            Else
+                Call ManagePolicy(eReference.MgePol.InsuredAdd, True)
+            End If
+        End If
+    End Sub
+    '---------------------------------------------------------------------------------------------------------------------------------
+
+    Private Sub ibtnAddNewBizPayor_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnAddNewBizPayor.Click
+
+        Call ClearSession()
+        RaiseEvent AddNewBizPayor(Me, EventArgs.Empty)
+
+        If IsNewBizSuccessful Then
+            PayorIDTag = True
+            PayorType = "C"
+            RaiseEvent ClearScreenNewBiz(Me, EventArgs.Empty)
+            Call ManageNewBiz(eReference.MgeNewBiz.ButtonAdd, True)
+            Call ManageNewBiz(eReference.MgeNewBiz.PayorName, False)
+            Call ManageNewBiz(eReference.MgeNewBiz.PayorAdd, False)
+        End If
+
+        upPaymentPremiumRelated.Update()
+
+    End Sub
+
+    Private Sub ibtnSearchNewBizPayor_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchNewBizPayor.Click
+        Call ClearSession()
+        If NewBizPayId = 0 Or PayorIDTag Then
+            RaiseEvent ClearScreenSearchPayor(Me, EventArgs.Empty)
+            SearchPayorType = "C"
+            ddlSearchPayorType.Enabled = False
+            Call SetModalSession(mpeSearchPayor, True, txtSearchPayorID)
+        Else
+            LoadPayorType = "C"
+            RaiseEvent LoadPayor(Me, EventArgs.Empty)
+            Call ManageNewBiz(eReference.MgeNewBiz.PayorId, False)
+            If IsPayorExist Then
+                PayorIDTag = True
+                RaiseEvent GetPayorDetails(Me, EventArgs.Empty)
+                RaiseEvent ClearScreenNewBiz(Me, EventArgs.Empty)
+                Call ManageNewBiz(eReference.MgeNewBiz.ButtonAdd, True)
+                Call ManageNewBiz(eReference.MgeNewBiz.PayorName, False)
+                Call ManageNewBiz(eReference.MgeNewBiz.PayorAdd, False)
+            Else
+                Call ManageNewBiz(eReference.MgeNewBiz.ButtonAdd, False)
+                Call ManageNewBiz(eReference.MgeNewBiz.PayorName, True)
+                Call ManageNewBiz(eReference.MgeNewBiz.PayorAdd, True)
+            End If
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnClearNewBizPayor_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearNewBizPayor.Click
+        Call ManageNewBiz(eReference.MgeNewBiz.Initial, True)
+        RaiseEvent ClearScreenNewBizPayor(Me, EventArgs.Empty)
+
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnClearNewBizInsured_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearNewBizInsured.Click
+        Call ManageNewBiz(eReference.MgeNewBiz.Insured, True)
+        Call ManageNewBiz(eReference.MgeNewBiz.InsuredAdd, False)
+        Call ManageNewBiz(eReference.MgeNewBiz.NewInsured, False)
+        RaiseEvent ClearScreenNewBiz(Me, EventArgs.Empty)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnAddNewBizInsured_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnAddNewBizInsured.Click
+        Call ManageNewBiz(eReference.MgeNewBiz.NewInsured, True)
+    End Sub
+
+    Private Sub ibtnSearchNewBizInsured_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchNewBizInsured.Click
+        Call ClearSession()
+        If NewBizInsId = 0 Or InsuredIDTag Then
+            RaiseEvent ClearScreenSearchInsured(Me, EventArgs.Empty)
+            Call SetModalSession(mpeSearchInsured, True, txtSearchInsuredID)
+        Else
+            RaiseEvent LoadInsured(Me, EventArgs.Empty)
+            Call ManageNewBiz(eReference.MgeNewBiz.Insured, False)
+            If IsInsuredExist Then
+                InsuredIDTag = True
+                RaiseEvent GetInsuredDetails(Me, EventArgs.Empty)
+                Call ManageNewBiz(eReference.MgeNewBiz.InsuredAdd, False)
+            Else
+                Call ManageNewBiz(eReference.MgeNewBiz.InsuredAdd, True)
+            End If
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    '---------------------------------------------------------------------------------------------------------------------------------
+    Private Sub ibtnSearchPayslipCode_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchPayslipCode.Click
+        Call ClearSession()
+        Call SearchPayslipCode()
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnSearchBillNo_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchBillNo.Click
+            Call ClearSession()
+            Call SearchBillNo()
+            RaiseEvent ComputeVatDetails(Me, EventArgs.Empty)
+            upPaymentPremiumRelated.Update()
+    End Sub
+    Protected Sub ibtnSearchSubsNo_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchSubsNo.Click
+
+        Call ClearSession()
+        Call SearchBillNo()
+        RaiseEvent ComputeVatDetails(Me, EventArgs.Empty)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub SearchPayslipCode()
+
+        RaiseEvent LoadPayslipCode(Me, EventArgs.Empty)
+
+        If IsPayslipCodeExist Then
+            Call ManagePolicy(eReference.MgePol.Initial, False)
+            PayslipCodeTag = True
+            Call ManagePolicy(eReference.MgePol.Search, False)
+            Call ManagePolicy(eReference.MgePol.Payslip, False)
+        Else
+            Call ManagePolicy(eReference.MgePol.Payslip, True)
+        End If
+    End Sub
+
+    Private Sub SearchBillNo() 'franco
+        If Boolean.Parse(If(ConfigurationManager.AppSettings("Newgen-Group"), "false")) Then
+            RaiseEvent LoadPolicyBilling(Me, EventArgs.Empty)
+        End If
+
+        If IsBillNoExist Then
+            Call ManagePolicy(eReference.MgePol.Initial, False)
+            BillNoTag = True
+            Call ManagePolicy(eReference.MgePol.Search, False)
+            Call ManagePolicy(eReference.MgePol.BillNo, False)
+            Call ManagePolicy(eReference.MgePol.SubsNo, False)
+            Call ManagePolicy(eReference.MgePol.Payor, False)
+            Call ManagePolicy(eReference.MgePol.Insured, False)
+            Call ManagePolicy(eReference.MgePol.Agent, False)
+
+        Else
+            Call ManagePolicy(eReference.MgePol.BillNo, True)
+            Call ManagePolicy(eReference.MgePol.SubsNo, True)
+            Call ManagePolicy(eReference.MgePol.Payor, True)
+            Call ManagePolicy(eReference.MgePol.Insured, True)
+            Call ManagePolicy(eReference.MgePol.Agent, True)
+        End If
+
+        upPaymentPremiumRelated.Update()
+    End Sub
+   
+
+    Private Sub ibtnSearchPayor_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchPayor.Click
+        Call ClearSession()
+        Call SearchPayor()
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub SearchPayor()
+        SearchPayorPolType = PolType
+        If PayorID = 0 Or PayorIDTag Then
+            RaiseEvent ClearScreenSearchPayor(Me, EventArgs.Empty)
+            ddlSearchPayorType.Enabled = True
+            Call SetModalSession(mpeSearchPayor, True, txtSearchPayorID)
+        Else
+            RaiseEvent LoadPayor(Me, EventArgs.Empty)
+            If GpaPaymentTag AndAlso PayorType = "C" Then
+                IsPayorExist = False
+                PayorID = 0
+            End If
+            Call ManagePolicy(eReference.MgePol.Payor, False)
+            If IsPayorExist Then
+                PayorIDTag = True
+                RaiseEvent GetPayorDetails(Me, EventArgs.Empty)
+                If PayorType = "C" Then
+                    SamePayorInsured = "N"
+                    ManagePolicy(eReference.MgePol.SamePayorInsured, False)
+                End If
+
+                If SamePayorInsured = "Y" Then
+                    RaiseEvent ClearScreenInsured(Me, EventArgs.Empty)
+                    RaiseEvent SetSamePayorInsured(Me, EventArgs.Empty)
+                    InsuredIDTag = True
+                    'Manage controls
+                    Call ManagePolicy(eReference.MgePol.Insured, False)
+                    Call ManagePolicy(eReference.MgePol.InsuredAdd, False)
+                End If
+
+                Call ManagePolicy(eReference.MgePol.PayorAdd, False)
+            Else
+                Call ManagePolicy(eReference.MgePol.PayorAdd, True)
+            End If
+        End If
+    End Sub
+
+    Private Sub ibtnSearchPolicy_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchPolicy.Click
+        SearchAgentTag = eReference.AgentTagType.Agent
+        Call ClearSession()
+        If PolicyNumber = String.Empty Or PolicyNumberTag Then
+            RaiseEvent ClearScreenSearchPolicy(Me, EventArgs.Empty)
+            Call SetModalSession(mpeSearchPolicy, True, txtSPPolicyNumber)
+        Else
+            RaiseEvent LoadPolicy(Me, EventArgs.Empty)
+            If IsPolicyExist Then
+                PolicyNumberTag = True
+                RaiseEvent GetPolicyDetails(Me, EventArgs.Empty)
+                Call ManagePolicy(eReference.MgePol.Initial, False)
+                Call ManagePolicy(eReference.MgePol.Search, False)
+                If PolType = "R" Then Call ManagePolicy(eReference.MgePol.BalanceToHigher, True)
+                If Not PolMod = "MWI" And PolicyNumber.IndexOf("-") > -1 Then
+                    If Not NewgenNewBusinessTag Then
+                        Call ManagePolicy(eReference.MgePol.Insured, True)
+                        Call ManagePolicy(eReference.MgePol.SamePayorInsured, True)
+                        Call ManagePolicy(eReference.MgePol.Payor, True)
+                        Call ManagePolicy(eReference.MgePol.Policy, True)
+                        Call ManageAgent(eReference.AgentTagType.Agent, True)
+                        For Each item As ListItem In ddlBusinessType.Items
+                            Select Case item.Value
+                                Case "GPA", "GPP"
+                                    item.Enabled = False
+                            End Select
+                        Next
+                    End If
+                End If
+            Else
+                Call ManagePolicy(eReference.MgePol.Initial, True)
+            End If
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Protected Sub ibtnSearchSalesOff_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchSalesOff.Click
+        SearchAgentTag = eReference.AgentTagType.SalesOfficer
+
+        Call ClearSession()
+        If GpaSalesOff = 0 Or AgentIDTag Then
+            RaiseEvent ClearScreenSearchAgent(Me, EventArgs.Empty)
+            Call SetModalSession(mpeSearchAgent, True, btnSearchAgentClose)
+        Else
+            RaiseEvent LoadAgent(Me, EventArgs.Empty)
+            If IsAgentExist Then
+                AgentIDTag = True
+                RaiseEvent GetAgentDetails(Me, EventArgs.Empty)
+
+                RaiseEvent LoadGpaSettings(Me, EventArgs.Empty)
+
+                SearchAgentTag = eReference.AgentTagType.SalesOfficer
+                RaiseEvent LoadGpaPolicy(Me, EventArgs.Empty)
+                Call ManageAgent(eReference.AgentTagType.SalesOfficer, False)
+            Else
+                Call ManageAgent(eReference.AgentTagType.SalesOfficer, True)
+            End If
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Protected Sub ibtnSearchUSD1_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchUSD1.Click
+        SearchAgentTag = eReference.AgentTagType.Usd1
+
+        Call ClearSession()
+        If GpaUsd1 = 0 Or AgentIDTag Then
+            RaiseEvent ClearScreenSearchAgent(Me, EventArgs.Empty)
+            Call SetModalSession(mpeSearchAgent, True, btnSearchAgentClose)
+        Else
+            RaiseEvent LoadAgent(Me, EventArgs.Empty)
+            If IsAgentExist Then
+                AgentIDTag = True
+                RaiseEvent GetAgentDetails(Me, EventArgs.Empty)
+                RaiseEvent LoadGpaPolicy(Me, EventArgs.Empty)
+                Call ManageAgent(eReference.AgentTagType.Usd1, False)
+            Else
+                Call ManageAgent(eReference.AgentTagType.Usd1, True)
+            End If
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Protected Sub ibtnSearchAsd_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchAsd.Click
+        Call ClearSession()
+        Call SearchASD()
+    End Sub
+
+    Protected Sub ibtnSearchPromoOff_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchPromoOff.Click
+        SearchAgentTag = eReference.AgentTagType.PromoOfficer
+
+        Call ClearSession()
+        If GpaPromoOff = 0 Or AgentIDTag Then
+            RaiseEvent ClearScreenSearchAgent(Me, EventArgs.Empty)
+            Call SetModalSession(mpeSearchAgent, True, btnSearchAgentClose)
+        Else
+            RaiseEvent LoadAgent(Me, EventArgs.Empty)
+            If IsAgentExist Then
+                AgentIDTag = True
+                RaiseEvent GetAgentDetails(Me, EventArgs.Empty)
+                If AgentID = 0 Then
+                    Call ManageAgent(eReference.AgentTagType.PromoOfficer, True)
+                Else
+                    Call ManageAgent(eReference.AgentTagType.PromoOfficer, False)
+                End If
+            Else
+                Call ManageAgent(eReference.AgentTagType.PromoOfficer, True)
+            End If
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnViewOPRs_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnViewOPRs.Click
+        RaiseEvent ClearScreenViewOPR(Me, EventArgs.Empty)
+        RaiseEvent LoadViewOPR(Me, EventArgs.Empty)
+
+        Call ClearSession()
+        Call SetModalSession(mpeViewOPRs, True, btnLoadViewOpr)
+    End Sub
+
+#End Region
+
+#Region "GridView"
+
+    Private Sub gvwPaymentTypeDetails_RowDeleting(sender As Object, e As GridViewDeleteEventArgs) Handles gvwPaymentTypeDetails.RowDeleting
+
+        Dim index As Integer = Convert.ToInt32(e.RowIndex)
+        Dim radSelect As RadioButton
+
+        radSelect = DirectCast(gvwPaymentTypeDetails.Rows(index).FindControl("radSelectPayTypeDetails"), RadioButton)
+        radSelect.Checked = True
+        radSelectPayTypeDetails_CheckedChanged(radSelect, EventArgs.Empty)
+
+        'Do not show "change of payment" prompt
+        mpeMessage.Hide()
+        '--------------------------------------
+
+        Call ClearSession()
+        RaiseEvent DeletePaymentTypeDetails(Me, EventArgs.Empty)
+
+        If IsPayTypeSuccessful Then
+            RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+        End If
+
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub gvwNewBiz_RowDeleting(sender As Object, e As GridViewDeleteEventArgs) Handles gvwNewBiz.RowDeleting
+
+        Dim index As Integer = Convert.ToInt32(e.RowIndex)
+        Dim radSelect As RadioButton
+
+        radSelect = DirectCast(gvwNewBiz.Rows(index).FindControl("radSelectPayTypeDetails"), RadioButton)
+        radSelect.Checked = True
+        radSelectNewBiz_CheckedChanged(radSelect, EventArgs.Empty)
+
+        Call ClearSession()
+        RaiseEvent DeleteNewBiz(Me, EventArgs.Empty)
+        If IsNewBizSuccessful Then
+            RaiseEvent ClearScreenNewBiz(Me, EventArgs.Empty)
+        End If
+
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub gvwOPRDetails_RowDeleting(sender As Object, e As GridViewDeleteEventArgs) Handles gvwOPRDetails.RowDeleting
+
+        Dim index As Integer = Convert.ToInt32(e.RowIndex)
+        Dim radSelect As RadioButton
+
+        radSelect = DirectCast(gvwOPRDetails.Rows(index).FindControl("radSelectOPRDetails"), RadioButton)
+        radSelect.Checked = True
+        radSelectOPRDetails_CheckedChanged(radSelect, EventArgs.Empty)
+
+        Call ClearSession()
+        RaiseEvent DeleteReceiptDetails(Me, EventArgs.Empty)
+        RaiseEvent ComputeVatDetails(Me, EventArgs.Empty)
+        If IsReceiptSuccessful Then
+            RaiseEvent ClearScreenReceiptDetails(Me, EventArgs.Empty)
+        End If
+
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+#End Region
+
+#Region "Radio Button"
+
+    Protected Sub radSelectViewAppNo_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.radSelectAppNo
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        'Call ClearSession()
+        ApplicationNumber = cDataType.fLong.IfNull(gvrSelect.Cells(2).Text.Trim)
+        ReceiptByCode = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(9).Text.Trim))
+        ReceiptById = cDataType.fLong.IfNull(gvrSelect.Cells(10).Text.Trim)
+        AgentID = cDataType.fLong.IfNull(gvrSelect.Cells(11).Text.Trim)
+        PayorID = cDataType.fLong.IfNull(gvrSelect.Cells(12).Text.Trim)
+        InsuredID = cDataType.fLong.IfNull(gvrSelect.Cells(13).Text.Trim)
+        LoadPolMod = cDataType.fString.IfNull(gvrSelect.Cells(14).Text.Trim)
+        SourceSite = cDataType.fString.IfNull(gvrSelect.Cells(15).Text.Trim)
+
+        SearchAgentID = eReference.AgentTagType.Agent
+        SearchAgent()
+        SearchPayor()
+        SearchInsured()
+
+        ManagePolicy(eReference.MgePol.Initial, True)
+        ManageOPRPaymentDetails("BALANCEPAYMENT")
+        ddlPolicyType.Enabled = False
+        ibtnSearchPolicy.Visible = False
+        ibtnViewAppNo.Visible = False
+        ibtnClearAppNo.Visible = True
+
+        Call SetModalSession(mpeViewOPRs, False, ibtnViewAppNo)
+        upPaymentPremiumRelated.Update()
+
+    End Sub
+
+    Protected Sub radSelectViewOpr_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Implements prePayment.IPaymentPremiumRelated.radSelectOpr
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+        OPRNumber = cDataType.fLong.IfNull(gvrSelect.Cells(1).Text.Trim)
+        ReceiptByCode = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(9).Text.Trim))
+        ReceiptById = cDataType.fLong.IfNull(gvrSelect.Cells(10).Text.Trim)
+
+        RaiseEvent LoadOPR(Me, EventArgs.Empty)
+
+        If ReceiptByCode <> Master.UserCode Then
+            btnPrintAppNo.Enabled = False
+            btnReceiptPrint.Enabled = False
+            btnReceiptSave.Enabled = False
+            btnReceiptCancel.Enabled = False
+        End If
+        'Manage controls
+
+        Call SetModalSession(mpeViewOPRs, False, ibtnViewOPRs)
+        upPaymentPremiumRelated.Update()
+
+    End Sub
+
+    Protected Sub radSelectAgent_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Implements preSearch.IAgent.radSelectAgent
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+        Dim CallerAgent As Integer = SearchAgentTag
+
+        Call ClearSession()
+
+        RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+
+        AgentID = cDataType.fLong.IfNull(gvrSelect.Cells(1).Text.Trim)
+        RaiseEvent LoadAgent(Me, EventArgs.Empty)
+        If IsAgentExist Then
+            AgentIDTag = True
+            Select Case SearchAgentTag
+                Case eReference.AgentTagType.SalesOfficer, eReference.AgentTagType.PromoOfficer, eReference.AgentTagType.Usd1
+                    RaiseEvent GetAgentDetails(Me, EventArgs.Empty)
+                    RaiseEvent LoadGpaSettings(Me, EventArgs.Empty)
+
+                    SearchAgentTag = CallerAgent
+                    RaiseEvent LoadGpaPolicy(Me, EventArgs.Empty)
+                    Call ManageAgent(SearchAgentTag, False)
+
+                Case Else
+                    Call ManageAgent(SearchAgentTag, False)
+
+            End Select
+        Else
+            Call ManageAgent(SearchAgentTag, True)
+        End If
+        Call SetModalSession(mpeSearchAgent, False, ibtnSearchAgent)
+
+        SearchAgentTag = 0
+
+    End Sub
+
+    Protected Sub radSelectInsured_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Implements preSearch.IInsured.radSelectInsured
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+
+        If WithNewBiz Then
+
+            RaiseEvent ClearScreenNewBiz(Me, EventArgs.Empty)
+
+            NewBizInsId = cDataType.fLong.IfNull(gvrSelect.Cells(1).Text.Trim)
+
+            RaiseEvent LoadInsured(Me, EventArgs.Empty)
+            Call ManageNewBiz(eReference.MgeNewBiz.Insured, False)
+            If IsInsuredExist Then
+                InsuredIDTag = True
+                RaiseEvent GetInsuredDetails(Me, EventArgs.Empty)
+                Call ManageNewBiz(eReference.MgeNewBiz.InsuredAdd, False)
+            Else
+                Call ManageNewBiz(eReference.MgeNewBiz.InsuredAdd, True)
+            End If
+
+        Else
+
+            RaiseEvent ClearScreenInsured(Me, EventArgs.Empty)
+
+            InsuredID = cDataType.fLong.IfNull(gvrSelect.Cells(1).Text.Trim)
+
+            RaiseEvent LoadInsured(Me, EventArgs.Empty)
+
+            Call ManagePolicy(eReference.MgePol.Insured, False)
+            If IsInsuredExist Then
+                InsuredIDTag = True
+                RaiseEvent GetInsuredDetails(Me, EventArgs.Empty)
+                Call ManagePolicy(eReference.MgePol.InsuredAdd, False)
+            Else
+                Call ManagePolicy(eReference.MgePol.InsuredAdd, True)
+            End If
+
+        End If
+
+        Call SetModalSession(mpeSearchInsured, False, ibtnSearchInsured)
+
+    End Sub
+
+    Protected Sub radSelectPayor_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Implements preSearch.IPayor.radSelectPayor
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+
+        If WithNewBiz Then
+
+            RaiseEvent ClearScreenNewBizPayor(Me, EventArgs.Empty)
+            NewBizPayId = cDataType.fLong.IfNull(gvrSelect.Cells(1).Text.Trim)
+
+            RaiseEvent LoadPayor(Me, EventArgs.Empty)
+            Call ManageNewBiz(eReference.MgeNewBiz.PayorId, False)
+            If IsPayorExist Then
+                PayorIDTag = True
+                RaiseEvent GetPayorDetails(Me, EventArgs.Empty)
+                RaiseEvent ClearScreenNewBiz(Me, EventArgs.Empty)
+                Call ManageNewBiz(eReference.MgeNewBiz.PayorName, False)
+                Call ManageNewBiz(eReference.MgeNewBiz.PayorAdd, False)
+            Else
+                Call ManageNewBiz(eReference.MgeNewBiz.PayorName, True)
+                Call ManageNewBiz(eReference.MgeNewBiz.PayorAdd, True)
+            End If
+
+        Else
+
+            RaiseEvent ClearScreenPayor(Me, EventArgs.Empty)
+            PayorID = cDataType.fLong.IfNull(gvrSelect.Cells(1).Text.Trim)
+            LoadPayorType = cDataType.fString.IfNull(gvrSelect.Cells(3).Text.Trim)
+
+            If LoadPayorType = "C" AndAlso LoadSearchType > 0 Then
+                PayorName = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(2).Text.Trim))
+                IsPayorExist = True
+            Else
+                RaiseEvent LoadPayor(Me, EventArgs.Empty)
+            End If
+
+            Call ManagePolicy(eReference.MgePol.Payor, False)
+
+            If IsPayorExist Then
+                PayorIDTag = True
+                If LoadSearchType = 0 Or LoadPayorID > 0 Then
+                    RaiseEvent GetPayorDetails(Me, EventArgs.Empty)
+                End If
+                Call ManagePolicy(eReference.MgePol.PayorAdd, False)
+                If PayorType = "C" Then
+                    SamePayorInsured = "N"
+                    ManagePolicy(eReference.MgePol.SamePayorInsured, False)
+                End If
+
+                If SamePayorInsured = "Y" Then
+                    RaiseEvent ClearScreenInsured(Me, EventArgs.Empty)
+                    RaiseEvent SetSamePayorInsured(Me, EventArgs.Empty)
+                    InsuredIDTag = True
+                    'Manage controls
+                    Call ManagePolicy(eReference.MgePol.Insured, False)
+                    Call ManagePolicy(eReference.MgePol.InsuredAdd, False)
+                End If
+            Else
+                Call ManagePolicy(eReference.MgePol.PayorAdd, True)
+            End If
+
+        End If
+
+        Call SetModalSession(mpeSearchPayor, False, ibtnSearchPayor)
+    End Sub
+
+    Protected Sub radSelectPolicy_CheckedChanged(ByVal sender As Object, e As EventArgs) Implements preSearch.IPolicy.radSelectPolicy
+
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        PolicyNumber = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(1).Text.Trim))
+        PolType = cDataType.fString.IfNull(Server.HtmlDecode(ddlSearchPolicyType.SelectedValue))
+        RaiseEvent GetPolicyDetails(Me, EventArgs.Empty)
+        Call ManagePolicy(eReference.MgePol.Initial, False)
+        Call ManagePolicy(eReference.MgePol.Search, False)
+        If PolType = "R" Then Call ManagePolicy(eReference.MgePol.BalanceToHigher, True)
+        Call SetModalSession(mpeSearchPolicy, False, ibtnSearchPolicy)
+
+    End Sub
+
+    Protected Sub radSelectPayTypeDetails_CheckedChanged(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.radSelectPayTypeDetails
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        Call DeselectGridView(gvwPaymentTypeDetails, radSelect)
+        RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+        OPRPaymentType = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(2).Text.Trim))
+        PaymentTypeID = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(1).Text.Trim))
+        RaiseEvent GetPaymentTypeDetails(Me, EventArgs.Empty)
+
+    End Sub
+
+    Protected Sub radSelectOPRDetails_CheckedChanged(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.radSelectOPRDetails
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        Call DeselectGridView(gvwOPRDetails, radSelect)
+        RaiseEvent ClearScreenReceiptDetails(Me, EventArgs.Empty)
+        ReceiptDetailID = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(1).Text.Trim))
+    End Sub
+
+    Protected Sub radSelectNewBiz_CheckedChanged(ByVal sender As Object, e As EventArgs) Implements prePayment.IPaymentPremiumRelated.radSelectNewBiz
+        Dim radSelect As RadioButton = DirectCast(sender, RadioButton)
+        Dim gvrSelect As GridViewRow = DirectCast(radSelect.NamingContainer, GridViewRow)
+
+        Call ClearSession()
+        Call DeselectGridView(gvwNewBiz, radSelect)
+        RaiseEvent ClearScreenNewBiz(Me, EventArgs.Empty)
+        NewBizID = cDataType.fString.IfNull(Server.HtmlDecode(gvrSelect.Cells(1).Text.Trim))
+    End Sub
+
+#End Region
+
+#End Region
+
+#Region "Custom Method"
+
+#Region "Sub"
+
+    Private Sub AddAttributes()
+        Call SetFocusBlur(txtOPRGrossAmount, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        Call SetFocusBlur(txtOPRRemarks, eCSS.TextBoxInputTextArea2Focus, eCSS.TextBoxInputTextArea2)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtECRNumber, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber)
+        Call SetFocusBlur(txtECRDate, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtPolicyNumber, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtPayorID, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber)
+        Call SetFocusBlur(txtInsuredID, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber)
+        Call SetFocusBlur(txtAgentID, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtSalesOffID, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber)
+        Call SetFocusBlur(txtPromoOffID, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtOPRAmount, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtAPRNumber, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber)
+        Call SetFocusBlur(txtAPRDate, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtAPRAmount, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtCheckNumber, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber)
+        Call SetFocusBlur(txtCheckAmount, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        'Call SetFocusBlur(txtCheckBankName, eCSS.TextBoxInputLongFocus, eCSS.TextBoxInputLong)
+        Call SetFocusBlur(txtCheckBankBranch, eCSS.TextBoxInputLongFocus, eCSS.TextBoxInputLong)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtCreditCardSwipeDate, eCSS.TextBoxInputDateFocus, eCSS.TextBoxInputDate)
+        Call SetFocusBlur(txtCreditCardNumber, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber)
+        Call SetFocusBlur(txtCreditCardApprovalCode, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtCreditCardAmount, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        Call SetFocusBlur(txtCreditCardRemarks, eCSS.TextBoxInputLong2Focus, eCSS.TextBoxInputLong2)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtDebitCardSwipeDate, eCSS.TextBoxInputDateFocus, eCSS.TextBoxInputDate)
+        'Call SetFocusBlur(txtDebitCardBankName, eCSS.TextBoxInputLongFocus, eCSS.TextBoxInputLong)
+        Call SetFocusBlur(txtDebitCardAccountNumber, eCSS.TextBoxInputLongFocus, eCSS.TextBoxInputLong)
+        Call SetFocusBlur(txtDebitCardAmount, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        Call SetFocusBlur(txtDebitCardRemarks, eCSS.TextBoxInputTextArea2Focus, eCSS.TextBoxInputTextArea2)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtVATableCollection, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        Call SetFocusBlur(txtNonVATCollection, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        Call SetFocusBlur(txtVATExemptCollection, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        Call SetFocusBlur(txtVATAmount, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        Call SetFocusBlur(txtVATWithholdingTax, eCSS.TextBoxInputShortNumberFocus, eCSS.TextBoxInputShortNumber, 2)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtSPPolicyNumber, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtSPPayorName, eCSS.TextBoxInputLongFocus, eCSS.TextBoxInputLong)
+        Call SetFocusBlur(txtSPInsuredName, eCSS.TextBoxInputLongFocus, eCSS.TextBoxInputLong)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtPAnumber, "txtPaNumberFocus", "txtPaNumber")
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtAddPayorDoB, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtAddPayorFirstName, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtAddPayorLastName, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtAddPayorMiddleName, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtAddPayorSuffix, eCSS.TextBoxInputShort, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtAddPayorName, eCSS.TextBoxInputLong2Focus, eCSS.TextBoxInputLong2)
+        ' -------------------------------------------------------------------------------
+        Call SetFocusBlur(txtAddInsuredDoB, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtAddInsuredLastName, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtAddInsuredLastName, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtAddInsuredMiddleName, eCSS.TextBoxInputShortFocus, eCSS.TextBoxInputShort)
+        Call SetFocusBlur(txtAddInsuredSuffix, eCSS.TextBoxInputShort, eCSS.TextBoxInputShort)
+        ' -------------------------------------------------------------------------------
+        Call SetButtonPostBack(btnCancel)
+        Call SetButtonPostBack(btnLoadViewOpr)
+        Call SetButtonPostBack(btnConfirmYes)
+        Call SetButtonPostBack(btnOprDtlAdd)
+        Call SetButtonPostBack(btnOprDtlClear)
+        Call SetButtonPostBack(btnReceiptAddNew)
+        Call SetButtonPostBack(btnReceiptCancel)
+        Call SetButtonPostBack(btnReceiptPrint)
+        Call SetButtonPostBack(btnReceiptSave)
+        Call SetButtonPostBack(btnSearchAgentClose)
+        Call SetButtonPostBack(btnSearchInsuredClose)
+        Call SetButtonPostBack(btnSearchPayorClose)
+        Call SetButtonPostBack(btnSearchPolicyClear)
+        Call SetButtonPostBack(btnSearchPolicyClose)
+        Call SetButtonPostBack(btnSearchPolicySearch)
+        ' -------------------------------------------------------------------------------        
+    End Sub
+
+    Private Sub ClearDropDownList(ByVal pDropDownList As DropDownList, ByVal pText As String, ByVal pValue As String)
+        With pDropDownList
+            .Items.Clear()
+            .Items.Insert(0, New ListItem(pText, pValue))
+        End With
+    End Sub
+
+    Private Sub ClearFields()
+        Call ClearSession()
+        RaiseEvent ClearScreenMain(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub ClearSession()
+        Session(eSession.IsMessage) = Nothing
+        Session(eSession.Message) = Nothing
+        Session(eSession.MessageType) = Nothing
+        Session(eSession.Modal) = Nothing
+        Session(eSession.ReportParam) = Nothing
+    End Sub
+
+    Private Sub DeselectGridView(ByVal pGridview As GridView, ByVal pRadButtonID As RadioButton)
+        Dim radSelect As RadioButton
+
+        For Each dr As GridViewRow In pGridview.Rows
+            radSelect = DirectCast(dr.FindControl(pRadButtonID.ID), RadioButton)
+            If Not radSelect.UniqueID = pRadButtonID.UniqueID Then
+                radSelect.Checked = False
+            End If
+        Next
+    End Sub
+
+    Private Sub SearchASD()
+        SearchAgentTag = eReference.AgentTagType.Asd
+
+        If GpaAsd = 0 Or AgentIDTag Then
+            RaiseEvent ClearScreenSearchAgent(Me, EventArgs.Empty)
+            Call SetModalSession(mpeSearchAgent, True, btnSearchAgentClose)
+        Else
+            RaiseEvent LoadAgent(Me, EventArgs.Empty)
+            If IsAgentExist Then
+                AgentIDTag = True
+                RaiseEvent GetAgentDetails(Me, EventArgs.Empty)
+                Call ManageAgent(SearchAgentTag, False)
+            Else
+                Call ManageAgent(SearchAgentTag, True)
+            End If
+        End If
+
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub LoadReference()
+        RaiseEvent LoadSourceSite(Me, EventArgs.Empty)
+        RaiseEvent LoadCurrency(Me, EventArgs.Empty)
+        RaiseEvent LoadPersonType(Me, EventArgs.Empty)
+        RaiseEvent LoadPersonTitle(Me, EventArgs.Empty)
+        RaiseEvent LoadFrequencyOfPayment(Me, EventArgs.Empty)
+        RaiseEvent LoadBusinessType(Me, EventArgs.Empty)
+        RaiseEvent LoadPaymentType(Me, EventArgs.Empty)
+        RaiseEvent LoadTransactionType(Me, EventArgs.Empty)
+        RaiseEvent LoadPolicyType(Me, EventArgs.Empty)
+        RaiseEvent LoadGpaType(Me, EventArgs.Empty)
+        'RaiseEvent LoadTerminalUseCCA(Me, EventArgs.Empty)
+        'RaiseEvent LoadTerminalUseDCA(Me, EventArgs.Empty)
+        'RaiseEvent LoadMerchantId(Me, EventArgs.Empty)
+        RaiseEvent LoadBankNetwork(Me, EventArgs.Empty)
+        RaiseEvent LoadAccountType(Me, EventArgs.Empty)
+        RaiseEvent LoadBankList(Me, EventArgs.Empty)
+        RaiseEvent LoadECashPaymentChannel(Me, EventArgs.Empty)
+        Call LoadSwipeTimes()
+    End Sub
+
+    Private Sub SetButtonPostBack(ByVal pButton As Button)
+        pButton.Attributes.Add("OnClick", "if(this.value === 'Processing...') { return false; } else { this.value = 'Processing...'; this.disabled = true; " + Page.ClientScript.GetPostBackEventReference(pButton, Nothing) + ";}")
+    End Sub
+
+    Private Sub SetCurrency(ByVal pTextbox As TextBox, ByVal pDecimal As Integer)
+        pTextbox.Attributes.Add("onkeypress", "return blockNonNumbers(this, event, true, false);")
+        Select Case pDecimal
+            Case -1 ' unlimited decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,-1,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,-1,false); javascript:this.value=Comma(this.value);")
+            Case 0 ' no decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,0,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,0,false); javascript:this.value=Comma(this.value);")
+            Case 2 ' 2 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,2,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,2,false); javascript:this.value=Comma(this.value);")
+            Case 3 ' 3 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,3,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,3,false); javascript:this.value=Comma(this.value);")
+            Case 4 ' 4 decimal places
+                pTextbox.Attributes.Add("onblur", "extractNumber(this,4,false); javascript:this.value=Comma(this.value);")
+                pTextbox.Attributes.Add("onkeyup", "extractNumber(this,4,false); javascript:this.value=Comma(this.value);")
+        End Select
+    End Sub
+
+    Private Sub SetDefaults()
+        'TODO: Put default values here!
+        SourceSite = SiteCode
+
+        OPRCurrency = "PHP"
+    End Sub
+
+    Private Sub LoadSwipeTimes()
+        For i = 12 To 1 Step -1
+            ddlCreditSwipeHour.Items.Insert(0, New ListItem(i.ToString("00"), i.ToString("00")))
+            ddlDebitSwipeHour.Items.Insert(0, New ListItem(i.ToString("00"), i.ToString("00")))
+        Next
+
+        For i = 59 To 0 Step -1
+            ddlCreditSwipeMinute.Items.Insert(0, New ListItem(i.ToString("00"), i.ToString("00")))
+            ddlDebitSwipeMinute.Items.Insert(0, New ListItem(i.ToString("00"), i.ToString("00")))
+        Next
+
+        ddlCreditSwipeAmPm.Items.Insert(0, New ListItem("PM", "PM"))
+        ddlCreditSwipeAmPm.Items.Insert(0, New ListItem("AM", "AM"))
+        ddlDebitSwipeAmPm.Items.Insert(0, New ListItem("PM", "PM"))
+        ddlDebitSwipeAmPm.Items.Insert(0, New ListItem("AM", "AM"))
+
+
+    End Sub
+
+    Private Sub SetReportSessionScript(ByVal pReport As String)
+        If Session("script") = String.Empty Or Session("script") Is Nothing Then
+            Session("script") = "window.open('" + pReport + "','','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+            'Session("script") = "window.open('" + pReport + "','_blank','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+        Else
+            Session("script") = Session("script") & "window.open('" + pReport + "','','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+            'Session("script") = Session("script") & "window.open('" + pReport + "','_blank','toolbar=yes,location=no,menubar=no,width=900,height=500,resizable=yes,scrollbars=yes,top=0,left=0');"
+        End If
+    End Sub
+
+    Private Sub ManageMain(ByVal pAction As Integer)
+        Select Case pAction
+            Case eDocSaveState.Initial, eDocSaveState.ViewNoEdit, eDocSaveState.ViewEdit, eDocSaveState.Print, eDocSaveState.Cancel
+                ManageOPRPaymentDetails("ENABLED", False)
+                ManagePolicy(eReference.MgePol.Enabled, False)
+                ManagePaymentType("ENABLED", False)
+                ManageNewBiz(eReference.MgeNewBiz.Enabled, False)
+                ManageReceiptDetails("ENABLED", False)
+                ManageAPRDetails("ENABLED", False)
+                ManageVatDetails("ENABLED", False)
+
+            Case eDocSaveState.AddNew, eDocSaveState.Edit
+                ManageOPRPaymentDetails("ENABLED", True)
+                ManagePolicy(eReference.MgePol.Enabled, True)
+                ManagePaymentType("ENABLED", True)
+                ManageNewBiz(eReference.MgeNewBiz.Enabled, True)
+                ManageReceiptDetails("ENABLED", True)
+                ManageAPRDetails("ENABLED", True)
+                ManageVatDetails("ENABLED", True)
+        End Select
+    End Sub
+
+    Private Sub ManageOPRPaymentDetails(ByVal pAction As String, Optional ByVal pEnabled As Boolean? = Nothing)
+
+        Select Case pAction
+            Case "ENABLED"
+                pnlPaymentDetails1.Enabled = pEnabled
+
+            Case "NEWBUSINESS"
+                chkBalanceToHigher.Visible = Not pEnabled
+
+            Case "SOURCESITE"
+                ddlSourceSite.Enabled = Not pEnabled
+                ibtnVerifySourceSite.Visible = Not pEnabled
+                ibtnClearSourceSite.Visible = pEnabled
+
+            Case "BALANCEPAYMENT"
+                ddlSourceSite.Enabled = False
+                ibtnVerifySourceSite.Visible = False
+                ibtnClearSourceSite.Visible = False
+
+            Case "GROSSAMOUNT"
+                txtOPRGrossAmount.Enabled = Not pEnabled
+                ibtnVerifyGrossAmount.Visible = Not pEnabled
+                ibtnClearGrossAmount.Visible = pEnabled
+
+            Case Else
+                ddlSourceSite.Enabled = pEnabled
+                ddlTransactionType.Enabled = pEnabled
+                txtOPRGrossAmount.Enabled = pEnabled
+                ddlOPRCurrency.Enabled = pEnabled
+                chkWithAPR.Enabled = pEnabled
+                chkBalanceToHigher.Enabled = pEnabled
+                txtOPRRemarks.Enabled = pEnabled
+
+        End Select
+
+    End Sub
+
+    Private Sub ManagePolicy(ByVal pAction As eReference.MgePol, ByVal pEnabled As Boolean)
+
+        Select Case pAction
+            Case eReference.MgePol.Enabled
+                pnlPolicyInformation.Enabled = pEnabled
+
+            Case eReference.MgePol.NewBiz
+                txtECRNumber.Enabled = Not pEnabled
+                txtECRDate.Enabled = Not pEnabled
+                divPayorInsured.Visible = Not pEnabled
+
+            Case eReference.MgePol.Search
+                ddlPolicyType.Enabled = pEnabled
+                txtPolicyNumber.Enabled = pEnabled
+                ibtnSearchPolicy.Visible = pEnabled
+                ibtnClearPolicy.Visible = Not pEnabled
+                If Val(TransactionType) = eReference.TranType.Regular Then
+                    If PolicyNumber = String.Empty And PolType <> String.Empty Then
+                        chkNoPolicy.Visible = Not pEnabled
+                    Else
+                        chkNoPolicy.Visible = False
+                    End If
+                End If
+
+            Case eReference.MgePol.Policy
+                ddlBusinessType.Enabled = pEnabled
+                ddlPlanCurrency.Enabled = pEnabled
+                ddlFrequencyoOfPayment.Enabled = pEnabled
+
+            Case eReference.MgePol.Payor
+                txtPayorID.Enabled = pEnabled
+                ibtnSearchPayor.Visible = pEnabled
+                ibtnClearPayor.Visible = Not pEnabled
+
+            Case eReference.MgePol.SamePayorInsured
+                chkSamePayorInsured.Visible = pEnabled
+                chkSamePayorInsured.Enabled = pEnabled
+
+            Case eReference.MgePol.PayorAdd
+                ibtnAddNewPayor.Visible = pEnabled
+
+            Case eReference.MgePol.Insured
+                txtInsuredID.Enabled = pEnabled
+                ibtnSearchInsured.Visible = pEnabled
+                ibtnClearInsured.Visible = Not pEnabled
+
+            Case eReference.MgePol.Agent
+                txtAgentID.Enabled = pEnabled
+                ibtnSearchAgent.Visible = pEnabled
+                ibtnClearAgent.Visible = Not pEnabled
+
+            Case eReference.MgePol.InsuredAdd
+                ibtnAddNewInsured.Visible = pEnabled
+
+            Case eReference.MgePol.Gpa
+                ddlPAplan.Enabled = pEnabled
+                rblGpaType.Enabled = pEnabled
+                txtPAnumber.Enabled = pEnabled
+                txtSalesOffID.Enabled = pEnabled
+                txtPromoOffID.Enabled = pEnabled
+                ibtnSearchSalesOff.Visible = pEnabled
+                ibtnClearSalesOff.Visible = pEnabled
+                ibtnSearchPromoOff.Visible = pEnabled
+                ibtnClearPromoOff.Visible = pEnabled
+
+            Case eReference.MgePol.Payslip
+                txtPayslipCode.Enabled = pEnabled
+                ibtnSearchPayslipCode.Visible = pEnabled
+                ibtnClearPayslipCode.Visible = Not pEnabled
+                txtOPRRemarks.Enabled = pEnabled
+                ibtnClearPolicy.Visible = False
+
+            Case eReference.MgePol.BalanceToHigher
+                chkBalanceToHigher.Enabled = pEnabled
+
+            Case eReference.MgePol.BillNo
+                divBillNo.Visible = True
+                txtBillNo.Enabled = pEnabled
+                ibtnSearchBillNo.Visible = pEnabled
+                ibtnClearBillNo.Visible = Not pEnabled
+                'txtOPRRemarks.Enabled = pEnabled
+                ibtnClearPolicy.Visible = False
+
+            Case eReference.MgePol.SubsNo
+                divSubsNo.Visible = True
+                txtSubsNo.Enabled = pEnabled
+                ibtnSearchSubsNo.Visible = pEnabled
+                ibtnClearSubsNo.Visible = Not pEnabled
+                'txtOPRRemarks.Enabled = pEnabled
+                ibtnClearPolicy.Visible = False
+
+            Case eReference.MgePol.Initial
+                txtECRNumber.Enabled = True
+                txtECRDate.Enabled = True
+                ddlPolicyType.Enabled = True
+                txtPolicyNumber.Enabled = True
+                ddlBusinessType.Enabled = False
+                ddlPlanCurrency.Enabled = False
+                ddlFrequencyoOfPayment.Enabled = False
+                ibtnSearchPolicy.Visible = True
+                ibtnClearPolicy.Visible = False
+                txtAgentID.Enabled = False
+                ibtnSearchAgent.Visible = False
+                txtPayorID.Enabled = False
+                ibtnSearchPayor.Visible = False
+                txtInsuredID.Enabled = False
+                ibtnSearchInsured.Visible = False
+                ibtnClearPayor.Visible = False
+                ibtnClearAgent.Visible = False
+                ibtnClearInsured.Visible = False
+                ibtnAddNewPayor.Visible = False
+                ibtnAddNewInsured.Visible = False
+                chkSamePayorInsured.Visible = True
+                chkSamePayorInsured.Enabled = False
+                'GPA Details
+                'ddlPaPolicy.Enabled = True
+                ddlPAplan.Enabled = True
+                rblGpaType.Enabled = True
+                txtPAnumber.Enabled = True
+                txtSalesOffID.Enabled = True
+                txtPromoOffID.Enabled = True
+                ibtnSearchSalesOff.Visible = True
+                ibtnClearSalesOff.Visible = True
+                ibtnSearchPromoOff.Visible = True
+                ibtnClearPromoOff.Visible = True
+                divPayorInsured.Visible = True
+                If Val(TransactionType) = eReference.TranType.Regular Then
+                    If PolicyNumber = String.Empty And PolType <> String.Empty Then chkNoPolicy.Visible = True
+                Else
+                    chkNoPolicy.Visible = False
+                End If
+                divPayslipCode.Visible = False
+                divBillNo.Visible = False
+                divSubsNo.Visible = False
+                chkBalanceToHigher.Enabled = False
+                divBalanceToHigher.Visible = BalanceToHigher
+                txtOPRRemarks.Enabled = True
+        End Select
+
+    End Sub
+
+    Private Sub ManagePaymentType(ByVal pAction As String, ByVal pEnabled As Boolean)
+        'Manage visibility 
+        CashPaymentTag = False
+        CheckPaymentTag = False
+        CreditCardPaymentTag = False
+        DebitCardPaymentTag = False
+        ECashPaymentTag = False
+
+        Select Case pAction
+            Case "ENABLED"
+                pnlPaymentTypeDetails.Enabled = pEnabled
+
+            Case eReference.PayTypeCSH
+                CashPaymentTag = True
+                If lstPaymentTypeDetails.Count = 0 Then OPRCashAmount = OPRGrossAmount
+                If Not GpaPaymentTag Then
+                    'txtOPRCashAmount.Enabled = False
+                Else
+                    txtOPRCashAmount.Enabled = True
+                End If
+
+            Case eReference.PayTypeCHQ
+                If Not GpaPaymentTag Then
+                    CashPaymentTag = True
+                End If
+
+                CheckPaymentTag = True
+
+            Case eReference.PayTypeCCA
+                CreditCardPaymentTag = True
+                If lstPaymentTypeDetails.Count = 0 Then CreditCardAmount = OPRGrossAmount
+                If Not GpaPaymentTag Then
+                    'txtCreditCardAmount.Enabled = False
+                Else
+                    txtCreditCardAmount.Enabled = True
+                End If
+
+            Case eReference.PayTypeDCA
+                DebitCardPaymentTag = True
+                If lstPaymentTypeDetails.Count = 0 Then DebitCardAmount = OPRGrossAmount
+                If Not GpaPaymentTag Then
+                    'txtDebitCardAmount.Enabled = False
+                Else
+                    txtDebitCardAmount.Enabled = True
+                End If
+
+            Case eReference.PayTypeECP
+                ECashPaymentTag = True
+                If lstPaymentTypeDetails.Count = 0 Then ECashPaymentAmount = OPRGrossAmount
+                If Not GpaPaymentTag Then
+                    'txtDebitCardAmount.Enabled = False
+                Else
+                    txtECashPaymentAmount.Enabled = True
+                End If
+            Case Else 'Default State
+        End Select
+
+    End Sub
+
+    Private Sub ManageReceiptDetails(ByVal pAction As String, ByVal pEnabled As Boolean)
+
+        Select Case pAction
+            Case "ENABLED"
+                pnlOPRDetails.Enabled = pEnabled
+
+            Case Else
+                ddlOPRPaymentType.Enabled = pEnabled
+                txtOPRAmount.Enabled = pEnabled
+                gvwOPRDetails.Enabled = pEnabled
+                btnOprDtlAdd.Enabled = pEnabled
+                btnOprDtlClear.Enabled = pEnabled
+
+        End Select
+
+    End Sub
+
+    Private Sub ManageAPRDetails(ByVal pAction As String, ByVal pEnabled As Boolean)
+
+        Select Case pAction
+            Case "ENABLED"
+                pnlAPRDetails.Enabled = pEnabled
+
+            Case Else
+                txtAPRNumber.Enabled = pEnabled
+                txtAPRAmount.Enabled = pEnabled
+                txtAPRDate.Enabled = pEnabled
+
+        End Select
+
+    End Sub
+
+    Private Sub ManageVatDetails(ByVal pAction As String, Optional ByVal pEnabled As Boolean? = Nothing)
+
+        Select Case pAction
+            Case "ENABLED"
+                pnlVATComputation.Enabled = pEnabled
+
+            Case Else
+                txtVATableCollection.Enabled = pEnabled
+                txtNonVATCollection.Enabled = pEnabled
+                txtVATExemptCollection.Enabled = pEnabled
+                txtVATAmount.Enabled = pEnabled
+                txtVATWithholdingTax.Enabled = pEnabled
+
+        End Select
+
+    End Sub
+
+    Private Sub ManageAgent(ByVal pAgentTagType As eReference.AgentTagType, Optional ByVal pEnabled As Boolean? = True)
+
+        Select Case pAgentTagType
+            Case eReference.AgentTagType.Agent
+                txtAgentID.Enabled = pEnabled
+                ibtnSearchAgent.Visible = pEnabled
+                ibtnClearAgent.Visible = Not pEnabled
+
+            Case eReference.AgentTagType.SalesOfficer
+                txtSalesOffID.Enabled = pEnabled
+                ibtnSearchSalesOff.Visible = pEnabled
+                ibtnClearSalesOff.Visible = Not pEnabled
+
+            Case eReference.AgentTagType.PromoOfficer
+                txtPromoOffID.Enabled = pEnabled
+                ibtnSearchPromoOff.Visible = pEnabled
+                ibtnClearPromoOff.Visible = Not pEnabled
+
+            Case eReference.AgentTagType.Usd1
+                txtUSD1ID.Enabled = pEnabled
+                ibtnSearchUSD1.Visible = pEnabled
+                ibtnClearUSD1.Visible = Not pEnabled
+
+            Case eReference.AgentTagType.Asd
+                txtAsdID.Enabled = pEnabled
+                ibtnSearchAsd.Visible = pEnabled
+                ibtnClearAsd.Visible = Not pEnabled
+
+        End Select
+
+    End Sub
+
+    Private Sub ManageGpaCardNo(ByVal pAction As String, Optional ByVal pEnabled As Boolean? = True)
+
+        Select Case pAction
+            Case "SEARCH"
+                ddlPAplan.Enabled = pEnabled
+                txtPAnumber.Enabled = pEnabled
+                ibtnSearchPaCardID.Visible = pEnabled
+                ibtnClearPaCardID.Visible = Not pEnabled
+        End Select
+
+    End Sub
+
+    Private Sub ManageCardPayment(ByVal pAction As String, Optional ByVal pEnabled As Boolean? = True)
+        Select Case pAction
+            Case eReference.PayTypeCCA
+                pnlCreditCardDetails.Enabled = pEnabled
+            Case eReference.PayTypeDCA
+                pnlDebitCardDetails.Enabled = pEnabled
+            Case "ALL"
+                pnlCreditCardDetails.Enabled = pEnabled
+                pnlDebitCardDetails.Enabled = pEnabled
+        End Select
+    End Sub
+
+    Private Sub ManageNewBiz(ByVal pAction As eReference.MgeNewBiz, ByVal pEnabled As Boolean)
+
+        Select Case pAction
+            Case eReference.MgeNewBiz.Enabled
+                pnlNewBiz.Enabled = pEnabled
+
+            Case eReference.MgeNewBiz.NewBiz
+                txtNewBizAmount.Enabled = pEnabled
+                txtNewBizEcrDate.Enabled = pEnabled
+                txtNewBizEcrNumber.Enabled = pEnabled
+
+            Case eReference.MgeNewBiz.PayorId
+                txtNewBizPayID.Enabled = pEnabled
+                ibtnSearchNewBizPayor.Visible = pEnabled
+                ibtnClearNewBizPayor.Visible = Not pEnabled
+
+            Case eReference.MgeNewBiz.PayorAdd
+                ibtnAddNewBizPayor.Visible = pEnabled
+
+            Case eReference.MgeNewBiz.PayorName
+                txtNewBizName.Enabled = pEnabled
+
+            Case eReference.MgeNewBiz.Insured
+                txtNewBizInsID.Enabled = pEnabled
+                ibtnSearchNewBizInsured.Visible = pEnabled
+                ibtnClearNewBizInsured.Visible = Not pEnabled
+
+            Case eReference.MgeNewBiz.InsuredAdd
+                ibtnAddNewBizInsured.Visible = pEnabled
+
+            Case eReference.MgeNewBiz.Button
+                If pEnabled Then
+                    btnNewBizAdd.Text = "Save"
+                Else
+                    btnNewBizAdd.Text = "Add"
+                End If
+                btnNewBizCancel.Enabled = pEnabled
+
+            Case eReference.MgeNewBiz.ButtonAdd
+                btnNewBizAdd.Enabled = pEnabled
+
+            Case eReference.MgeNewBiz.NewInsured
+                txtNewBizFirstName.Enabled = pEnabled
+                txtNewBizLastName.Enabled = pEnabled
+                txtNewBizMiddleName.Enabled = pEnabled
+                txtNewBizSuffix.Enabled = pEnabled
+                txtNewBizPlaceOfBirth.Enabled = pEnabled
+                ddlNewBizType.Enabled = pEnabled
+                ddlNewBizTitle.Enabled = pEnabled
+                txtNewBizDoB.Enabled = pEnabled
+
+            Case eReference.MgeNewBiz.Initial
+                btnNewBizAdd.Text = "Add"
+                btnNewBizAdd.Enabled = False
+                btnNewBizCancel.Enabled = False
+
+                ibtnSearchNewBizPayor.Visible = True
+                ibtnAddNewBizPayor.Visible = False
+                ibtnClearNewBizPayor.Visible = False
+                ibtnSearchNewBizInsured.Visible = False
+                ibtnAddNewBizInsured.Visible = False
+
+                txtNewBizPayID.Enabled = True
+                txtNewBizName.Enabled = False
+                txtNewBizInsID.Enabled = False
+                txtNewBizAmount.Enabled = False
+                txtNewBizEcrDate.Enabled = False
+                txtNewBizEcrNumber.Enabled = False
+                txtNewBizFirstName.Enabled = False
+                txtNewBizLastName.Enabled = False
+                txtNewBizMiddleName.Enabled = False
+                txtNewBizSuffix.Enabled = False
+                txtNewBizPlaceOfBirth.Enabled = False
+                ddlNewBizType.Enabled = False
+                ddlNewBizTitle.Enabled = False
+                txtNewBizDoB.Enabled = False
+
+        End Select
+
+    End Sub
+
+    Private Sub ManageAddInsured(ByVal pAction As String, ByVal pEnabled As Boolean)
+
+        Select Case pAction
+            Case "TYPE"
+                txtAddInsuredLastName.Enabled = Not pEnabled
+                txtAddInsuredFirstName.Enabled = Not pEnabled
+                txtAddInsuredMiddleName.Enabled = Not pEnabled
+                txtAddInsuredDoB.Enabled = Not pEnabled
+            Case "EXIST"
+                txtInsuredID.Enabled = False
+                ddlAddInsuredType.Enabled = pEnabled
+                txtAddInsuredLastName.Enabled = pEnabled
+                txtAddInsuredFirstName.Enabled = pEnabled
+                txtAddInsuredMiddleName.Enabled = pEnabled
+                txtAddInsuredDoB.Enabled = pEnabled
+            Case "SEARCH"
+                txtInsuredID.Enabled = True
+                ddlAddInsuredType.Enabled = pEnabled
+                txtAddInsuredLastName.Enabled = pEnabled
+                txtAddInsuredFirstName.Enabled = pEnabled
+                txtAddInsuredMiddleName.Enabled = pEnabled
+                txtAddInsuredDoB.Enabled = pEnabled
+        End Select
+
+    End Sub
+
+    Private Sub ManageAddPayor(ByVal pAction As String, Optional ByVal pEnabled As Boolean? = True)
+
+        Select Case pAction
+            Case "TYPE"
+                pnlAddPayor1.Visible = pEnabled
+                pnlAddPayor2.Visible = Not pEnabled
+                pnlAddPayor1.Enabled = pEnabled
+                pnlAddPayor2.Enabled = Not pEnabled
+                'txtAddPayorName.Enabled = Not pEnabled
+                'txtAddPayorLastName.Enabled = pEnabled
+                'txtAddPayorFirstName.Enabled = pEnabled
+                'txtAddPayorMiddleName.Enabled = pEnabled
+                'txtAddPayorDoB.Enabled = pEnabled
+            Case "EXIST"
+                txtPayorID.Enabled = False
+                pnlAddPayor1.Visible = IIf(PayorType = "C", True, False)
+                pnlAddPayor2.Visible = IIf(PayorType = "C", False, True)
+                ddlAddPayorType.Enabled = pEnabled
+                txtAddPayorName.Enabled = pEnabled
+                txtAddPayorLastName.Enabled = pEnabled
+                txtAddPayorFirstName.Enabled = pEnabled
+                txtAddPayorMiddleName.Enabled = pEnabled
+                txtAddPayorDoB.Enabled = pEnabled
+            Case "SEARCH"
+                txtPayorID.Enabled = True
+                pnlAddPayor1.Visible = False
+                pnlAddPayor2.Visible = True
+                ddlAddPayorType.Enabled = pEnabled
+                txtAddPayorName.Enabled = pEnabled
+                txtAddPayorLastName.Enabled = pEnabled
+                txtAddPayorFirstName.Enabled = pEnabled
+                txtAddPayorMiddleName.Enabled = pEnabled
+                txtAddPayorDoB.Enabled = pEnabled
+        End Select
+
+    End Sub
+
+
+    Private Sub SetDropDownList(ByVal pDropDownList As DropDownList, ByVal pDataSource As DataTable, ByVal pDataTextField As String, _
+        ByVal pDataValueField As String, Optional ByVal pNewDataTextField As String = Nothing, Optional ByVal pNewDataValueField As String = Nothing)
+
+        With pDropDownList
+            .Items.Clear()
+            If Not IsNothing(pNewDataTextField) AndAlso Not IsNothing(pNewDataValueField) Then
+                If IsNothing(pNewDataTextField) Then pNewDataTextField = String.Empty
+                If IsNothing(pNewDataValueField) Then pNewDataValueField = String.Empty
+
+                .Items.Insert(0, New ListItem(pNewDataTextField, pNewDataValueField))
+            End If
+            .AppendDataBoundItems = True
+            If pDataSource.Rows.Count > 0 Then
+                .DataTextField = pDataTextField
+                .DataValueField = pDataValueField
+            End If
+            .DataSource = IIf(pDataSource.Rows.Count = 0, Nothing, pDataSource)
+            .DataBind()
+        End With
+
+    End Sub
+
+    Private Sub SetRadioButtonList(ByVal pRadioButtonList As RadioButtonList, ByVal pDataSource As DataTable, ByVal pDataTextField As String, _
+        ByVal pDataValueField As String)
+
+        With pRadioButtonList
+            .Items.Clear()
+            .AppendDataBoundItems = True
+            If pDataSource.Rows.Count > 0 Then
+                .DataTextField = pDataTextField
+                .DataValueField = pDataValueField
+            End If
+            .DataSource = IIf(pDataSource.Rows.Count = 0, Nothing, pDataSource)
+            .DataBind()
+            .SelectedIndex = 0
+        End With
+
+    End Sub
+
+    Private Sub SetDropDownListNewListItem(ByVal pDropDownList As DropDownList, ByVal pDataIndex As Integer, ByVal pDataTextField As String,
+                                           ByVal pDataValueField As String)
+        With pDropDownList
+            .Items.Insert(pDataIndex, New ListItem(pDataTextField, pDataValueField))
+            .AppendDataBoundItems = True
+            .DataBind()
+        End With
+    End Sub
+
+    Private Sub SetFocusBlur(ByVal pTextBox As TextBox, ByVal pFocus As String, ByVal pBlur As String, Optional ByVal pDecimal As Integer? = Nothing)
+
+        Dim mOnBlurValue As String = pTextBox.Attributes.Item("onblur")
+        Dim mOnFocusValue As String = pTextBox.Attributes.Item("onfocus")
+
+        mOnBlurValue &= "DoBlur(this, '" & pBlur & "');"
+        mOnFocusValue &= "DoFocus(this, '" & pFocus & "');"
+
+        If Not IsNothing(pDecimal) Then
+            mOnBlurValue &= String.Concat("extractNumber(this,", pDecimal, ",false); javascript:this.value=Comma(this.value);")
+        End If
+
+        pTextBox.Attributes.Add("onfocus", mOnFocusValue)
+        pTextBox.Attributes.Add("onblur", mOnBlurValue)
+
+    End Sub
+
+    Private Sub SetFocusEnterKey(ByVal pTextbox As TextBox, ByVal pSetFocusTextBox As Object)
+        pTextbox.Attributes.Add("onkeypress", "if (event.keyCode == 13){document.getElementById('" + pSetFocusTextBox.ClientID + "').focus()};")
+    End Sub
+
+    Private Sub SetModalSession(ByVal pModal As AjaxControlToolkit.ModalPopupExtender, ByVal pShow As Boolean, ByVal pSetFocus As Object)
+        Session(eSession.Modal) = IIf(pShow, pModal.ID, Nothing)
+        If pShow Then
+            pModal.Show()
+        Else
+            pModal.Hide()
+        End If
+        'FOCUS Me.Page.SetFocus(pSetFocus)
+    End Sub
+
+    Private Sub ShowMessageBox(ByVal pMessage As String, ByVal pMessageType As String)
+        Me.Message = pMessage
+        Me.MessageType = pMessageType
+        Me.IsMessage = True
+    End Sub
+
+#End Region
+
+#Region "Function"
+
+    Private Function ConvertToList(Of T As New)(ByVal pGridView As GridView) As List(Of T)
+        Dim lstLocal As List(Of T) = New List(Of T)
+
+        For Each dr As GridViewRow In pGridView.Rows
+            Dim objLocal As New T
+            Select Case pGridView.ID
+                Case gvwPaymentTypeDetails.ID
+                    With TryCast(objLocal, cPaymentType)
+                        .PaymentTypeID = cDataType.fString.IfNull(dr.Cells(1).Text)
+                        .PaymentType = cDataType.fString.IfNull(dr.Cells(2).Text)
+                        .CheckNumber = cDataType.fLong.IfNull(dr.Cells(3).Text)
+                        .TerminalUse = cDataType.fString.IfNull(dr.Cells(4).Text)
+                        .MerchantID = cDataType.fString.IfNull(dr.Cells(5).Text)
+                        .SwipeDate = cDataType.fDate.IfNull(dr.Cells(6).Text)
+                        .Network = cDataType.fString.IfNull(dr.Cells(7).Text)
+                        .Bank = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(8).Text))
+                        .Branch = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(9).Text))
+                        .CASA = cDataType.fString.IfNull(dr.Cells(10).Text)
+                        .AccountNumber = cDataType.fString.IfNull(dr.Cells(11).Text)
+                        .CardType = cDataType.fString.IfNull(dr.Cells(12).Text)
+                        .CardNumber = cDataType.fString.IfNull(dr.Cells(13).Text)
+                        .ApprovalCode = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(14).Text))
+                        .Remarks = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(15).Text))
+                        .Amount = cDataType.fDecimal.IfNull(dr.Cells(17).Text)
+                        .BatchNumber = cDataType.fLong.IfNull(dr.Cells(18).Text)
+                        .ReferenceID = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(19).Text))
+                        .PaymentChannel = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(20).Text))
+                        .ServiceFeeRate = cDataType.fDecimal.IfNull(Server.HtmlDecode(dr.Cells(21).Text))
+                    End With
+                Case gvwOPRDetails.ID
+                    With TryCast(objLocal, cReceiptDetail)
+                        .IsSelected = cDataType.fBoolean.IfNull(DirectCast(dr.FindControl("radSelectOPRDetails"), RadioButton).Checked)
+                        .ReceiptID = cDataType.fString.IfNull(dr.Cells(1).Text)
+                        .TrnxCode = cDataType.fString.IfNull(dr.Cells(2).Text)
+                        .ActType = cDataType.fString.IfNull(dr.Cells(3).Text)
+                        .TrnxDesc = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(4).Text))
+                        .DueDate = cDataType.fString.IfNull(dr.Cells(5).Text)
+                        .Amount = cDataType.fDecimal.IfNull(dr.Cells(6).Text)
+                        .ReceiptType = cDataType.fString.IfNull(dr.Cells(7).Text)
+                    End With
+                Case gvwNewBiz.ID
+                    With TryCast(objLocal, cNewBiz)
+                        .Id = cDataType.fString.IfNull(dr.Cells(1).Text)
+                        .LastName = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(2).Text))
+                        .FirstName = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(3).Text))
+                        .MiddleName = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(4).Text))
+                        .DoB = cDataType.fDate.IfNull(dr.Cells(5).Text)
+                        .Name = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(6).Text))
+                        .ApplNo = cDataType.fLong.IfNull(dr.Cells(7).Text)
+                        .Amount = cDataType.fDecimal.IfNull(dr.Cells(8).Text)
+                        .EcrNumber = cDataType.fLong.IfNull(dr.Cells(9).Text)
+                        .EcrDate = cDataType.fDate.IfNull(dr.Cells(10).Text)
+                        .Suffix = cDataType.fString.IfNull(dr.Cells(11).Text)
+                        .Title = cDataType.fString.IfNull(dr.Cells(12).Text)
+                        .PlaceOfBirth = cDataType.fString.IfNull(Server.HtmlDecode(dr.Cells(13).Text))
+                        .Sex = cDataType.fString.IfNull(dr.Cells(14).Text)
+                        .PrsPid = cDataType.fLong.IfNull(dr.Cells(15).Text)
+                        .PayPrsPid = cDataType.fLong.IfNull(dr.Cells(16).Text)
+                    End With
+                Case Else
+
+            End Select
+            lstLocal.Add(objLocal)
+        Next
+
+        Return lstLocal
+
+    End Function
+
+#End Region
+
+#End Region
+
+    Private Sub ddlAddPayorType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlAddPayorType.SelectedIndexChanged
+        Call ClearSession()
+        PayorType = ddlAddPayorType.SelectedValue
+        If PayorType = "C" Then
+            RaiseEvent ClearScreenPayorType(Me, EventArgs.Empty)
+            SamePayorInsured = "N"
+        End If
+        Call ManageAddPayor("TYPE", IIf(PayorType = "C", True, False))
+
+        Call SetModalSession(mpeAddPayor, True, ddlAddPayorType)
+        'FOCUS Me.Page.SetFocus(IIf(PayorType = "C", txtAddPayorName, txtAddPayorLastName))
+        upAddPayor.Update()
+    End Sub
+
+    Protected Sub ibtnAddNewPayor_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnAddNewPayor.Click
+        SetModalSession(mpeAddPayor, True, btnAddPayorOk)
+    End Sub
+
+    Private Sub ibtnAddNewInsured_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnAddNewInsured.Click
+        SetModalSession(mpeAddInsured, True, btnAddInsuredOk)
+    End Sub
+
+    Private Sub btnAddPayorClose_Click(sender As Object, e As EventArgs) Handles btnAddPayorClose.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenAddPayor(Me, EventArgs.Empty)
+        Call SetModalSession(mpeAddPayor, False, ibtnAddNewPayor)
+    End Sub
+
+    Private Sub btnAddInsuredClose_Click(sender As Object, e As EventArgs) Handles btnAddInsuredClose.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenAddInsured(Me, EventArgs.Empty)
+        Call SetModalSession(mpeAddInsured, False, ibtnAddNewInsured)
+    End Sub
+
+    Private Sub btnPrintAppNo_Click(sender As Object, e As EventArgs) Handles btnPrintAppNo.Click
+        ClearSession()
+
+        ReportType = eReport.ReceiptAppno
+        RaiseEvent GenerateReport(Me, EventArgs.Empty)
+        If IsSuccessful Then
+            SetReportSessionScript(ePage.RptReceiptAppno)
+            ScriptManager.RegisterStartupScript(sender, GetType(String), "OPEN_WINDOW", Session("script"), True)
+            Session("script") = String.Empty
+        End If
+    End Sub
+
+    Private Sub btnReceiptPrint_Click(sender As Object, e As EventArgs) Handles btnReceiptPrint.Click
+        RaiseEvent ConfirmPrint(Me, EventArgs.Empty)
+        'SetModalSession(mpeConfirm, True, btnConfirmNo)
+    End Sub
+
+    Private Sub btnReceiptPreview_Click(sender As Object, e As EventArgs) Handles btnReceiptPreview.Click
+        Call ClearSession()
+        IsPreview = True
+        ReportType = eReport.Receipt
+        RaiseEvent GenerateReport(Me, EventArgs.Empty)
+        If IsSuccessful Then
+            SetReportSessionScript(ePage.RptReceipt)
+            ScriptManager.RegisterStartupScript(sender, GetType(String), "OPEN_WINDOW", Session("script"), True)
+            Session("script") = String.Empty
+        End If
+    End Sub
+
+    Private Sub btnConfirmNo_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnConfirmNo.Click
+        ConfirmClickState = True
+
+        Call ClearSession()
+        SetModalSession(mpeConfirm, False, btnConfirmYes)
+    End Sub
+
+    Private Sub btnConfirmYes_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnConfirmYes.Click
+        ConfirmClickState = True
+        mpeConfirm.Hide()
+
+        Call ClearSession()
+        Select Case ConfirmCaller
+            Case "CANCEL"
+                DocSaveState = eDocSaveState.Cancel
+                RaiseEvent ProcessPaymentPremium(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    ReceiptById = UserID
+                    RaiseEvent LoadOPR(Me, EventArgs.Empty)
+
+                    'upPaymentPremiumRelated.Update()
+                Else
+                    DocSaveState = eDocSaveState.ViewNoEdit
+                End If
+                Call SetModalSession(mpeConfirm, False, btnReceiptCancel)
+
+            Case "SAVE"
+                RaiseEvent ProcessPaymentPremium(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    ReceiptById = UserID
+                    RaiseEvent LoadOPR(Me, EventArgs.Empty)
+                    DocSaveState = eDocSaveState.ViewEdit
+                End If
+
+            Case "PRINT"
+                IsPreview = False
+                ReportType = eReport.Receipt
+                RaiseEvent GenerateReport(Me, EventArgs.Empty)
+                If IsSuccessful Then
+                    DocSaveState = eDocSaveState.Print
+                    RaiseEvent ProcessPaymentPremium(Me, EventArgs.Empty)
+                    If IsSuccessful Then
+                        ReceiptById = UserID
+                        RaiseEvent LoadOPR(Me, EventArgs.Empty)
+                    Else
+                        DocSaveState = eDocSaveState.ViewEdit
+                    End If
+                End If
+
+        End Select
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub btnAddInsuredOk_Click(sender As Object, e As EventArgs) Handles btnAddInsuredOk.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenInsured(Me, EventArgs.Empty)
+        IsSuccessful = False
+        RaiseEvent LoadAddInsured(Me, EventArgs.Empty)
+        If IsSuccessful Then
+            RaiseEvent ClearScreenAddInsured(Me, EventArgs.Empty)
+            InsuredIDTag = True
+            'Manage controls
+            Call ManagePolicy(eReference.MgePol.InsuredAdd, False)
+            Call SetModalSession(mpeAddInsured, False, ibtnAddNewInsured)
+            'upPaymentPremiumRelated.Update()
+        Else
+            Call SetModalSession(mpeAddInsured, True, btnAddInsuredOk)
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub btnAddPayorOk_Click(sender As Object, e As EventArgs) Handles btnAddPayorOk.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenPayor(Me, EventArgs.Empty)
+        IsSuccessful = False
+        RaiseEvent LoadAddPayor(Me, EventArgs.Empty)
+        If IsSuccessful Then
+            RaiseEvent ClearScreenAddPayor(Me, EventArgs.Empty)
+            PayorIDTag = True
+            'Manage controls
+            Call ManagePolicy(eReference.MgePol.PayorAdd, False)
+            If PayorType = "C" Then
+                SamePayorInsured = "N"
+                ManagePolicy(eReference.MgePol.SamePayorInsured, False)
+            End If
+            If SamePayorInsured = "Y" Then
+                RaiseEvent ClearScreenInsured(Me, EventArgs.Empty)
+                RaiseEvent SetSamePayorInsured(Me, EventArgs.Empty)
+                InsuredIDTag = True
+                'Manage controls
+                Call ManagePolicy(eReference.MgePol.Insured, False)
+                Call ManagePolicy(eReference.MgePol.InsuredAdd, False)
+            End If
+            Call SetModalSession(mpeAddPayor, False, ibtnAddNewPayor)
+
+            'upPaymentPremiumRelated.Update()
+        Else
+            Call SetModalSession(mpeAddPayor, True, btnAddPayorOk)
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ddlSearchPolicyType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlSearchPolicyType.SelectedIndexChanged
+        PolType = ddlSearchPolicyType.SelectedValue
+    End Sub
+
+    Private Sub ddlPolicyType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlPolicyType.SelectedIndexChanged
+        PolType = ddlPolicyType.SelectedValue
+        If TransactionType = eReference.TranType.Regular AndAlso PolType = "G" Then
+            PayslipCodeTag = True
+            BillNoTag = True
+        Else
+            PayslipCodeTag = False
+            BillNoTag = False
+        End If
+
+        If NewBusinessTag OrElse GpaPaymentTag OrElse PolType = String.Empty Then
+            chkNoPolicy.Visible = False
+        Else
+            chkNoPolicy.Visible = True
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub btnOprDtlClear_Click(sender As Object, e As EventArgs) Handles btnOprDtlClear.Click
+        RaiseEvent ClearScreenReceiptDetails(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub btnReceiptCancel_Click(sender As Object, e As EventArgs) Handles btnReceiptCancel.Click
+        RaiseEvent ConfirmCancel(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub btnCreditCardApprovalCode_Click(sender As Object, e As EventArgs) Handles btnCreditCardApprovalCode.Click
+        RaiseEvent CreditCardFetchData(Me, EventArgs.Empty)
+        ManageCardPayment(eReference.PayTypeCCA, False)
+    End Sub
+
+    Private Sub btnDebitCardChargeSlip_Click(sender As Object, e As EventArgs) Handles btnDebitCardChargeSlip.Click
+        RaiseEvent DebitCardFetchData(Me, EventArgs.Empty)
+        ManageCardPayment(eReference.PayTypeDCA, False)
+    End Sub
+
+    Private Sub ibtnAddCash_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnAddCash.Click
+        RaiseEvent AddCashPayment(Me, EventArgs.Empty)
+        If IsPayTypeSuccessful Then
+            RaiseEvent ClearScreenPaymentTypeDetails(Me, EventArgs.Empty)
+            'FOCUS Me.Page.SetFocus(ddlOPRPaymentType)
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub rblGpaType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles rblGpaType.SelectedIndexChanged
+        'If ddlOPRTransaction.Items.Count > 0 Then
+        '    ddlOPRTransaction.SelectedValue = rblGpaType.SelectedValue
+        '    ddlOPRTransaction_SelectedIndexChanged(Me, EventArgs.Empty)
+        'End If
+
+        'Clear Fields----------------------------------------
+        GpaPaymentTag = True
+        SearchAgentTag = eReference.AgentTagType.SalesOfficer
+        RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+        SearchAgentTag = eReference.AgentTagType.PromoOfficer
+        RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+        SearchAgentTag = eReference.AgentTagType.Usd1
+        RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+        SearchAgentTag = eReference.AgentTagType.Asd
+        RaiseEvent ClearScreenAgent(Me, EventArgs.Empty)
+        '----------------------------------------------------
+
+        If GpaType = eReference.ColrefGpaRenewal Then
+            divSalesOfficer.Visible = False
+            ManageAgent(eReference.AgentTagType.Usd1, True)
+            ManageAgent(eReference.AgentTagType.Asd, True)
+
+            RaiseEvent LoadGpaRenewalAsd(Me, EventArgs.Empty)
+            Call SearchASD()
+            'Call ibtnSearchAsd_Click(Me, New ImageClickEventArgs(0, 0))
+            'PolicyNumber = GpaSettingsPolnum & IIf(GpaSettingsAllowRenewal, "B", String.Empty)
+        Else
+            divSalesOfficer.Visible = True
+            ManageAgent(eReference.AgentTagType.Usd1, False)
+            ibtnClearUSD1.Visible = False
+            ManageAgent(eReference.AgentTagType.Asd, False)
+            ibtnClearAsd.Visible = False
+            ManageGpaCardNo("SEARCH", True)
+
+            'PolicyNumber = GpaSettingsPolnum
+        End If
+
+    End Sub
+
+    Private Sub ibtnSearchPaCardID_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnSearchPaCardID.Click
+
+        SearchAgentTag = eReference.AgentTagType.SalesOfficer
+        If AgentID = 0 Then SearchAgentTag = eReference.AgentTagType.Usd1
+
+        RaiseEvent LoadGpaSettings(Me, EventArgs.Empty)
+        RaiseEvent LoadGpaCardNo(Me, EventArgs.Empty)
+        If IsGpaCardNoExist Then
+            GpaCardNoTag = True
+
+            'RaiseEvent GetGpaDetails(Me, EventArgs.Empty)
+            Call ManageGpaCardNo("SEARCH", False)
+            'FOCUS Me.Page.SetFocus(ibtnSearchPaCardID)
+        Else
+            Call ManageGpaCardNo("SEARCH", True)
+        End If
+
+    End Sub
+
+    Private Sub btnLoadViewOpr_Click(sender As Object, e As EventArgs) Handles btnLoadViewOpr.Click
+        dtViewOPR = Nothing
+        RaiseEvent LoadViewOPR(Me, EventArgs.Empty)
+        Call SetModalSession(mpeViewOPRs, True, btnLoadViewOpr)
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ddlCheckBankName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlCheckBankName.SelectedIndexChanged
+        txtOtherBank.Text = String.Empty
+        If ddlCheckBankName.SelectedValue = "OTHER" Then
+            divOtherBank.Visible = True
+        Else
+            divOtherBank.Visible = False
+        End If
+    End Sub
+
+    Private Sub ibtnClearSourceSite_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearSourceSite.Click
+        SourceSite = String.Empty
+        IsSourceSiteLocked = False
+    End Sub
+
+    Private Sub ibtnVerifySourceSite_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnVerifySourceSite.Click
+        IsSourceSiteLocked = True
+    End Sub
+
+    Private Sub ibtnClearGrossAmount_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearGrossAmount.Click
+        OPRGrossAmount = 0
+        IsGrossAmountLocked = False
+        'PaymentTypeTag = False
+    End Sub
+
+    Private Sub ibtnVerifyGrossAmount_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnVerifyGrossAmount.Click
+        IsGrossAmountLocked = True
+        If Not PolMod.Equals(String.Empty) And IsGrossAmountLocked Then
+            If Not PaymentTypeTag = True Then PaymentTypeTag = True
+            'Else
+            'PaymentTypeTag = False
+        End If
+    End Sub
+
+    Private Sub ddlCreditCardTerminalUse_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlCreditCardTerminalUse.SelectedIndexChanged
+        RaiseEvent LoadMerchantId(Me, EventArgs.Empty)
+        RaiseEvent LoadDefaultTerminal(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub ddlDebitCardTerminalUse_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ddlDebitCardTerminalUse.SelectedIndexChanged
+        RaiseEvent LoadMerchantId(Me, EventArgs.Empty)
+        RaiseEvent LoadDefaultTerminal(Me, EventArgs.Empty)
+    End Sub
+
+    Private Sub dummyCalculateVat_Click(sender As Object, e As EventArgs) Handles dummyCalculateVat.Click
+        VATTotalCollection = VATableCollection + VATExemptCollection + NonVATCollection + VATAmount
+        If NonVATCollection = OPRGrossAmount / 0.98 Then
+            VATWithholdingTax = NonVATCollection * 0.02
+        End If
+        VATAmountNetWTax = VATTotalCollection - VATWithholdingTax
+    End Sub
+
+    Private Sub chkNoPolicy_CheckedChanged(sender As Object, e As EventArgs) Handles chkNoPolicy.CheckedChanged
+        NoPolicy = DirectCast(sender, CheckBox).Checked
+        If NoPolicy Then
+            PolicyNumberTag = True
+            Call ManagePolicy(eReference.MgePol.Search, False)
+            Call ManagePolicy(eReference.MgePol.Insured, True)
+            Call ManagePolicy(eReference.MgePol.SamePayorInsured, True)
+            Call ManagePolicy(eReference.MgePol.Payor, True)
+            Call ManagePolicy(eReference.MgePol.Policy, True)
+            Call ManageAgent(eReference.AgentTagType.Agent, True)
+            'PolType = "G"
+            PolicyNumber = String.Empty
+            For Each item As ListItem In ddlBusinessType.Items
+                Select Case item.Value
+                    Case "GPA", "GPP"
+                        item.Enabled = False
+                End Select
+            Next
+            'FOCUS Me.Page.SetFocus(ibtnSearchPolicy)
+        Else
+            PolicyNumberTag = False
+            Call ManagePolicy(eReference.MgePol.Initial, False)
+            Call ManagePolicy(eReference.MgePol.Search, True)
+            RaiseEvent ClearScreenPolicy(Me, EventArgs.Empty)
+        End If
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub ibtnViewAppNo_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnViewAppNo.Click
+        RaiseEvent ClearScreenViewAppNo(Me, EventArgs.Empty)
+        RaiseEvent LoadViewAppNo(Me, EventArgs.Empty)
+
+        Call ClearSession()
+        Call SetModalSession(mpeViewAppNo, True, btnViewAppNoClose)
+    End Sub
+
+    Private Sub ibtnClearAppNo_Click(sender As Object, e As ImageClickEventArgs) Handles ibtnClearAppNo.Click
+        Call ClearSession()
+        RaiseEvent ClearScreenPolicy(Me, EventArgs.Empty)
+        ManageOPRPaymentDetails("SOURCESITE", True)
+        ddlPolicyType.Enabled = True
+        ibtnViewAppNo.Visible = True
+        ibtnClearAppNo.Visible = False
+        NewBusinessTag = True
+        upPaymentPremiumRelated.Update()
+    End Sub
+
+    Private Sub btnViewAppNoClose_Click(sender As Object, e As EventArgs) Handles btnViewAppNoClose.Click
+        Call ClearSession()
+        Call SetModalSession(mpeViewAppNo, False, ibtnViewAppNo)
+    End Sub
+
+    Protected Sub gvwViewOpr_SelectedIndexChanged(sender As Object, e As EventArgs) Handles gvwViewOpr.SelectedIndexChanged
+
+    End Sub
+
+    Protected Sub txtOPRGrossAmount_TextChanged(sender As Object, e As EventArgs) Handles txtOPRGrossAmount.TextChanged
+
+    End Sub
+
+  
+End Class

@@ -1,0 +1,139 @@
+﻿#Region "Description"
+' PAGE NAME     : Payment Debit Credit Memo Interface
+' CREATED BY    : Junie
+' CREATED DATE  : 04/10/2025
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports Cocolife.Utility.OCS.Classes
+
+#End Region
+
+Namespace Payment
+
+    Public Interface IPaymentDebitCreditMemo
+
+#Region "Properties"
+        ReadOnly Property SiteCode As Long
+        ReadOnly Property RoleCode As String
+        ReadOnly Property UserID As Long
+
+        Property IsInvoiceNoExisting As Boolean
+
+        Property ReceiptByCode As String
+        Property DocSaveState As Integer
+        Property DMCMTransNo As String
+        Property DMCMNumber As Long
+        Property MemoType As String
+        Property ReservedDMCMID As Long
+        Property DebitCreditID As Long
+        Property Reason As String
+        Property Remarks As String
+
+        'Property SourceSite As String
+        'Property IsSourceSiteLocked As Boolean
+        Property IsSuccessful As Boolean
+        Property IsTransIDExisting As Boolean 'can be dmcm no
+
+        Property Status As String
+        Property Mode As String
+
+        Property IsUnitPriceLocked As Boolean
+        Property UnitPrice As Decimal
+        Property TotalAmount As Decimal
+        Property VATable As Decimal
+        Property VATExempt As Decimal
+        Property VATAmount As Decimal
+        Property NonVAT As Decimal
+        Property TotalSales As Decimal
+        Property WitholdingTax As Decimal
+        Property NetOfWitholdingTax As Decimal
+        Property Discount As Decimal
+        Property Quantity As Long
+        Property DiscountID As String
+        Property Particulars As String
+        Property SISourcetype As String
+
+        Property SourceType As String
+
+        Property InvoiceNumber As Long
+        Property PrintCounter As Long
+        Property InvoiceDate As Date
+        Property DMCMDate As Date
+        Property ReferenceNo As String
+        Property BillStatNo As String
+        Property PayorName As String
+        Property PayorAddress As String
+        Property PayorTIN As String
+        Property PolicyNumber As String
+        Property PreparedBy As String
+        Property OfficeName As String
+        Property OfficeContact As String
+        Property OfficeAddr As String
+        Property OfficeTin As String
+        Property EffectivityFrom As Date
+        Property EffectivityTo As Date
+        Property RenewalDate As Date
+        Property BillStatementDate As Date
+        Property BillPeriodFrom As Date
+        Property BillPeriodTo As Date
+        Property BillingType As String
+        Property Approver As String
+
+        'WriteOnly Property dtSourceSite As DataTable
+        WriteOnly Property dtViewSI As DataTable
+        WriteOnly Property dtViewDMCM As DataTable
+        WriteOnly Property dtBillingType As DataTable
+        WriteOnly Property dtApprover As DataTable
+
+        Property ViewSINumber As Long
+        Property ViewSIFrom As Date
+        Property ViewSITo As Date
+        Property ViewSIReferenceNumber As String
+
+        Property ViewDMCMFrom As Date
+        Property ViewDMCMTo As Date
+        Property ViewDMCMNumber As Long
+        Property ViewDMCMBySINo As Long
+        Property ViewDMCMByTransID As String
+        ' Property ViewARNumber As Long
+        ' Property ViewARBySINo As Long
+#End Region
+
+#Region "Events"
+        Event ClearScreenMain As EventHandler(Of EventArgs)
+        Event LoadSourceSite As EventHandler(Of EventArgs)
+        Event LoadCurrency As EventHandler(Of EventArgs)
+        Event CheckSourceSite As EventHandler(Of EventArgs)
+        Event LoadViewSI As EventHandler(Of EventArgs)
+
+        Event LoadSalesInvoice As EventHandler(Of EventArgs)
+        Event LoadDebitCreditMemo As EventHandler(Of EventArgs)
+        Event LoadBillingType As EventHandler(Of EventArgs)
+        Event LoadApprover As EventHandler(Of EventArgs)
+        Event LoadViewDMCM As EventHandler(Of EventArgs)
+        Event ClearScreenSIInfo As EventHandler(Of EventArgs)
+        Event LoadDMCM As EventHandler(Of EventArgs)
+        Event ConfirmSave As EventHandler(Of EventArgs)
+        Event ConfirmSend As EventHandler(Of EventArgs)
+        Event ConfirmCancel As EventHandler(Of EventArgs)
+        Event ProcessDebitCreditMemo As EventHandler(Of EventArgs)
+        Event GenerateReport As EventHandler(Of EventArgs)
+        Event CheckUnitPrice As EventHandler(Of EventArgs)
+        Event ClearScreenViewSI As EventHandler(Of EventArgs)
+        'Event CheckGrossAmount As EventHandler(Of EventArgs)
+        'Event LoadNewDMCM As EventHandler(Of EventArgs)
+#End Region
+
+#Region "Transactions"
+        Sub radSelectDMCM(ByVal sender As Object, ByVal e As EventArgs)
+        Sub radSelectSI(ByVal sender As Object, ByVal e As EventArgs)
+#End Region
+
+    End Interface
+End Namespace
+

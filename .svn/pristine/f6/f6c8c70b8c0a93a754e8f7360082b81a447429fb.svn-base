@@ -1,0 +1,104 @@
+﻿#Region "Description"
+' PAGE NAME     : HMO PAYSLIP Interface 
+' CREATED BY    : EJ
+' CREATED DATE  : 11/13/2024
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports Cocolife.Utility.OCS.Classes
+#End Region
+
+Namespace Reference
+
+    Public Interface ISalesInvoice
+
+#Region "Variables"
+
+#End Region
+
+#Region "Properties"
+        Property SalesInvoiceID As Long
+        Property Tag As Char
+        Property ReferenceNo As String
+        Property PayorName As String
+        Property PayorAddress As String
+        Property PayorTIN As String
+        Property InsuredClientName As String
+        Property PolicyNumber As String
+        Property CoveragePeriodFrom As Date
+        Property CoveragePeriodTo As Date
+        Property InvoiceCurrency As String
+        Property InvoiceAmount As Decimal
+        Property VATable As Decimal
+        Property VATExempt As Decimal
+        Property VATAmount As Decimal
+        Property NonVAT As Decimal
+        Property TotalSales As Decimal
+        Property WitholdingTax As Decimal
+        Property NetOfWitholdingTax As Decimal
+        Property Discount As Decimal
+        Property DiscountIdNo As String
+        Property PaymentTerm As String
+        Property NextDueDate As Date
+        Property AgentName As String
+        Property AgentCode As String
+        Property InvoiceRemarks As String
+        Property InvoiceOtherInfo As String
+        Property InvoiceNumber As Long
+        Property AckReceiptNumber As Long
+        Property InvoiceDate As Date
+        Property SIPrintStatus As String
+        Property UploadDate As Date
+        Property SiteCode As Long
+
+
+        Property UnitPrice As Decimal
+        Property Particulars As String
+        Property Quantity As Long
+        Property PreparedBy As String
+        Property SiteAddr As String
+        Property SiteContact As String
+        Property SiteName As String
+        Property SiteTin As String
+        Property BillStatDate As Date
+        Property BillStatNo As String
+        Property ParticularsRaw As String 'new coll
+        Property SISourceType As String
+        'end
+        Property SIPrintedBy As String
+        Property lstSIDetails As DataTable
+        '------------------------------------
+        Property IsRecordExist() As Boolean
+#End Region
+
+#Region "Single Point Functions"
+        Function IsNewSalesInvoiceAllowed(ByVal pNextDocNumber As String) As Boolean
+        Function LoadViewDoc(ByVal pPrspid As Long, ByVal pDocNumber As Long, Optional ByVal pType As Integer = 0) As DataTable
+        Function LoadViewDoc(pPrspid As Long, pReferenceNo As String) As DataTable
+        Function LoadViewDoc(pPrspid As Long, pParam As Integer, Optional pStartDate As Date? = Nothing, Optional pEndDate As Date? = Nothing) As DataTable
+
+        Function LoadViewDocDMCM(pRoleCode As String, pDocNumber As Long, pReferenceNo As String, pType As Integer) As DataTable
+        Function LoadViewDocDMCM(pRoleCode As String, Optional pStartDate As Date? = Nothing, Optional pEndDate As Date? = Nothing) As DataTable
+
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Transactions"
+        Sub LoadNewSalesInvoice(pSiteId As Long, pUserId As Long, Optional ByRef pConn As Object = Nothing, Optional ByRef pTrans As Object = Nothing)
+        Sub SearchSalesInvoice(ByVal pReferenceNo As String, ByVal pPolicyNo As String)
+        Sub SearchSalesInvoiceByNo(ByVal pReferenceNo As String)
+        Sub SearchSalesInvoiceDMCM(ByVal pReferenceNo As String, ByVal pRoleCode As String, ByVal pSiteCode As Long, ByVal pUserID As Long)
+#End Region
+
+    End Interface
+
+End Namespace
+
+

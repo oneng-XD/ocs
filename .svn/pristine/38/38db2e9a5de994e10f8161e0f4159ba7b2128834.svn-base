@@ -1,0 +1,364 @@
+﻿#Region "Description"
+' PAGE NAME     : SITE_OPRCHKPY BLL
+' CREATED BY    : EJ
+' CREATED DATE  : 05/04/2015
+' UPDATE LOGS [modified by | modified date | updates]
+' ------------------------------------------------------------------------------- 
+' 
+' ------------------------------------------------------------------------------- 
+#End Region
+
+#Region "Imports"
+Imports System.Data.OracleClient
+Imports eAction = Cocolife.Utility.Common.Enums.eDBAction
+Imports cDataType = Cocolife.Utility.Common.DataType
+Imports bllCommon = Cocolife.BLL.Common
+Imports dalWorking = Cocolife.DAL.OCS.Working
+#End Region
+
+Namespace Working
+
+    Public Class BSiteOPRChkPy
+        
+#Region "Implements"
+        Implements ISiteOPRChkPy
+#End Region
+
+#Region "Variables"
+        Private mId As Long = cDataType.fLong.Empty
+        Private mOPRNmbr As Long = cDataType.fLong.Empty
+        Private mChkNmbr As Long = cDataType.fLong.Empty
+        Private mBank As String = cDataType.fString.Empty
+        Private mBranch As String = cDataType.fString.Empty
+        Private mAmount As Decimal = cDataType.fDecimal.Empty
+        Private mLineNmbr As Integer = cDataType.fInteger.Empty
+        Private mOTCFlag As Integer = cDataType.fInteger.Empty
+        Private mDepositDate As Date = cDataType.fDate.Empty
+        Private mClearingDate As Date = cDataType.fDate.Empty
+        Private mClearingStatusId As Integer = cDataType.fInteger.Empty
+        Private mRemarks As String = cDataType.fString.Empty
+        Private mUserID As String = cDataType.fString.Empty
+        Private mSiteCode As Long = cDataType.fLong.Empty
+        Private mStatusId As Long = cDataType.fLong.Empty
+        Private mPostBy As Long = cDataType.fLong.Empty
+        Private mPostDate As Date = cDataType.fDate.Empty
+        Private mLastUpdateBy As Long = cDataType.fLong.Empty
+        Private mLastUpdate As Date = cDataType.fDate.Empty
+#End Region
+
+#Region "Properties"
+
+        Public Property Id As Long Implements ISiteOPRChkPy.Id
+            Get
+                Return mId
+            End Get
+            Set(value As Long)
+                mId = value
+            End Set
+        End Property
+
+        Public Property LastUpdate As Date Implements ISiteOPRChkPy.LastUpdate
+            Get
+                Return mLastUpdate
+            End Get
+            Set(value As Date)
+                mLastUpdate = value
+            End Set
+        End Property
+
+        Public Property LastUpdateBy As Long Implements ISiteOPRChkPy.LastUpdateBy
+            Get
+                Return mLastUpdateBy
+            End Get
+            Set(value As Long)
+                mLastUpdateBy = value
+            End Set
+        End Property
+
+        Public Property PostBy As Long Implements ISiteOPRChkPy.PostBy
+            Get
+                Return mPostBy
+            End Get
+            Set(value As Long)
+                mPostBy = value
+            End Set
+        End Property
+
+        Public Property PostDate As Date Implements ISiteOPRChkPy.PostDate
+            Get
+                Return mPostDate
+            End Get
+            Set(value As Date)
+                mPostDate = value
+            End Set
+        End Property
+
+        Public Property StatusId As Integer Implements ISiteOPRChkPy.StatusId
+            Get
+                Return mStatusId
+            End Get
+            Set(value As Integer)
+                mStatusId = value
+            End Set
+        End Property
+
+        Public Property OPRNmbr() As Long Implements ISiteOPRChkPy.OPRNmbr
+            Get
+                Return mOPRNmbr
+            End Get
+            Set(value As Long)
+                mOPRNmbr = value
+            End Set
+        End Property
+
+        Public Property ChkNmbr() As Long Implements ISiteOPRChkPy.ChkNmbr
+            Get
+                Return mChkNmbr
+            End Get
+            Set(value As Long)
+                mChkNmbr = value
+            End Set
+        End Property
+
+        Public Property Bank() As String Implements ISiteOPRChkPy.Bank
+            Get
+                Return mBank
+            End Get
+            Set(value As String)
+                mBank = value
+            End Set
+        End Property
+
+        Public Property Branch() As String Implements ISiteOPRChkPy.Branch
+            Get
+                Return mBranch
+            End Get
+            Set(value As String)
+                mBranch = value
+            End Set
+        End Property
+
+        Public Property Amount() As Decimal Implements ISiteOPRChkPy.Amount
+            Get
+                Return mAmount
+            End Get
+            Set(value As Decimal)
+                mAmount = value
+            End Set
+        End Property
+
+        Public Property LineNmbr() As Integer Implements ISiteOPRChkPy.LineNmbr
+            Get
+                Return mLineNmbr
+            End Get
+            Set(value As Integer)
+                mLineNmbr = value
+            End Set
+        End Property
+
+        Public Property OTCFlag() As Integer Implements ISiteOPRChkPy.OTCFlag
+            Get
+                Return mOTCFlag
+            End Get
+            Set(value As Integer)
+                mOTCFlag = value
+            End Set
+        End Property
+
+        Public Property DepositDate() As Date Implements ISiteOPRChkPy.DepositDate
+            Get
+                Return mDepositDate
+            End Get
+            Set(value As Date)
+                mDepositDate = value
+            End Set
+        End Property
+        Public Property ClearingDate() As Date Implements ISiteOPRChkPy.ClearingDate
+            Get
+                Return mClearingDate
+            End Get
+            Set(value As Date)
+                mClearingDate = value
+            End Set
+        End Property
+        Public Property ClearingStatusId() As Integer Implements ISiteOPRChkPy.ClearingStatusId
+            Get
+                Return mClearingStatusId
+            End Get
+            Set(value As Integer)
+                mClearingStatusId = value
+            End Set
+        End Property
+        Public Property Remarks() As String Implements ISiteOPRChkPy.Remarks
+            Get
+                Return mRemarks
+            End Get
+            Set(value As String)
+                mRemarks = value
+            End Set
+        End Property
+
+#End Region
+
+#Region "Constructor"
+
+        Sub New()
+
+        End Sub
+
+        Sub New(ByVal pId As Long, ByVal pOPRNmbr As Long, ByVal pChkNmbr As Long, ByVal pBank As String,
+                ByVal pBranch As String, ByVal pAmount As Decimal, ByVal pLineNmbr As Integer,
+                ByVal pOTCFlag As Integer, ByVal pDepositDate As Date, pClearingDate As Date,
+                ByVal pClearingStatusId As Integer, pRemarks As String, ByVal pStatusId As Integer,
+                ByVal pPostBy As Long, ByVal pPostDate As Date, ByVal pLastUpdateBy As Long,
+                ByVal pLastUpdate As Date)
+            Id = pId
+            OPRNmbr = pOPRNmbr
+            ChkNmbr = pChkNmbr
+            Bank = pBank
+            Branch = pBranch
+            Amount = pAmount
+            LineNmbr = pLineNmbr
+            OTCFlag = pOTCFlag
+            DepositDate = pDepositDate
+            ClearingDate = pClearingDate
+            ClearingStatusId = pClearingStatusId
+            Remarks = pRemarks
+            StatusId = pStatusId
+            LineNmbr = pLineNmbr
+            PostBy = pPostBy
+            PostDate = pPostDate
+            LastUpdateBy = pLastUpdateBy
+            LastUpdate = pLastUpdate
+        End Sub
+
+#End Region
+
+#Region "Single Point Functions"
+
+#End Region
+
+#Region "Validations"
+
+#End Region
+
+#Region "Data Retrieval"
+
+        Public Function GetOPRChkPyDt(ByVal pDocNumber As Long, ByVal pUserId As Long) As DataTable
+            Try
+                Dim objDal As New dalWorking.DSiteOPRChkPy
+                Dim dtLocal As DataTable
+
+                dtLocal = objDal.GetSiteOPRChkPy(pDocNumber, pUserId)
+
+                Return dtLocal
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+
+        Public Function GetCheckTagging(ByVal pSiteCode As Long, Optional ByVal pFromDate As Date = #1/1/1900#, Optional ByVal pToDate As Date = #1/1/1900#, Optional ByVal pReceiptNo As Long = 0, Optional ByVal pCheckNo As Long = 0) As DataTable
+            Try
+                Dim objDal As New dalWorking.DSiteOPRChkPy
+                Dim dtLocal As DataTable
+
+                dtLocal = objDal.GetCheckTagging(pSiteCode, pReceiptNo, pCheckNo, pFromDate, pToDate)
+
+                Return dtLocal
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+
+        Public Function GetForDeposit(ByVal pSiteCode As Long, ByVal pReceiptNo As Long, ByVal pCheckNo As Long, ByVal pFromDate As Date, ByVal pToDate As Date) As DataTable
+            Try
+                Dim objDal As New dalWorking.DSiteOPRChkPy
+                Dim dtLocal As DataTable
+
+                dtLocal = objDal.GetCheckTagging(pSiteCode, pReceiptNo, pCheckNo, pFromDate, pToDate)
+
+                Dim dtFiltered = From c In dtLocal.AsEnumerable
+                                 Where CDate(c.Item("clearing_date")) = #1/1/1900#
+                                 Select c
+
+                If dtFiltered.Any Then
+                    dtLocal = dtFiltered.CopyToDataTable
+                Else
+                    dtLocal = New DataTable
+                End If
+
+                Return dtLocal
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+
+        Public Function GetForClearing(ByVal pSiteCode As Long, ByVal pReceiptNo As Long, ByVal pCheckNo As Long, ByVal pFromDate As Date, ByVal pToDate As Date) As DataTable
+            Try
+                Dim objDal As New dalWorking.DSiteOPRChkPy
+                Dim dtLocal As DataTable
+
+                dtLocal = objDal.GetCheckTagging(pSiteCode, pReceiptNo, pCheckNo, pFromDate, pToDate)
+
+                Dim dtFiltered = From c In dtLocal.AsEnumerable
+                                 Where CDate(c.Item("deposit_date")) <> #1/1/1900#
+                                 Select c
+
+                If dtFiltered.Any Then
+                    dtLocal = dtFiltered.CopyToDataTable
+                Else
+                    dtLocal = New DataTable
+                End If
+
+                Return dtLocal
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+
+        Public Function GetForReDeposit(ByVal pSiteCode As Long, ByVal pReceiptNo As Long, ByVal pCheckNo As Long, ByVal pFromDate As Date, ByVal pToDate As Date) As DataTable
+            Try
+                Dim objDal As New dalWorking.DSiteOPRChkPy
+                Dim dtLocal As DataTable
+
+                dtLocal = objDal.GetCheckTagging(pSiteCode, pReceiptNo, pCheckNo, pFromDate, pToDate)
+
+                Dim dtFiltered = From c In dtLocal.AsEnumerable
+                                 Where CDate(c.Item("clearing_date")) <> #1/1/1900# _
+                                 And CInt(c.Item("code")) = 1
+                                 Select c
+
+                If dtFiltered.Any Then
+                    dtLocal = dtFiltered.CopyToDataTable
+                Else
+                    dtLocal = New DataTable
+                End If
+
+                Return dtLocal
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+
+#End Region
+
+#Region "Transactions"
+
+        Public Function Alter(ByVal pAction As String, ByRef pConn As Object, ByRef pTrans As Object) As Long
+
+            Try
+                Dim objDAL As New dalWorking.DSiteOPRChkPy
+                objDAL.AlterSiteOPRChkPy(Me, pAction, pConn, pTrans)
+                Return objDAL.Reference
+            Catch ex As Exception
+                Throw
+            End Try
+
+        End Function
+
+#End Region
+
+    End Class
+
+End Namespace
+
