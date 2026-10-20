@@ -151,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ChangePassword.aspx" />
+    <Content Include="RptReceiptCIPreview.aspx" />
     <Content Include="Images\chPaymentDebitCreditMemo.png" />
     <Content Include="Images\chPaymentDMCMApproval.png" />
     <Content Include="PaymentAckReceipt.aspx" />
@@ -253,6 +254,13 @@
       <DependentUpon>ChangePassword.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="RptReceiptCIPreview.aspx.designer.vb">
+      <DependentUpon>RptReceiptCIPreview.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RptReceiptCIPreview.aspx.vb">
+      <DependentUpon>RptReceiptCIPreview.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="PaymentAckReceipt.aspx.designer.vb">
       <DependentUpon>PaymentAckReceipt.aspx</DependentUpon>
     </Compile>
@@ -322,6 +330,12 @@
     <Compile Include="PaymentCheckTagging.aspx.vb">
       <DependentUpon>PaymentCheckTagging.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Reports\ReceiptCIPreview.vb">
+      <DependentUpon>ReceiptCIPreview.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Reports\ReceiptDMCM.vb">
       <DependentUpon>ReceiptDMCM.rpt</DependentUpon>
@@ -527,6 +541,14 @@
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>SummaryPremium.vb</LastGenOutput>
     </Content>
+    <Content Include="Reports\ReceiptCIPreview.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>ReceiptCIPreview.vb</LastGenOutput>
+    </Content>
+    <EmbeddedResource Include="Reports\ReceiptCIPreview.resx">
+      <DependentUpon>ReceiptCIPreview.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reports\Receipt.resx">
       <DependentUpon>Receipt.vb</DependentUpon>
       <SubType>Designer</SubType>

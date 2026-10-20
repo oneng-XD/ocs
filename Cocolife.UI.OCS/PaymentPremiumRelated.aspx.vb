@@ -6328,13 +6328,14 @@ Partial Public Class PaymentPremiumRelated
     Private Sub btnReceiptPreview_Click(sender As Object, e As EventArgs) Handles btnReceiptPreview.Click
         Call ClearSession()
         IsPreview = True
-        ReportType = eReport.Receipt
+        ReportType = eReport.ReceiptCIPreview
         RaiseEvent GenerateReport(Me, EventArgs.Empty)
         If IsSuccessful Then
-            SetReportSessionScript(ePage.RptReceipt)
+            SetReportSessionScript(ePage.RptReceiptCIPreview)
             ScriptManager.RegisterStartupScript(sender, GetType(String), "OPEN_WINDOW", Session("script"), True)
             Session("script") = String.Empty
         End If
+
     End Sub
 
     Private Sub btnConfirmNo_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnConfirmNo.Click

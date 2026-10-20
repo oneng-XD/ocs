@@ -8,116 +8,59 @@ Imports System.IO
 Partial Public Class RptReceipt
     Inherits System.Web.UI.Page
 
-    'Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-
-    '    Try
-
-    '        Dim mParam = Split(Session(eSession.ReportParam), "|")
-    '        Dim mDocNumber As Long = CLng(mParam(0))
-    '        Dim mHasPrintButton As Boolean = CBool(mParam(1))
-    '        Dim mSiteCode As Long = mParam(2)
-    '        Dim mUserId As Long = mParam(3)
-    '        Dim oReport As New ReportDocument
-    '        'Dim strFileName As String = String.Concat(mSiteCode, "_", mDocNumber, "_Receipt.pdf")
-
-    '        oReport.Load(Server.MapPath("~\Reports\Receipt.rpt"))
-    '        oReport.SetParameterValue("pSiteCode", mSiteCode)
-    '        oReport.SetParameterValue("pDocNumber", mDocNumber)
-    '        oReport.SetParameterValue("pUserId", mUserId)
-
-    '        Dim logon As New TableLogOnInfo
-    '        Dim conn As New ConnectionInfo
-
-    '        conn.ServerName = cCrystalConn.CRServerName
-    '        conn.UserID = cCrystalConn.CRUserID
-    '        conn.Password = cCrystalConn.CRPassword
-
-    '        For Each table As CrystalDecisions.CrystalReports.Engine.Table In oReport.Database.Tables
-    '            logon = table.LogOnInfo
-    '            logon.ConnectionInfo = conn
-    '            table.ApplyLogOnInfo(logon)
-    '        Next
-
-    '        divButton.Visible = mHasPrintButton
-    '        CRViewer.ReportSource = oReport
-    '        'CRViewer.DataBind()
-
-    '        ''export to pdf
-    '        'Dim oStream As System.IO.MemoryStream
-    '        'oStream = oReport.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat)
-    '        'Dim bytes As Byte() = oStream.ToArray()
-    '        'oStream.Close()
-
-    '        'Response.Clear()
-    '        'Response.ClearContent()
-    '        'Response.ClearHeaders()
-    '        'Response.Buffer = True
-    '        'Response.Expires = -1
-    '        'Response.ContentType = "application/pdf"
-    '        'Response.AddHeader("Content-Disposition", "attachment; filename=" & strFileName)
-    '        'Response.BinaryWrite(bytes)
-    '        'Response.Flush()
-    '        'Response.Close()
-    '        'Response.End()
-
-    '    Catch ex As Exception
-    '        'Throw
-    '    End Try
-
-    'End Sub
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
-        Dim mPara = Split(Session(eSession.ReportParam), "|")
-        Dim mDocNumber As Long = CLng(mPara(0))
-        Dim mHasPrintButton As Boolean = CBool(mPara(1))
-        Dim mSiteCode As Long = mPara(2)
-        Dim mUserId As Long = mPara(3)
-        Dim mFile As String = mPara(5)
-        Dim oReport As New ReportDocument
-        Dim strFileName As String = String.Concat(mSiteCode, "_", mDocNumber, "_Receipt.pdf")
-        Dim strReportFileName As String = String.Concat("~\reports\Receipt", mFile, ".rpt")
+        'Dim mPara = Split(Session(eSession.ReportParam), "|")
+        'Dim mDocNumber As Long = CLng(mPara(0))
+        'Dim mHasPrintButton As Boolean = CBool(mPara(1))
+        'Dim mSiteCode As Long = mPara(2)
+        'Dim mUserId As Long = mPara(3)
+        'Dim mFile As String = mPara(5)
+        'Dim oReport As New ReportDocument
+        'Dim strFileName As String = String.Concat(mSiteCode, "_", mDocNumber, "_Receipt.pdf")
+        'Dim strReportFileName As String = String.Concat("~\reports\Receipt", mFile, ".rpt")
 
-        If Not File.Exists(Server.MapPath(strReportFileName)) Then
-            strReportFileName = "~\reports\Receipt.rpt"
-        End If
+        'If Not File.Exists(Server.MapPath(strReportFileName)) Then
+        '    strReportFileName = "~\reports\Receipt.rpt"
+        'End If
 
-        Try
-            oReport = uReportFactory.GetReport(oReport.GetType)
-            CRSource.Report.FileName = strReportFileName
-            oReport.Load(Server.MapPath(strReportFileName), OpenReportMethod.OpenReportByTempCopy)
+        'Try
+        '    oReport = uReportFactory.GetReport(oReport.GetType)
+        '    CRSource.Report.FileName = strReportFileName
+        '    oReport.Load(Server.MapPath(strReportFileName), OpenReportMethod.OpenReportByTempCopy)
 
-            oReport.SetParameterValue("pSiteCode", mSiteCode)
-            oReport.SetParameterValue("pDocNumber", mDocNumber)
-            oReport.SetParameterValue("pUserId", mUserId)
-            CRViewer.HasPrintButton = mHasPrintButton
-            'btnPrint.Visible = False 'mHasPrintButton
+        '    oReport.SetParameterValue("pSiteCode", mSiteCode)
+        '    oReport.SetParameterValue("pDocNumber", mDocNumber)
+        '    oReport.SetParameterValue("pUserId", mUserId)
+        '    CRViewer.HasPrintButton = mHasPrintButton
+        '    'btnPrint.Visible = False 'mHasPrintButton
 
-            Call uReportFactory.CRLogOnInfo(oReport, cCrystalConn.CRServerName, String.Empty, cCrystalConn.CRUserID, cCrystalConn.CRPassword)
-            CRViewer.ReportSource = oReport
+        '    Call uReportFactory.CRLogOnInfo(oReport, cCrystalConn.CRServerName, String.Empty, cCrystalConn.CRUserID, cCrystalConn.CRPassword)
+        '    CRViewer.ReportSource = oReport
 
-            'If mHasPrintButton Then
-            'CRViewer.DataBind()
+        '    'If mHasPrintButton Then
+        '    'CRViewer.DataBind()
 
-            Call uReportFactory.ExportCRTo(oReport, ExportFormatType.PortableDocFormat, strFileName, "inline")
-            'End If
-        Catch ex As Exception
-            oReport.Database.Dispose()
-            oReport.Close()
-            oReport.Dispose()
-            oReport = Nothing
-        Finally
-            'If mHasPrintButton Then
-            If oReport IsNot Nothing Then
-                If oReport.IsLoaded Then
-                    oReport.Database.Dispose()
-                    oReport.Close()
-                    oReport.Dispose()
-                    oReport = Nothing
-                End If
-            End If
-            'End If
-        End Try
+        '    Call uReportFactory.ExportCRTo(oReport, ExportFormatType.PortableDocFormat, strFileName, "inline")
+        '    'End If
+        'Catch ex As Exception
+        '    oReport.Database.Dispose()
+        '    oReport.Close()
+        '    oReport.Dispose()
+        '    oReport = Nothing
+        'Finally
+        '    'If mHasPrintButton Then
+        '    If oReport IsNot Nothing Then
+        '        If oReport.IsLoaded Then
+        '            oReport.Database.Dispose()
+        '            oReport.Close()
+        '            oReport.Dispose()
+        '            oReport = Nothing
+        '        End If
+        '    End If
+        '    'End If
+        'End Try
 
     End Sub
 

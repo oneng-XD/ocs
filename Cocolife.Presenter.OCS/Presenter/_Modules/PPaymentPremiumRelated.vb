@@ -5427,7 +5427,7 @@ Namespace Payment
                 With vwReport
                     .IsSuccessful = False
                     Select Case .ReportType
-                        Case eReport.Receipt, eReport.ReceiptAppno
+                        Case eReport.ReceiptCIPreview, eReport.ReceiptAppno
                             .RptParamString = String.Concat(vwPaymentPremiumRelated.OPRNumber, "|", Not .IsPreview, "|", .SiteCode, "|", .UserId, "|", vwPaymentPremiumRelated.ApplicationNumber, "|", vwPaymentPremiumRelated.AgentSalesForce)
                             If Not .IsPreview Then SetMessage(String.Concat("<strong><h2>REMINDER:</h2></strong><br />Please print receipt using OCS - Printer!"), eSystemMessage.Information, True)
                     End Select

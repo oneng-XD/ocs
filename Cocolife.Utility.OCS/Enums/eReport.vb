@@ -15,6 +15,7 @@
 Namespace Enums
 
     Public Enum eReport
+        ReceiptCIPreview
         Receipt
         DetailPrem
         DetailNonPrem
