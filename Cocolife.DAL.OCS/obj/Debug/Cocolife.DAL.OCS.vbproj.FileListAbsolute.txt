@@ -101,3 +101,15 @@ C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\
 C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\obj\Debug\dalOCS.dll
 C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\obj\Debug\dalOCS.xml
 C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.DAL.OCS\obj\Debug\dalOCS.pdb
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\bin\Debug\dalOCS.dll
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\bin\Debug\dalOCS.pdb
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\bin\Debug\dalOCS.xml
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\bin\Debug\utiOCS.dll
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\bin\Debug\utiOCS.pdb
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\bin\Debug\utiOCS.xml
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\obj\Debug\Cocolife.DAL.OCS.vbprojResolveAssemblyReference.cache
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\obj\Debug\Cocolife.DAL.OCS.Resources.resources
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\obj\Debug\Cocolife.DAL.OCS.vbproj.GenerateResource.Cache
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\obj\Debug\dalOCS.dll
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\obj\Debug\dalOCS.xml
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.DAL.OCS\obj\Debug\dalOCS.pdb

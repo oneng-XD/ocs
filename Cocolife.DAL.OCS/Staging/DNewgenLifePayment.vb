@@ -86,21 +86,21 @@ Namespace Staging
 
                         .Add(New OracleParameter("pSourceID", OracleType.VarChar)).Value = ""
                         .Add(New OracleParameter("pEWTAMT", OracleType.VarChar)).Value = "0"
-                        .Add(New OracleParameter("pVATAMT", OracleType.VarChar)).Value = "0"
+                        .Add(New OracleParameter("pVATAMT", OracleType.VarChar)).Value = pObject.VATAmount
                         .Add(New OracleParameter("pGrossAmount", OracleType.VarChar)).Value = pObject.TotalAmount
-                        .Add(New OracleParameter("pVatableCollection", OracleType.VarChar)).Value = "0"
-                        .Add(New OracleParameter("pVatExemptAmount", OracleType.VarChar)).Value = "0"
-                        .Add(New OracleParameter("pVatAmount", OracleType.VarChar)).Value = "0"
-                        .Add(New OracleParameter("pWithholdingTax", OracleType.VarChar)).Value = "0"
-                        .Add(New OracleParameter("pNetAmount", OracleType.VarChar)).Value = pObject.TotalAmount
-                        .Add(New OracleParameter("pSubscriberNo", OracleType.VarChar)).Value = ""
+                        .Add(New OracleParameter("pVatableCollection", OracleType.VarChar)).Value = pObject.VATableCollection
+                        .Add(New OracleParameter("pVatExemptAmount", OracleType.VarChar)).Value = pObject.VATExemptCollection
+                        .Add(New OracleParameter("pVatAmount", OracleType.VarChar)).Value = pObject.VATAmount
+                        .Add(New OracleParameter("pWithholdingTax", OracleType.VarChar)).Value = pObject.VATWithholdingTax
+                        .Add(New OracleParameter("pNetAmount", OracleType.VarChar)).Value = pObject.VATTotalCollection
+                        .Add(New OracleParameter("pSubscriberNo", OracleType.VarChar)).Value = pObject.SubsNo
                         .Add(New OracleParameter("pInvoiceType", OracleType.VarChar)).Value = "CI"
                         .Add(New OracleParameter("pInvoiceNo", OracleType.VarChar)).Value = pObject.ORNo
-                        .Add(New OracleParameter("pAddress", OracleType.VarChar)).Value = ""
-                        .Add(New OracleParameter("pTIN", OracleType.VarChar)).Value = ""
+                        .Add(New OracleParameter("pAddress", OracleType.VarChar)).Value = pObject.PayorAddress
+                        .Add(New OracleParameter("pTIN", OracleType.VarChar)).Value = pObject.PayorTin
                         .Add(New OracleParameter("pVATABLE", OracleType.VarChar)).Value = "0"
-                        .Add(New OracleParameter("pNONVAT", OracleType.VarChar)).Value = "0"
-                        .Add(New OracleParameter("pNETWITHHOLDINGTAX", OracleType.VarChar)).Value = "0"
+                        .Add(New OracleParameter("pNONVAT", OracleType.VarChar)).Value = pObject.NonVatCollection
+                        .Add(New OracleParameter("pNETWITHHOLDINGTAX", OracleType.VarChar)).Value = pObject.VATAmountNetWTax
                         .Add(New OracleParameter("pDISCOUNT", OracleType.VarChar)).Value = "0"
 
                         .Add(New OracleParameter("pParticularsJSON", OracleType.Clob)).Value = pObject.ParticularsJSON
@@ -110,6 +110,10 @@ Namespace Staging
                         .Add(New OracleParameter("pAPIUsername", OracleType.VarChar)).Value = apiUsername
                         .Add(New OracleParameter("pAPIPassword", OracleType.VarChar)).Value = apiPassword
                         .Add(New OracleParameter("pAPIGrantType", OracleType.VarChar)).Value = apiGrantType
+
+
+
+
                     End With
 
                     oraDR = .ExecuteReader

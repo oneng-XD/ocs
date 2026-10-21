@@ -4387,9 +4387,9 @@ Namespace Payment
 
                                 Next
 
-                                objNewgenPayment = New bllStaging.BNewgenLifePayment(.OPRNumber, .OPRDate, .ApplicationNumber, .PolicyNumber, .PayorName,
-                                                                                .APRNumber, .APRDate, .PolCur, .OPRGrossAmount, "Reg",
-                                                                                .BillNo, .CommissionAmount, "Active", .OPRRemarks, mParticularsJSON,
+                                objNewgenPayment = New bllStaging.BNewgenLifePayment(.OPRNumber, .OPRDate, .ApplicationNumber, .PolicyNumber, .PayorName, .APRNumber, .APRDate, .PolCur, .OPRGrossAmount,
+                                                                                .VATableCollection, .NonVATCollection, .VATExemptCollection, .VATAmount, .VATTotalCollection, .VATWithholdingTax, .VATAmountNetWTax,
+                                                                                "Reg", .BillNo, .SubsNo, .PayorTin, .PayorAddress, .CommissionAmount, "Active", .OPRRemarks, mParticularsJSON,
                                                                                 mPaymentModeJSON)
                         End Select
 

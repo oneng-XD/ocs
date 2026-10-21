@@ -87,3 +87,12 @@ C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\
 C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.dll
 C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.xml
 C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.pdb
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.Utility.OCS\bin\Debug\utiOCS.dll
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.Utility.OCS\bin\Debug\utiOCS.pdb
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.Utility.OCS\bin\Debug\utiOCS.xml
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbprojResolveAssemblyReference.cache
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.Resources.resources
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.Utility.OCS\obj\Debug\Cocolife.Utility.OCS.vbproj.GenerateResource.Cache
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.dll
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.xml
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.Utility.OCS\obj\Debug\utiOCS.pdb

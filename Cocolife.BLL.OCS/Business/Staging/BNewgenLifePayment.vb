@@ -34,8 +34,18 @@ Namespace Staging
         Private mAPRDate As String = String.Empty
         Private mCurrency As String = String.Empty
         Private mTotalAmount As String = String.Empty
+        Private mVATableCollection As String = String.Empty
+        Private mNonVATCollection As String = String.Empty
+        Private mVATExemptCollection As String = String.Empty
+        Private mVATAmount As String = String.Empty
+        Private mVATTotalCollection As String = String.Empty
+        Private mVATWithholdingTax As String = String.Empty
+        Private mVATAmountNetWTax As String = String.Empty
         Private mBusinessType As String = String.Empty
         Private mBillNo As String = String.Empty
+        Private mSubsNo As String = String.Empty
+        Private mPayorTin As String = String.Empty
+        Private mPayorAddress As String = String.Empty
         Private mRetainedAmount As String = String.Empty
         Private mPaymentStatus As String = String.Empty
         Private mRemarks As String = String.Empty
@@ -125,6 +135,62 @@ Namespace Staging
                 mTotalAmount = value
             End Set
         End Property
+        Public Property VATableCollection As String Implements Staging.INewgenLifePayment.VATableCollection
+            Get
+                Return mVATableCollection
+            End Get
+            Set(value As String)
+                mVATableCollection = value
+            End Set
+        End Property
+        Public Property NonVatCollection As String Implements Staging.INewgenLifePayment.NonVatCollection
+            Get
+                Return mNonVATCollection
+            End Get
+            Set(value As String)
+                mNonVATCollection = value
+            End Set
+        End Property
+        Public Property VATExemptCollection As String Implements Staging.INewgenLifePayment.VATExemptCollection
+            Get
+                Return mVATExemptCollection
+            End Get
+            Set(value As String)
+                mVATExemptCollection = value
+            End Set
+        End Property
+        Public Property VATAmount As String Implements Staging.INewgenLifePayment.VATAmount
+            Get
+                Return mVATAmount
+            End Get
+            Set(value As String)
+                mVATAmount = value
+            End Set
+        End Property
+        Public Property VATTotalCollection As String Implements Staging.INewgenLifePayment.VATTotalCollection
+            Get
+                Return mVATTotalCollection
+            End Get
+            Set(value As String)
+                mVATTotalCollection = value
+            End Set
+        End Property
+        Public Property VATWithholdingTax As String Implements Staging.INewgenLifePayment.VATWithholdingTax
+            Get
+                Return mVATWithholdingTax
+            End Get
+            Set(value As String)
+                mVATWithholdingTax = value
+            End Set
+        End Property
+        Public Property VATAmountNetWTax As String Implements Staging.INewgenLifePayment.VATAmountNetWTax
+            Get
+                Return mVATAmountNetWTax
+            End Get
+            Set(value As String)
+                mVATAmountNetWTax = value
+            End Set
+        End Property
 
         Public Property BusinessType As String Implements Staging.INewgenLifePayment.BusinessType
             Get
@@ -141,6 +207,30 @@ Namespace Staging
             End Get
             Set(value As String)
                 mBillNo = value
+            End Set
+        End Property
+        Public Property SubsNo As String Implements Staging.INewgenLifePayment.SubsNo
+            Get
+                Return mSubsNo
+            End Get
+            Set(value As String)
+                mSubsNo = value
+            End Set
+        End Property
+        Public Property PayorTin As String Implements Staging.INewgenLifePayment.PayorTin
+            Get
+                Return mPayorTin
+            End Get
+            Set(value As String)
+                mPayorTin = value
+            End Set
+        End Property
+        Public Property PayorAddress As String Implements Staging.INewgenLifePayment.PayorAddress
+            Get
+                Return mPayorAddress
+            End Get
+            Set(value As String)
+                mPayorAddress = value
             End Set
         End Property
 
@@ -200,7 +290,8 @@ Namespace Staging
 
         Sub New(ByVal pORNo As String, ByVal pDateOfReceipt As String, ByVal pApplicationNo As String, ByVal pPolicyNo As String,
                 ByVal pPayorName As String, ByVal pAPR As String, ByVal pAPRDate As String, ByVal pCurrency As String,
-                ByVal pTotalAmount As String, ByVal pBusinessType As String, ByVal pBillNo As String, ByVal pRetainedAmount As String,
+                ByVal pTotalAmount As String, ByVal pVATableCollection As String, ByVal pNonVatCollection As String, ByVal pVATExemptCollection As String, ByVal pVATAmount As String, ByVal pVATTotalCollection As String, ByVal pVATWithholdingTax As String, ByVal pVATAmountNetWTax As String,
+                ByVal pBusinessType As String, ByVal pBillNo As String, ByVal pSubsNo As String, ByVal pPayorTin As String, ByVal pPayorAddress As String, ByVal pRetainedAmount As String,
                 ByVal pPaymentStatus As String, ByVal pRemarks As String, ByVal pParticularsJSON As String,
                 ByVal pPaymentModeJSON As String)
             ORNo = pORNo
@@ -212,8 +303,18 @@ Namespace Staging
             APRDate = pAPRDate
             Currency = pCurrency
             TotalAmount = pTotalAmount
+            VATableCollection = pVATableCollection
+            NonVatCollection = pNonVatCollection
+            VATExemptCollection = pVATExemptCollection
+            VATAmount = pVATAmount
+            VATTotalCollection = pVATTotalCollection
+            VATWithholdingTax = pVATWithholdingTax
+            VATAmountNetWTax = pVATAmountNetWTax
             BusinessType = pBusinessType
             BillNo = pBillNo
+            SubsNo = pSubsNo
+            PayorTin = pPayorTin
+            PayorAddress = pPayorAddress
             RetainedAmount = pRetainedAmount
             PaymentStatus = pPaymentStatus
             Remarks = pRemarks

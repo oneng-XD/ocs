@@ -137,3 +137,18 @@ C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\
 C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.BLL.OCS\obj\Release\bllOCS.dll
 C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.BLL.OCS\obj\Release\bllOCS.xml
 C:\Users\jdoafallas\Documents\backup\OCS\10-14-2026 for GROUP Deployment - Copy\ocs\Cocolife.BLL.OCS\obj\Release\bllOCS.pdb
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\bin\Release\bllOCS.dll
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\bin\Release\bllOCS.pdb
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\bin\Release\bllOCS.xml
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\bin\Release\dalOCS.dll
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\bin\Release\utiOCS.dll
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\bin\Release\dalOCS.pdb
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\bin\Release\dalOCS.xml
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\bin\Release\utiOCS.pdb
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\bin\Release\utiOCS.xml
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\obj\Release\Cocolife.BLL.OCS.vbprojResolveAssemblyReference.cache
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\obj\Release\Cocolife.BLL.OCS.Resources.resources
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\obj\Release\Cocolife.BLL.OCS.vbproj.GenerateResource.Cache
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\obj\Release\bllOCS.dll
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\obj\Release\bllOCS.xml
+C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.BLL.OCS\obj\Release\bllOCS.pdb
