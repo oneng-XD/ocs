@@ -87,9 +87,9 @@ Partial Public Class Login
 
     Public ReadOnly Property ConnectionType() As eConnType Implements preSecurity.IDatabase.ConnectionType
         Get
-            'Return eConnType.Test
+            Return eConnType.Test
             'Return eConnType.QAT
-            Return eConnType.UAT
+            'Return eConnType.UAT
             'Return eConnType.Live
         End Get
     End Property

@@ -60,16 +60,6 @@ Partial Public Class RptReceiptCIPreview
                 Server.MapPath(strReportFileName),
                 OpenReportMethod.OpenReportByTempCopy
             )
-            System.Diagnostics.Debug.WriteLine(
-                "Actual report file: " & Server.MapPath(strReportFileName)
-            )
-
-            System.Diagnostics.Debug.WriteLine(
-                "Saved printer: " & oReport.PrintOptions.PrinterName
-            )
-
-            'Diagnostic test for a saved printer dependency.
-            oReport.PrintOptions.PrinterName = String.Empty
 
             oReport.SetParameterValue("pSiteCode", mSiteCode)
             oReport.SetParameterValue("pDocNumber", mDocNumber)

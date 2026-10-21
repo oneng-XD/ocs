@@ -6,39 +6,7 @@ OCS.UI
 </name>
 </assembly>
 <members>
-<member name="F:Cocolife.UI.OCS.RptReceiptCIPreview.Head1">
-	<summary>
-Head1 control.
-</summary>
-	<remarks>
-Auto-generated field.
-To modify move field declaration from designer file to code-behind file.
-</remarks>
-</member><member name="F:Cocolife.UI.OCS.RptReceiptCIPreview.frmRpt">
-	<summary>
-frmRpt control.
-</summary>
-	<remarks>
-Auto-generated field.
-To modify move field declaration from designer file to code-behind file.
-</remarks>
-</member><member name="F:Cocolife.UI.OCS.RptReceiptCIPreview.CRViewer">
-	<summary>
-CRViewer control.
-</summary>
-	<remarks>
-Auto-generated field.
-To modify move field declaration from designer file to code-behind file.
-</remarks>
-</member><member name="F:Cocolife.UI.OCS.RptReceiptCIPreview.CRSource">
-	<summary>
-CRSource control.
-</summary>
-	<remarks>
-Auto-generated field.
-To modify move field declaration from designer file to code-behind file.
-</remarks>
-</member><member name="F:Cocolife.UI.OCS.ChangePassword.upChangePassword">
+<member name="F:Cocolife.UI.OCS.ChangePassword.upChangePassword">
 	<summary>
 upChangePassword control.
 </summary>
@@ -10984,6 +10952,38 @@ Auto-generated field.
 To modify move field declaration from designer file to code-behind file.
 </remarks>
 </member><member name="F:Cocolife.UI.OCS.RptReceiptDMCMPreview.CRSource">
+	<summary>
+CRSource control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:Cocolife.UI.OCS.RptReceiptCIPreview.Head1">
+	<summary>
+Head1 control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:Cocolife.UI.OCS.RptReceiptCIPreview.frmRpt">
+	<summary>
+frmRpt control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:Cocolife.UI.OCS.RptReceiptCIPreview.CRViewer">
+	<summary>
+CRViewer control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:Cocolife.UI.OCS.RptReceiptCIPreview.CRSource">
 	<summary>
 CRSource control.
 </summary>

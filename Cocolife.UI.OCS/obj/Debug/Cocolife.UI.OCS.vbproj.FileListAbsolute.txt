@@ -189,4 +189,3 @@ C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.UI.OCS\obj\Debug\Cocolif
 C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.UI.OCS\obj\Debug\OCS.UI.dll
 C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.UI.OCS\obj\Debug\OCS.UI.xml
 C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.UI.OCS\obj\Debug\OCS.UI.pdb
-C:\Users\jdoafallas\Documents\git_projects\ocs\Cocolife.UI.OCS\obj\Debug\Cocolife.UI.OCS.ReceiptCIPreview.resources

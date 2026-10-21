@@ -39,8 +39,8 @@ Namespace Enums
         ' -------------------------------------------------------------------------------
         Public Const RptORReceipt As String = "RptORReceipt.aspx"
         Public Const RptReceipt As String = "RptReceipt.aspx"
-        Public Const RptReceiptCIPreview As String = "RptReceiptCIPreview.aspx"
         Public Const RptReceiptDMCM As String = "RptReceiptDMCM.aspx"
+        Public Const RptReceiptCIPreview As String = "RptReceiptCIPreview.aspx"
         Public Const RptReceiptDMCMPreview As String = "RptReceiptDMCMPreview.aspx"
         Public Const RptReceiptBanca As String = "RptReceiptBanca.aspx"
         Public Const RptDetailPrem As String = "RptDetailPrem.aspx"
